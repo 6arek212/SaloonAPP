@@ -83,7 +83,7 @@ val SFTypography = Typography(
     ),
     overline = TextStyle(
         fontFamily = SF_FONT,
-        fontWeight = FontWeight.W400,
-        fontSize = 12.sp
+        fontWeight = FontWeight.W300,
+        fontSize = 26.sp
     )
 )

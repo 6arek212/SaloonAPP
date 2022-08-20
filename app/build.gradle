@@ -112,4 +112,6 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.2.0")
 
+    implementation 'com.afollestad.material-dialogs:datetime:3.3.0'
+
 }
