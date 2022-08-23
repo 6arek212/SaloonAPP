@@ -14,12 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.presentation.components.DatePicker
+import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.PurpleGrey
+import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListEvent
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -27,192 +28,215 @@ fun BookAppointmentView(
     navController: NavController,
     viewModel: BookAppointmentViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.value
-    val focusManager = LocalFocusManager.current
 
+    val timeError = viewModel.state.value.timeError
+    val dateError = viewModel.state.value.dateError
+    val serviceTypeError = viewModel.state.value.serviceTypeError
+
+    val expandDropDown2 = viewModel.state.value.expandDropDown2
+    val expandDropDown1 = viewModel.state.value.expandDropDown1
+    val typesList = viewModel.state.value.typesList
+    val availableAppointmentsTimesList = viewModel.state.value.availableAppointmentsTimesList
+    val date = viewModel.state.value.date
+    val time = viewModel.state.value.time
+    val serviceType = viewModel.state.value.serviceType
+
+    val progressBar = viewModel.state.value.progressBarState
+    val queue = viewModel.state.value.errorQueue
+
+    val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background)
-    )
-    {
+    DefaultScreenUI(
+        queue = queue,
+        progressBarState = progressBar,
+        onRemoveHeadFromQueue = { viewModel.onTriggerEvent(BookAppointmentEvent.OnRemoveHeadFromQueue) }) {
 
-        Image(
-            painter = painterResource(id = R.drawable.barber_shop_brief),
-            contentDescription = "",
-            modifier = Modifier
-                .heightIn(min = 200.dp)
-                .widthIn(min = 200.dp)
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 16.dp, end = 16.dp)
-
-        )
-
-
-
-
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
-                .verticalScroll(scrollState)
-        ) {
+                .background(MaterialTheme.colors.background)
+        )
+        {
 
-            Text(text = "Book An Appointment", style = MaterialTheme.typography.overline)
-
-            Divider(
+            Image(
+                painter = painterResource(id = R.drawable.barber_shop_brief),
+                contentDescription = "",
                 modifier = Modifier
-                    .padding(top = 16.dp)
-                    .fillMaxWidth()
-                    .height(.5.dp), color = PurpleGrey
+                    .heightIn(min = 200.dp)
+                    .widthIn(min = 200.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 16.dp, end = 16.dp)
+
             )
 
-            Spacer(modifier = Modifier.padding(16.dp))
 
 
 
-            DatePicker(
-                error = state.dateError,
-                label = "Pick Date",
-                datePicked = state.date,
-                updatedDate = { updatedDate ->
-                    viewModel.onTriggerEvent(BookAppointmentEvent.DateChanged(updatedDate))
-                })
-
-            Spacer(modifier = Modifier.padding(16.dp))
-
-
-            DropDownMenuComponent(
-                error = state.timeError,
-                label = "Pick time",
-                expanded = state.expandDropDown2,
-                selectedOptionText = state.time,
-                onExpandedChange = {
-                    viewModel.onTriggerEvent(BookAppointmentEvent.TimeDropDownExpandChange(!state.expandDropDown2))
-                },
-                onDismissRequest = {
-                    viewModel.onTriggerEvent(BookAppointmentEvent.TimeDropDownExpandChange(false))
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+                    .verticalScroll(scrollState)
             ) {
-                for (time in state.appointmentsList) {
 
-                    DropdownMenuItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        onClick = {
-                            viewModel.onTriggerEvent(
-                                BookAppointmentEvent.TimeDropDownExpandChange(
-                                    false
+                Text(text = "Book An Appointment", style = MaterialTheme.typography.overline)
+
+                Divider(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
+                        .height(.5.dp), color = PurpleGrey
+                )
+
+                Spacer(modifier = Modifier.padding(16.dp))
+
+
+
+                DatePicker(
+                    error = dateError,
+                    label = "Pick Date",
+                    datePicked = date,
+                    updatedDate = { updatedDate ->
+                        viewModel.onTriggerEvent(BookAppointmentEvent.DateChanged(updatedDate))
+                    })
+
+                Spacer(modifier = Modifier.padding(16.dp))
+
+
+                DropDownMenuComponent(
+                    error = timeError,
+                    label = "Pick time",
+                    expanded = expandDropDown2,
+                    selectedOptionText = time,
+                    onExpandedChange = {
+                        viewModel.onTriggerEvent(BookAppointmentEvent.TimeDropDownExpandChange(!expandDropDown2))
+                    },
+                    onDismissRequest = {
+                        viewModel.onTriggerEvent(BookAppointmentEvent.TimeDropDownExpandChange(false))
+                    }
+                ) {
+                    for (time in availableAppointmentsTimesList) {
+
+                        DropdownMenuItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            onClick = {
+                                viewModel.onTriggerEvent(
+                                    BookAppointmentEvent.TimeDropDownExpandChange(
+                                        false
+                                    )
                                 )
-                            )
-                            viewModel.onTriggerEvent(BookAppointmentEvent.TimeChanged(time))
-                        }) {
-                        Column {
+                                viewModel.onTriggerEvent(BookAppointmentEvent.TimeChanged(time))
+                            }) {
+                            Column {
 
-                            Text(
-                                text = time,
-                                style = MaterialTheme.typography.body1,
-                                color = MaterialTheme.colors.onSurface
-                            )
+                                Text(
+                                    text = time,
+                                    style = MaterialTheme.typography.body1,
+                                    color = MaterialTheme.colors.onSurface
+                                )
 
-                            Divider(
-                                modifier = Modifier
-                                    .padding(top = 8.dp, bottom = 8.dp)
-                                    .fillMaxWidth()
-                                    .height(.5.dp), color = PurpleGrey
-                            )
+                                Divider(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp, bottom = 8.dp)
+                                        .fillMaxWidth()
+                                        .height(.5.dp), color = PurpleGrey
+                                )
+
+                            }
+
 
                         }
-
-
                     }
                 }
-            }
 
 
-            Spacer(modifier = Modifier.padding(16.dp))
+                Spacer(modifier = Modifier.padding(16.dp))
 
 
-            DropDownMenuComponent(
-                error = state.serviceTypeError,
-                label = "Pick type",
-                expanded = state.expandDropDown1,
-                selectedOptionText = state.serviceType,
-                onExpandedChange = {
-                    viewModel.onTriggerEvent(
-                        BookAppointmentEvent.ServiceTypeDropDownExpandChange(
-                            !state.expandDropDown1
+                DropDownMenuComponent(
+                    error = serviceTypeError,
+                    label = "Pick type",
+                    expanded = expandDropDown1,
+                    selectedOptionText = serviceType,
+                    onExpandedChange = {
+                        viewModel.onTriggerEvent(
+                            BookAppointmentEvent.ServiceTypeDropDownExpandChange(
+                                !expandDropDown1
+                            )
                         )
-                    )
-                },
-                onDismissRequest = {
-                    viewModel.onTriggerEvent(
-                        BookAppointmentEvent.ServiceTypeDropDownExpandChange(
-                            false
+                    },
+                    onDismissRequest = {
+                        viewModel.onTriggerEvent(
+                            BookAppointmentEvent.ServiceTypeDropDownExpandChange(
+                                false
+                            )
                         )
-                    )
-                }
-            ) {
-                for (type in state.typesList) {
+                    }
+                ) {
+                    for (type in typesList) {
 
-                    DropdownMenuItem(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        onClick = {
-                            viewModel.onTriggerEvent(
-                                BookAppointmentEvent.ServiceTypeDropDownExpandChange(
-                                    false
+                        DropdownMenuItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            onClick = {
+                                viewModel.onTriggerEvent(
+                                    BookAppointmentEvent.ServiceTypeDropDownExpandChange(
+                                        false
+                                    )
                                 )
-                            )
-                            viewModel.onTriggerEvent(BookAppointmentEvent.ServiceTypeChanged(type))
-                        }) {
-                        Column {
+                                viewModel.onTriggerEvent(
+                                    BookAppointmentEvent.ServiceTypeChanged(
+                                        type
+                                    )
+                                )
+                            }) {
+                            Column {
 
-                            Text(
-                                text = type,
-                                style = MaterialTheme.typography.body1,
-                                color = MaterialTheme.colors.onSurface
-                            )
+                                Text(
+                                    text = type,
+                                    style = MaterialTheme.typography.body1,
+                                    color = MaterialTheme.colors.onSurface
+                                )
 
-                            Divider(
-                                modifier = Modifier
-                                    .padding(top = 8.dp, bottom = 8.dp)
-                                    .fillMaxWidth()
-                                    .height(.5.dp), color = PurpleGrey
-                            )
+                                Divider(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp, bottom = 8.dp)
+                                        .fillMaxWidth()
+                                        .height(.5.dp), color = PurpleGrey
+                                )
+
+                            }
+
 
                         }
-
-
                     }
                 }
+
+
+
+
+
+
+
+                Spacer(modifier = Modifier.padding(16.dp))
+
+
+                Button(
+                    contentPadding = PaddingValues(16.dp),
+                    onClick = { viewModel.onTriggerEvent(BookAppointmentEvent.Submit) },
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text(text = "Book it !", style = MaterialTheme.typography.button)
+                }
+
+                Spacer(modifier = Modifier.padding(16.dp))
+
             }
-
-
-
-
-
-
-
-            Spacer(modifier = Modifier.padding(16.dp))
-
-
-            Button(
-                contentPadding = PaddingValues(16.dp),
-                onClick = { viewModel.onTriggerEvent(BookAppointmentEvent.Submit) },
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Text(text = "Book it !", style = MaterialTheme.typography.button)
-            }
-
-            Spacer(modifier = Modifier.padding(16.dp))
 
         }
-
     }
-
 }

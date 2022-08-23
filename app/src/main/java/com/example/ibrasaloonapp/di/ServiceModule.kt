@@ -1,6 +1,6 @@
 package com.example.ibrasaloonapp.di
 
-import com.example.ibrasaloonapp.network.services.SessionListService
+import com.example.ibrasaloonapp.network.services.AppointmentService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +16,7 @@ object ServiceModule {
     @Provides
     fun provideSessionListService(
         retrofit: Retrofit
-    ) = lazy { retrofit.create(SessionListService::class.java) }.value
+    ) = lazy { retrofit.create(AppointmentService::class.java) }.value
 
 
 }

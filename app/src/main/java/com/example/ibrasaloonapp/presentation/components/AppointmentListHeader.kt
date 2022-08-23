@@ -39,7 +39,7 @@ fun SessionListHeader(
             Text(
                 modifier = Modifier
                     .padding(16.dp),
-                text = "Request An Appointment",
+                text = "Book An Appointment",
                 style = MaterialTheme.typography.h5
             )
         }

@@ -50,7 +50,7 @@ private fun showDatePicker(
     picker.show(activity.supportFragmentManager, picker.toString())
     picker.addOnPositiveButtonClickListener {
         val dateString: String =
-            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it))
+            SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(it))
         updatedDate(dateString)
     }
 }

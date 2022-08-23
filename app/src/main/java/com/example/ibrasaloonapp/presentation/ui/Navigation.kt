@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
-import com.example.ibrasaloonapp.presentation.ui.session_list.SessionListView
+import com.example.ibrasaloonapp.presentation.ui.appointment_list.SessionListView
 
 
 @Composable

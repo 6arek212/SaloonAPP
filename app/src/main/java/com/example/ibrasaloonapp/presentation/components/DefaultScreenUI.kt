@@ -10,9 +10,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.ibrasaloonapp.domain.model.ProgressBarState
-import com.example.ibrasaloonapp.domain.model.UIComponent
-import java.util.*
+import com.example.ibrasaloonapp.core.domain.ProgressBarState
+import com.example.ibrasaloonapp.core.domain.Queue
+import com.example.ibrasaloonapp.core.domain.UIComponent
 
 
 /**
@@ -21,7 +21,7 @@ import java.util.*
  */
 @Composable
 fun DefaultScreenUI(
-    queue: Queue<UIComponent> = LinkedList(),
+    queue: Queue<UIComponent> = Queue(mutableListOf()),
     onRemoveHeadFromQueue: () -> Unit,
     progressBarState: ProgressBarState = ProgressBarState.Idle,
     content: @Composable () -> Unit,

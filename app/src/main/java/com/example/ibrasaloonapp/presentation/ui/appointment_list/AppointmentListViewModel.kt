@@ -1,18 +1,17 @@
-package com.example.ibrasaloonapp.presentation.ui.session_list
+package com.example.ibrasaloonapp.presentation.ui.appointment_list
 
-import android.se.omapi.Session
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ibrasaloonapp.domain.model.ProgressBarState
+import com.example.ibrasaloonapp.core.domain.ProgressBarState
+import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.network.ApiResult
-import com.example.ibrasaloonapp.repository.SessionRepository
+import com.example.ibrasaloonapp.repository.AppointmentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 
@@ -22,24 +21,24 @@ private const val TAG = "SessionListViewModel"
 class SessionListViewModel
 @Inject
 constructor(
-    private val repository: SessionRepository
+    private val repository: AppointmentRepository
 ) : ViewModel() {
 
-    private val _state: MutableState<SessionListState> = mutableStateOf(SessionListState())
-    val state: State<SessionListState> = _state
+    private val _state: MutableState<AppointmentListState> = mutableStateOf(AppointmentListState())
+    val state: State<AppointmentListState> = _state
 
 
     init {
-        onTriggerEvent(SessionListEvent.GetSessions)
+        onTriggerEvent(AppointmentListEvent.GetSessions)
     }
 
-    fun onTriggerEvent(event: SessionListEvent) {
+    fun onTriggerEvent(event: AppointmentListEvent) {
         viewModelScope.launch {
             when (event) {
-                is SessionListEvent.GetSessions -> {
+                is AppointmentListEvent.GetSessions -> {
                     getSessions()
                 }
-                is SessionListEvent.OnRemoveHeadFromQueue -> {
+                is AppointmentListEvent.OnRemoveHeadFromQueue -> {
                     removeHeadMessage()
                 }
             }
@@ -50,11 +49,11 @@ constructor(
     suspend fun getSessions() {
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
-        val result = repository.getSessions()
+        val result = repository.getAppointments()
 
         when (result) {
             is ApiResult.Success -> {
-                _state.value = _state.value.copy(sessions = result.value)
+                _state.value = _state.value.copy(appointments = result.value)
             }
 
             is ApiResult.GenericError -> {
@@ -74,7 +73,7 @@ constructor(
         try {
             val queue = _state.value.errorQueue
             queue.remove() // can throw exception if empty
-            _state.value = state.value.copy(errorQueue = LinkedList()) // force recompose
+            _state.value = state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
             _state.value = state.value.copy(errorQueue = queue)
         } catch (e: Exception) {
             Log.d(TAG, "removeHeadMessage: Nothing to remove from DialogQueue")

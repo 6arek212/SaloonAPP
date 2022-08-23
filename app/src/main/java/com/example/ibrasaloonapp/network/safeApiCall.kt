@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -32,7 +33,7 @@ suspend fun <T> safeApiCall(
             throwable.printStackTrace()
             when (throwable) {
                 is Code400Exception -> {
-                    ApiResult.GenericError(throwable.code, throwable.message)
+                    ApiResult.GenericError(throwable.code, throwable.message ?: "")
                 }
 
                 is TimeoutCancellationException -> {
@@ -46,10 +47,10 @@ suspend fun <T> safeApiCall(
                 is HttpException -> {
                     val code = throwable.code()
                     val errorResponse = convertErrorBody(throwable)
-                    Log.d(TAG, errorResponse + "")
+                    Log.d(TAG, "HttpException ${errorResponse}")
                     ApiResult.GenericError(
                         code,
-                        errorResponse
+                        errorResponse ?: ""
                     )
                 }
                 else -> {
@@ -72,7 +73,9 @@ class Code400Exception(message: String? = "SOME KIND OF ERROR 400-499", val code
 
 private fun convertErrorBody(throwable: HttpException): String? {
     return try {
-        throwable.response()?.errorBody()?.string()
+        throwable.response()?.errorBody()?.string()?.let {
+            JSONObject(it).getString("message")
+        }
     } catch (exception: Exception) {
         ERROR_UNKNOWN
     }

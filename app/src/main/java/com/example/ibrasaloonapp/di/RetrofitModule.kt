@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-const val BASE_API = "http://192.168.1.21:3000/api/"
+const val BASE_API = "http://192.168.1.46:3000/api/"
 
 @Module
 @InstallIn(SingletonComponent::class)

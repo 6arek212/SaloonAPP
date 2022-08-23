@@ -1,4 +1,4 @@
-package com.example.ibrasaloonapp.domain.model
+package com.example.ibrasaloonapp.core.domain
 
 sealed class UIComponent {
 

@@ -11,12 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.domain.model.Session
+import com.example.ibrasaloonapp.domain.model.Appointment
 
 
 @Composable
 fun SessionCard(
-    session: Session,
+    appointment: Appointment,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -38,7 +38,7 @@ fun SessionCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                session.type?.let {
+                appointment.type?.let {
                     Text(
                         text = it,
                         style = MaterialTheme.typography.h4,
@@ -56,7 +56,7 @@ fun SessionCard(
 
             Spacer(modifier = Modifier.padding(16.dp))
 
-            session.date?.let {
+            appointment.date?.let {
                 Text(
                     modifier = Modifier.align(Alignment.End),
                     text = it,

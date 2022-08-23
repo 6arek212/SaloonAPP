@@ -1,9 +1,12 @@
 package com.example.ibrasaloonapp.presentation.components
 
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.DialogProperties
 
 @Composable
 fun GenericDialog(
@@ -13,6 +16,10 @@ fun GenericDialog(
     onRemoveHeadFromQueue: () -> Unit,
 ) {
     AlertDialog(
+        properties = DialogProperties(
+            dismissOnClickOutside = true,
+            dismissOnBackPress = true,
+        ),
         modifier = modifier,
         onDismissRequest = {
             onRemoveHeadFromQueue()
@@ -27,6 +34,7 @@ fun GenericDialog(
                 Text(text = description)
             }
         },
-        buttons = {}
+        confirmButton = {},
+        dismissButton = {}
     )
 }
