@@ -20,14 +20,8 @@ private const val TAG = "MainActivity"
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
 
-     val viewModel: MainActivityViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val state = viewModel.state.value ?: AuthState()
-        val loggedIn = if (state.isLoggedIn) Screen.AppointmentsList.route else Screen.Login.route
-
         setContent {
             AppTheme {
                 Navigation()

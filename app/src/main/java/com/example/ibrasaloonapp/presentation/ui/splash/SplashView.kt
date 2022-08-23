@@ -32,6 +32,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.ui.Screen
+import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SplashView(
@@ -39,15 +42,25 @@ fun SplashView(
     authViewModel: MainActivityViewModel = hiltViewModel()
 ) {
 
-    val state = authViewModel.state.observeAsState().value
+    val state = authViewModel.state.value
+    val events = authViewModel.events
 
-    Log.d("SplashView", "SplashView: ${state}")
-
-    state?.let {
-        it.authData?.let {
-//            navController.navigate(Screen.AppointmentsList.route)
+    LaunchedEffect(key1 = true) {
+        launch {
+            events.collect { event ->
+                when (event) {
+                    is MainActivityViewModel.UIEvent.NavigateNow -> {
+                        navController.navigate(event.route) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    }
+                }
+            }
         }
     }
+
+
+//            navController.navigate(Screen.AppointmentsList.route)
 
     Column(
         modifier = Modifier
