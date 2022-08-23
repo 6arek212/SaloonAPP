@@ -33,10 +33,13 @@ constructor(
     val authRepository: AuthRepository
 ) : ViewModel() {
 
+    //TODO: NETWORK STATUS !!!!
+
+
     private val _state: MutableState<AuthState> = mutableStateOf(AuthState())
     val state: State<AuthState> = _state
 
-    private val _events = Channel<MainActivityViewModel.UIEvent>()
+    private val _events = Channel<UIEvent>()
     val events = _events.receiveAsFlow()
 
     init {

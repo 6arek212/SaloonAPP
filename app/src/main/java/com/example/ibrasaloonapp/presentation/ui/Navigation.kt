@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
 import com.example.ibrasaloonapp.presentation.ui.login.LoginView
+import com.example.ibrasaloonapp.presentation.ui.signup.SignupView
 import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
 
 
@@ -19,6 +20,7 @@ fun Navigation(firstRoute: String = Screen.Splash.route) {
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
         splash(navController = navController)
         login(navController = navController)
+        signup(navController = navController)
         appointmentList(navController = navController)
         bookAppointment(navController = navController)
     }
@@ -43,6 +45,18 @@ fun NavGraphBuilder.login(
         arguments = emptyList()
     ) {
         LoginView(navController = navController)
+    }
+}
+
+
+fun NavGraphBuilder.signup(
+    navController: NavController,
+) {
+    composable(
+        route = Screen.Login.route,
+        arguments = emptyList()
+    ) {
+        SignupView(navController = navController)
     }
 }
 
