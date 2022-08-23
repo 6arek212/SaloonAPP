@@ -7,37 +7,63 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
-import com.example.ibrasaloonapp.presentation.ui.appointment_list.SessionListView
+import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
+import com.example.ibrasaloonapp.presentation.ui.login.LoginView
+import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
 
 
 @Composable
-fun Navigation() {
+fun Navigation(firstRoute: String = Screen.Splash.route) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.SessionList.route) {
-        sessionList(navController = navController)
-        addAppointment(navController = navController)
+    NavHost(navController = navController, startDestination = Screen.Splash.route) {
+        splash(navController = navController)
+        login(navController = navController)
+        appointmentList(navController = navController)
+        bookAppointment(navController = navController)
     }
 }
 
-
-fun NavGraphBuilder.sessionList(
+fun NavGraphBuilder.splash(
     navController: NavController,
 ) {
     composable(
-        route = Screen.SessionList.route,
+        route = Screen.Splash.route,
         arguments = emptyList()
     ) {
-        SessionListView(navController = navController)
+        SplashView(navController = navController)
+    }
+}
+
+fun NavGraphBuilder.login(
+    navController: NavController,
+) {
+    composable(
+        route = Screen.Login.route,
+        arguments = emptyList()
+    ) {
+        LoginView(navController = navController)
     }
 }
 
 
-fun NavGraphBuilder.addAppointment(
+fun NavGraphBuilder.appointmentList(
     navController: NavController,
 ) {
     composable(
-        route = Screen.AddAppointment.route,
+        route = Screen.AppointmentsList.route,
+        arguments = emptyList()
+    ) {
+        AppointmentListView(navController = navController)
+    }
+}
+
+
+fun NavGraphBuilder.bookAppointment(
+    navController: NavController,
+) {
+    composable(
+        route = Screen.BookAppointment.route,
         arguments = emptyList()
     ) {
         BookAppointmentView(navController = navController)

@@ -26,3 +26,17 @@ fun stringToDate(str: String): String {
         return ""
     }
 }
+
+fun stringDateFormat(str: String): String {
+    try {
+        val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+        val date = sdfInput.parse(str)
+        val sdfOutput = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        val formatted = sdfOutput.format(date)
+        return formatted.toString()
+    } catch (e: ParseException) {
+        // handle the failure
+        Log.e(TAG, "formatDate:${e.message} ")
+        return ""
+    }
+}

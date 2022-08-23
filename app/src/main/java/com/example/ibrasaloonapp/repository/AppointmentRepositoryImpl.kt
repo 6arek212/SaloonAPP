@@ -1,7 +1,8 @@
 package com.example.ibrasaloonapp.repository
 
-import android.util.Log
+import androidx.compose.ui.text.capitalize
 import com.example.ibrasaloonapp.core.ServiceType
+import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.AppointmentDto
@@ -10,12 +11,12 @@ import com.example.ibrasaloonapp.network.services.AppointmentService
 import com.example.trainingapp.util.safeApiCall
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import org.json.JSONObject
+import java.util.*
 import javax.inject.Inject
 
 private const val TAG = "AppointmentRepositoryIm"
 
-class SessionRepositoryImpl
+class AppointmetRepositoryImpl
 @Inject
 constructor(
     private val service: AppointmentService,
@@ -26,7 +27,17 @@ constructor(
 
     override suspend fun getAppointments(): ApiResult<List<Appointment>> {
         return safeApiCall(dispatcher = dispatcher) {
-            val appointmentsDto = service.getAppointments().appointments
+            val appointmentsDto = service.getAppointments().appointments.map {
+                AppointmentDto(
+                    id = it.id,
+                    customer = it.customer,
+                    type = it.type?.capitalize(Locale.getDefault()),
+                    date = it.date?.let { stringDateFormat(it) } ?: "",
+                    time = it.time,
+                    isActive = it.isActive,
+                    createdAt = it.createdAt
+                )
+            }
             mapper.toDomainList(appointmentsDto)
         }
     }
@@ -50,7 +61,9 @@ constructor(
     }
 
     override suspend fun getServiceType(): ApiResult<List<String>> {
-        return ApiResult.Success(fakeServiceType.map { tp -> tp.value })
+        return ApiResult.Success(fakeServiceType.map { tp ->
+            tp.value.capitalize(Locale.getDefault())
+        })
     }
 
     override suspend fun getAvailableAppointments(date: String): ApiResult<List<String>> {

@@ -114,4 +114,8 @@ dependencies {
 
     implementation 'com.afollestad.material-dialogs:datetime:3.3.0'
 
+    //data store
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+
 }

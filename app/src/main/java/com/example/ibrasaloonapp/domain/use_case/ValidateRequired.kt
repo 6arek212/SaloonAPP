@@ -1,7 +1,6 @@
-package com.example.ibrasaloonapp.domain.user_case
+package com.example.ibrasaloonapp.domain.use_case
 
 import android.util.Log
-import android.util.Patterns
 
 private const val TAG = "ValidateRequired"
 

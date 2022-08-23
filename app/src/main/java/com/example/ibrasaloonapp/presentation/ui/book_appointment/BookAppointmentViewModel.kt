@@ -11,7 +11,7 @@ import com.example.ibrasaloonapp.core.stringToDate
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
-import com.example.ibrasaloonapp.domain.user_case.ValidateRequired
+import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.AppointmentDto
 import com.example.ibrasaloonapp.repository.AppointmentRepository

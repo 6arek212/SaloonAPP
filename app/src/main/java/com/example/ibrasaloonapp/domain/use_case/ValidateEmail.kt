@@ -1,4 +1,4 @@
-package com.example.ibrasaloonapp.domain.user_case
+package com.example.ibrasaloonapp.domain.use_case
 
 import android.util.Patterns
 

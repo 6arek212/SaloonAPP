@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.presentation.ui.appointment_list
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.SessionCard
 import com.example.ibrasaloonapp.presentation.components.SessionListHeader
@@ -27,10 +29,12 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SessionListView(
+fun AppointmentListView(
     navController: NavController,
     viewModel: SessionListViewModel = hiltViewModel(),
+    authViewModel: MainActivityViewModel = hiltViewModel()
 ) {
+    val authData = authViewModel.state.value
     val queue = viewModel.state.value.errorQueue
     val appointments = viewModel.state.value.appointments
     val progressBar = viewModel.state.value.progressBarState
@@ -68,7 +72,7 @@ fun SessionListView(
                         span = { GridItemSpan(maxLineSpan) }
                     ) {
 
-                        SessionListHeader(navigateToAddAppointment = { navController.navigate(Screen.AddAppointment.route) })
+                        SessionListHeader(navigateToAddAppointment = { navController.navigate(Screen.BookAppointment.route) })
                     }
 
                     itemsIndexed(
