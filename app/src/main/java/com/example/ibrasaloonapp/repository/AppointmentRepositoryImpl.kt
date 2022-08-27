@@ -1,6 +1,5 @@
 package com.example.ibrasaloonapp.repository
 
-import androidx.compose.ui.text.capitalize
 import com.example.ibrasaloonapp.core.ServiceType
 import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
@@ -16,7 +15,7 @@ import javax.inject.Inject
 
 private const val TAG = "AppointmentRepositoryIm"
 
-class AppointmetRepositoryImpl
+class AppointmentRepositoryImpl
 @Inject
 constructor(
     private val service: AppointmentService,
@@ -24,10 +23,17 @@ constructor(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AppointmentRepository {
 
+    class AppointmentsData(
+        val historyAppointments: List<Appointment>,
+        val activeAppointments: List<Appointment>
+    )
 
-    override suspend fun getAppointments(): ApiResult<List<Appointment>> {
+    override suspend fun getAppointments(): ApiResult<AppointmentsData> {
         return safeApiCall(dispatcher = dispatcher) {
-            val appointmentsDto = service.getAppointments().appointments.map {
+
+            val result = service.getAppointments()
+
+            val activeAppointments = result.activeAppointments.map {
                 AppointmentDto(
                     id = it.id,
                     customer = it.customer,
@@ -38,7 +44,23 @@ constructor(
                     createdAt = it.createdAt
                 )
             }
-            mapper.toDomainList(appointmentsDto)
+
+            val historyAppointments = result.historyAppointments.map {
+                AppointmentDto(
+                    id = it.id,
+                    customer = it.customer,
+                    type = it.type?.capitalize(Locale.getDefault()),
+                    date = it.date?.let { stringDateFormat(it) } ?: "",
+                    time = it.time,
+                    isActive = it.isActive,
+                    createdAt = it.createdAt
+                )
+            }
+
+            AppointmentsData(
+                historyAppointments = mapper.toDomainList(historyAppointments),
+                activeAppointments = mapper.toDomainList(activeAppointments)
+            )
         }
     }
 
@@ -54,16 +76,14 @@ constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteAppointment(id: String): ApiResult<String> {
+    override suspend fun cancelAppointment(id: String): ApiResult<String> {
         return safeApiCall(dispatcher = dispatcher) {
-            service.deleteAppointment(id).message
+            service.cancelAppointment(id).message
         }
     }
 
     override suspend fun getServiceType(): ApiResult<List<String>> {
-        return ApiResult.Success(fakeServiceType.map { tp ->
-            tp.value.capitalize(Locale.getDefault())
-        })
+        return ApiResult.Success(fakeServiceType.map { it.value })
     }
 
     override suspend fun getAvailableAppointments(date: String): ApiResult<List<String>> {

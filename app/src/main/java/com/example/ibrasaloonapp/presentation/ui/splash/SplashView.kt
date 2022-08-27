@@ -36,6 +36,8 @@ import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val TAG = "SplashView"
+
 @Composable
 fun SplashView(
     navController: NavController,
@@ -50,6 +52,8 @@ fun SplashView(
             events.collect { event ->
                 when (event) {
                     is MainActivityViewModel.UIEvent.NavigateNow -> {
+                        Log.d(TAG, "SplashView: ${state}")
+
                         navController.navigate(event.route) {
                             popUpTo(Screen.Splash.route) { inclusive = true }
                         }

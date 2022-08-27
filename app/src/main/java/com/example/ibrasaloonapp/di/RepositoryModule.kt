@@ -1,15 +1,13 @@
 package com.example.ibrasaloonapp.di
 
-import android.app.Application
 import android.content.Context
-import android.util.Log
 import com.example.ibrasaloonapp.network.model.AppointmentDtoMapper
 import com.example.ibrasaloonapp.network.model.AuthDataDtoMapper
 import com.example.ibrasaloonapp.network.model.CustomerDtoMapper
 import com.example.ibrasaloonapp.network.services.AppointmentService
 import com.example.ibrasaloonapp.network.services.AuthService
 import com.example.ibrasaloonapp.repository.AppointmentRepository
-import com.example.ibrasaloonapp.repository.AppointmetRepositoryImpl
+import com.example.ibrasaloonapp.repository.AppointmentRepositoryImpl
 import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.AuthRepositoryImpl
 import dagger.Module
@@ -49,7 +47,7 @@ object RepositoryModule {
         service: AppointmentService,
         appointmentDtoMapper: AppointmentDtoMapper
     ): AppointmentRepository {
-        return AppointmetRepositoryImpl(service = service, mapper = appointmentDtoMapper)
+        return AppointmentRepositoryImpl(service = service, mapper = appointmentDtoMapper)
     }
 
 

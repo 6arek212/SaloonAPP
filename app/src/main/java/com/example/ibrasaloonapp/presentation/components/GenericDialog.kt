@@ -14,6 +14,8 @@ fun GenericDialog(
     title: String,
     description: String? = null,
     onRemoveHeadFromQueue: () -> Unit,
+    onConfirm: () -> Unit,
+    confirmButton: Boolean = false
 ) {
     AlertDialog(
         properties = DialogProperties(
@@ -34,7 +36,12 @@ fun GenericDialog(
                 Text(text = description)
             }
         },
-        confirmButton = {},
+        confirmButton = {
+            if (confirmButton)
+                Button(onClick = onConfirm) {
+                    Text(text = "Confirm")
+                }
+        },
         dismissButton = {}
     )
 }

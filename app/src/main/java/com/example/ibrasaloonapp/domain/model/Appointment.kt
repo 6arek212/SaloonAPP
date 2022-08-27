@@ -8,6 +8,6 @@ data class Appointment(
     val time: String? = null,
     val isActive: Boolean? = null,
     val createdAt: String? = null,
-    val customer: Customer? = null
+    val customer: String? = null
 ) {
 }

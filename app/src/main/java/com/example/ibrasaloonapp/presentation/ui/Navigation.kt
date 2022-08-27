@@ -17,7 +17,7 @@ import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
 fun Navigation(firstRoute: String = Screen.Splash.route) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.Splash.route) {
+    NavHost(navController = navController, startDestination = Screen.AppointmentsList.route) {
         splash(navController = navController)
         login(navController = navController)
         signup(navController = navController)

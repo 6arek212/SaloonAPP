@@ -1,15 +1,13 @@
 package com.example.ibrasaloonapp.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
@@ -24,19 +22,20 @@ fun DefaultScreenUI(
     queue: Queue<UIComponent> = Queue(mutableListOf()),
     onRemoveHeadFromQueue: () -> Unit,
     progressBarState: ProgressBarState = ProgressBarState.Idle,
+    dialogOnConfirm: () -> Unit = {},
     content: @Composable () -> Unit,
-) {
+    ) {
     val scaffoldState = rememberScaffoldState()
     Scaffold(
+        modifier = Modifier.statusBarsPadding(),
         scaffoldState = scaffoldState,
-
-        ) { padding ->
+    ) { padding ->
 
         Box(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
                 .background(MaterialTheme.colors.background)
+                .padding(padding)
         ) {
             content()
             //process the queue
@@ -48,7 +47,9 @@ fun DefaultScreenUI(
                                 .fillMaxWidth(0.9f),
                             title = uiComponent.title,
                             description = uiComponent.description,
-                            onRemoveHeadFromQueue = onRemoveHeadFromQueue
+                            onRemoveHeadFromQueue = onRemoveHeadFromQueue,
+                            onConfirm = dialogOnConfirm,
+                            confirmButton = uiComponent.confirmButton
                         )
                     }
                 }

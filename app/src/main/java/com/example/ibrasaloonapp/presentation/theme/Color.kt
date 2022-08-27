@@ -3,26 +3,22 @@ package com.example.ibrasaloonapp.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 
-val Purple = Color(0xFF3F2A8C)
-val PurpleVariant = Color(0xFF5841A7)
+val Purple = Color(0xFF5A1651)
+val PurpleVariant = Color(0xFFD68CCD)
 val PurpleLite = Color(0xFFF8F6FF)
-val Purple2 = Color(0xFF7760C9)
 
-val Blue300 = Color(0xFF64B5F6)
-val Blue400 = Color(0xFF42A5F5)
-val Blue500 = Color(0xFF2196F3)
-val Blue600 = Color(0xFF1E88E5)
-val Blue700 = Color(0xFF1976D2)
-val Blue800 = Color(0xFF1565C0)
 
-val Teal300 = Color(0xFF1AC6FF)
+val Green = Color(0xFF32C240)
+val Red = Color(0xFFE22D2D)
+val RedLite = Color(0xFFEF8282)
 
-val Grey1 = Color(0XFFF9F9F9)
-val PurpleGrey = Color(0xFFDAE0E8)
+
+val Gray = Color(0XFFF9F9F9)
+val Gray2  = Color(0xFFE2E2E2)
+val GrayBackground = Color(0xFFF2F2F2)
 val PurpleGrey2 = Color(0xFFE4E1EE)
 
-val Orange = Color(0xFFFFB92D)
-val Orange2 = Color(0xFFEC7308)
+val Orange = Color(0xFFEC9E44)
 
 val Black1 = Color(0xFF222222)
 val Black2 = Color(0xFF000000)

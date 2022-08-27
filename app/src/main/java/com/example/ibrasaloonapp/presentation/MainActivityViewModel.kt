@@ -55,9 +55,9 @@ constructor(
     private fun checkAuth() {
         viewModelScope.launch {
             val authData = authRepository.getLoginStatus()
-            delay(3000L)
-            if (!authData.token.isBlank()) {
-                _state.value = state.value.copy(isLoggedIn = true)
+//            delay(3000L)
+            if (authData.token.isNotBlank()) {
+                _state.value = state.value.copy(isLoggedIn = true, authData = authData)
                 _events.send(UIEvent.NavigateNow(Screen.AppointmentsList.route))
             } else {
                 _state.value = AuthState(isLoggedIn = false)
@@ -69,7 +69,7 @@ constructor(
     }
 
     sealed class UIEvent {
-        class NavigateNow(val route:String) : UIEvent()
+        class NavigateNow(val route: String) : UIEvent()
     }
 
 

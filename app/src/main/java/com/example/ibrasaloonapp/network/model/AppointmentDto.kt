@@ -8,7 +8,7 @@ data class AppointmentDto(
     val id: String? = null,
 
     @SerializedName("customer")
-    val customer: CustomerDto? = null,
+    val customer: String? = null,
 
     @SerializedName("type")
     val type: String? = null,

@@ -79,6 +79,8 @@ dependencies {
 
     def material = "1.6.1"
     implementation "com.google.android.material:material:$material"
+    implementation('androidx.compose.material3:material3-window-size-class:1.0.0-beta01')
+    implementation('androidx.compose.material3:material3:1.0.0-beta01')
 
 
     def retrofit_ver = "2.9.0"
@@ -117,5 +119,10 @@ dependencies {
     //data store
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
+
+    //FlowRow
+    //implementation "com.google.accompanist:accompanist-flowlayout:0.20.0"
+
+    //snapper
 
 }

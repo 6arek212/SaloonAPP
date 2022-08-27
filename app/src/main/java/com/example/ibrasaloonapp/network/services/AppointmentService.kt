@@ -24,7 +24,7 @@ interface AppointmentService {
     )
 
     @DELETE("appointments/{id}")
-    suspend fun deleteAppointment(
+    suspend fun cancelAppointment(
         @Path("id") id: String
     ): MessageResponse
 

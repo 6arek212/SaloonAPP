@@ -1,6 +1,7 @@
 package com.example.ibrasaloonapp.presentation.ui.book_appointment
 
 import DropDownMenuComponent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,14 +21,21 @@ import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.presentation.components.DatePicker
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
-import com.example.ibrasaloonapp.presentation.theme.PurpleGrey
+import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListEvent
+import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentsListViewModel
+import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+
+private const val TAG = "BookAppointmentView"
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BookAppointmentView(
     navController: NavController,
-    viewModel: BookAppointmentViewModel = hiltViewModel()
+    viewModel: BookAppointmentViewModel = hiltViewModel(),
 ) {
 
     val timeError = viewModel.state.value.timeError
@@ -46,6 +55,22 @@ fun BookAppointmentView(
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
+
+    val events = viewModel.events
+
+    LaunchedEffect(Unit) {
+        launch {
+            events.collect { event ->
+                when (event) {
+                    is BookAppointmentViewModel.UIEvent.OnBookAppointment -> {
+
+                        Log.d(TAG, "BookAppointmentView: ")
+                    }
+                }
+            }
+        }
+    }
+
 
     DefaultScreenUI(
         queue = queue,
@@ -86,7 +111,7 @@ fun BookAppointmentView(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth()
-                        .height(.5.dp), color = PurpleGrey
+                        .height(.5.dp), color = MaterialTheme.colors.onBackground
                 )
 
                 Spacer(modifier = Modifier.padding(16.dp))
@@ -142,7 +167,7 @@ fun BookAppointmentView(
                                     modifier = Modifier
                                         .padding(top = 8.dp, bottom = 8.dp)
                                         .fillMaxWidth()
-                                        .height(.5.dp), color = PurpleGrey
+                                        .height(.5.dp), color = MaterialTheme.colors.onBackground
                                 )
 
                             }
@@ -206,7 +231,7 @@ fun BookAppointmentView(
                                     modifier = Modifier
                                         .padding(top = 8.dp, bottom = 8.dp)
                                         .fillMaxWidth()
-                                        .height(.5.dp), color = PurpleGrey
+                                        .height(.5.dp), color = MaterialTheme.colors.onBackground
                                 )
 
                             }

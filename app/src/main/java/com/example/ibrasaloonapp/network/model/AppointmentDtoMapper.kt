@@ -14,7 +14,7 @@ constructor(
             type = model.type,
             date = model.date,
             id = model.id ?: "",
-            customer = model.customer?.let { customerMapper.mapToDomainModel(model.customer) },
+            customer = model.customer,
             time = model.time,
             isActive = model.isActive,
             createdAt = model.createdAt
@@ -26,7 +26,7 @@ constructor(
             type = domainModel.type,
             date = domainModel.date,
             id = domainModel.id,
-            customer = domainModel.customer?.let { customerMapper.mapFromDomainModel(domainModel.customer) },
+            customer = domainModel.customer,
             time = domainModel.time,
             isActive = domainModel.isActive,
             createdAt = domainModel.createdAt

@@ -2,11 +2,13 @@ package com.example.ibrasaloonapp.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -15,55 +17,42 @@ import com.example.ibrasaloonapp.domain.model.Appointment
 
 
 @Composable
-fun SessionCard(
-    appointment: Appointment,
-    modifier: Modifier = Modifier
+fun AppointmentCard(
+    modifier: Modifier = Modifier,
+    time: String = "12:00",
+    date: String = "August 08,2022"
 ) {
-    Surface(
+    Card(
         modifier = modifier.heightIn(min = 100.dp),
-        elevation = 10.dp,
-        color = MaterialTheme.colors.surface,
-        shape = MaterialTheme.shapes.large
+        elevation = 1.dp,
+        backgroundColor = MaterialTheme.colors.surface,
+        shape = MaterialTheme.shapes.medium
     ) {
 
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                appointment.type?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.h4,
-                        color = MaterialTheme.colors.onSurface
-                    )
-                }
+            Image(
+                painter = painterResource(id = R.drawable.tools2),
+                contentDescription = "",
+                modifier = Modifier
+                    .width(40.dp)
+                    .align(CenterHorizontally)
+            )
 
-                Image(
-                    modifier = Modifier.widthIn(max = 20.dp),
-                    painter = painterResource(id = R.drawable.tools1),
-                    contentDescription = "",
-                )
 
-            }
+            Spacer(modifier = Modifier.padding(8.dp))
 
-            Spacer(modifier = Modifier.padding(16.dp))
-
-            appointment.date?.let {
-                Text(
-                    modifier = Modifier.align(Alignment.End),
-                    text = it,
-                    style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.onSurface
-                )
-            }
+            Text(
+                text = time,
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onSurface
+            )
+            Text(
+                text = date,
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onSurface
+            )
         }
 
 

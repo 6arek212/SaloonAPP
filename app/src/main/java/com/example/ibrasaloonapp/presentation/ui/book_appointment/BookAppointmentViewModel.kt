@@ -14,8 +14,11 @@ import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.AppointmentDto
+import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.example.ibrasaloonapp.repository.AppointmentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,13 +28,19 @@ private const val TAG = "BookAppointmentViewMode"
 class BookAppointmentViewModel
 @Inject
 constructor(
-    val repository: AppointmentRepository,
-    val validateRequired: ValidateRequired
+    private val repository: AppointmentRepository,
+    private val validateRequired: ValidateRequired
 ) : ViewModel() {
+
+    sealed class UIEvent {
+        object OnBookAppointment : UIEvent()
+    }
 
     private val _state: MutableState<BookAppointmentState> = mutableStateOf(BookAppointmentState())
     val state: State<BookAppointmentState> = _state
 
+    private val _events = Channel<UIEvent>()
+    val events = _events.receiveAsFlow()
 
     init {
         onTriggerEvent(BookAppointmentEvent.GetServicesTypes)
@@ -42,7 +51,11 @@ constructor(
         viewModelScope.launch {
             when (event) {
                 is BookAppointmentEvent.DateChanged -> {
-                    _state.value = _state.value.copy(date = event.date, time = "")
+                    _state.value = _state.value.copy(
+                        date = event.date,
+                        time = "",
+                        availableAppointmentsTimesList = listOf()
+                    )
                     getAvailableAppointmentsTimes()
                 }
                 is BookAppointmentEvent.ServiceTypeChanged -> {
@@ -91,7 +104,12 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Error",
+                        description = result.errorMessage
+                    )
+                )
             }
 
             is ApiResult.NetworkError -> {
@@ -115,7 +133,12 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Error",
+                        description = result.errorMessage
+                    )
+                )
             }
 
             is ApiResult.NetworkError -> {
@@ -165,6 +188,13 @@ constructor(
                 onTriggerEvent(BookAppointmentEvent.GetAvailableAppointments)
                 _state.value =
                     _state.value.copy(serviceType = "", time = "", date = getCurrentDateAsString())
+                _events.send(UIEvent.OnBookAppointment)
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Booked",
+                        description = "the appointment has been booked"
+                    )
+                )
             }
 
             is ApiResult.GenericError -> {

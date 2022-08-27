@@ -7,7 +7,8 @@ import com.example.ibrasaloonapp.core.domain.UIComponent
 
 data class AppointmentListState(
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
-    val appointments: List<Appointment> = listOf(),
+    val activeAppointments: List<Appointment> = listOf(),
+    val historyAppointments: List<Appointment> = listOf(),
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf())
 ) {
 }

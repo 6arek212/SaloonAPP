@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
+import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.repository.AppointmentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,10 +16,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-private const val TAG = "SessionListViewModel"
+private const val TAG = "AppointmentsListVM"
 
 @HiltViewModel
-class SessionListViewModel
+class AppointmentsListViewModel
 @Inject
 constructor(
     private val repository: AppointmentRepository
@@ -29,31 +30,43 @@ constructor(
 
 
     init {
-        onTriggerEvent(AppointmentListEvent.GetSessions)
+        onTriggerEvent(AppointmentListEvent.GetAppointments)
     }
 
     fun onTriggerEvent(event: AppointmentListEvent) {
         viewModelScope.launch {
             when (event) {
-                is AppointmentListEvent.GetSessions -> {
-                    getSessions()
+                is AppointmentListEvent.GetAppointments -> {
+                    getAppointments()
                 }
                 is AppointmentListEvent.OnRemoveHeadFromQueue -> {
                     removeHeadMessage()
+                }
+                is AppointmentListEvent.CancelAppointment -> {
+                    cancelAppointment(event.id, event.index)
                 }
             }
         }
     }
 
 
-    suspend fun getSessions() {
+    suspend fun cancelAppointment(id: String, index: Int) {
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
-        val result = repository.getAppointments()
+        val result = repository.cancelAppointment(id)
 
         when (result) {
             is ApiResult.Success -> {
-                _state.value = _state.value.copy(appointments = result.value)
+                val list = ArrayList(_state.value.activeAppointments)
+                list.removeAt(index)
+                _state.value = _state.value.copy(activeAppointments = list)
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Canceled",
+                        description = "You'r appointment has been canceled",
+                        confirmButton = true
+                    )
+                )
             }
 
             is ApiResult.GenericError -> {
@@ -68,6 +81,40 @@ constructor(
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
     }
 
+
+    suspend fun getAppointments() {
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
+
+        val result = repository.getAppointments()
+
+        when (result) {
+            is ApiResult.Success -> {
+                _state.value = _state.value.copy(
+                    activeAppointments = result.value.activeAppointments,
+                    historyAppointments = result.value.historyAppointments
+                )
+                Log.d(TAG, "getAppointments: ${_state.value}")
+            }
+
+            is ApiResult.GenericError -> {
+
+            }
+
+            is ApiResult.NetworkError -> {
+
+            }
+        }
+
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+    }
+
+
+    private fun appendToMessageQueue(uiComponent: UIComponent) {
+        val queue = state.value.errorQueue
+        queue.add(uiComponent)
+        _state.value = _state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
+        _state.value = _state.value.copy(errorQueue = queue)
+    }
 
     private fun removeHeadMessage() {
         try {
