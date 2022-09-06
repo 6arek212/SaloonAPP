@@ -6,11 +6,11 @@ import javax.inject.Inject
 
 class AuthDataDtoMapper
 @Inject
-constructor(val customerDtoMapper: CustomerDtoMapper) : DomainMapper<AuthDataDto, AuthData> {
+constructor(val userDtoMapper: UserDtoMapper) : DomainMapper<AuthDataDto, AuthData> {
 
     override fun mapToDomainModel(model: AuthDataDto): AuthData {
         return AuthData(
-            customer = customerDtoMapper.mapToDomainModel(model.customer),
+            user = userDtoMapper.mapToDomainModel(model.customer),
             token = model.token,
             expiresIn = model.expiresIn
         )
@@ -18,7 +18,7 @@ constructor(val customerDtoMapper: CustomerDtoMapper) : DomainMapper<AuthDataDto
 
     override fun mapFromDomainModel(domainModel: AuthData): AuthDataDto {
         return AuthDataDto(
-            customer = customerDtoMapper.mapFromDomainModel(domainModel.customer),
+            customer = userDtoMapper.mapFromDomainModel(domainModel.user),
             token = domainModel.token,
             expiresIn = domainModel.expiresIn
         )

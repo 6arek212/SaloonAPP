@@ -3,7 +3,7 @@ package com.example.ibrasaloonapp.di
 import android.content.Context
 import com.example.ibrasaloonapp.network.model.AppointmentDtoMapper
 import com.example.ibrasaloonapp.network.model.AuthDataDtoMapper
-import com.example.ibrasaloonapp.network.model.CustomerDtoMapper
+import com.example.ibrasaloonapp.network.model.UserDtoMapper
 import com.example.ibrasaloonapp.network.services.AppointmentService
 import com.example.ibrasaloonapp.network.services.AuthService
 import com.example.ibrasaloonapp.repository.AppointmentRepository
@@ -24,19 +24,19 @@ object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideAppointmentMapper(customerMapper: CustomerDtoMapper): AppointmentDtoMapper {
+    fun provideAppointmentMapper(customerMapper: UserDtoMapper): AppointmentDtoMapper {
         return AppointmentDtoMapper(customerMapper)
     }
 
     @Singleton
     @Provides
-    fun provideCustomerMapper(): CustomerDtoMapper {
-        return CustomerDtoMapper()
+    fun provideCustomerMapper(): UserDtoMapper {
+        return UserDtoMapper()
     }
 
     @Singleton
     @Provides
-    fun provideAuthDataMapper(customerMapper: CustomerDtoMapper): AuthDataDtoMapper {
+    fun provideAuthDataMapper(customerMapper: UserDtoMapper): AuthDataDtoMapper {
         return AuthDataDtoMapper(customerMapper)
     }
 

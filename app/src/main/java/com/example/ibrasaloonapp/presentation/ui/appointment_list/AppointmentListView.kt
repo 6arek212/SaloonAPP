@@ -12,12 +12,14 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.samples.crane.base.CraneScreen
+import androidx.compose.samples.crane.base.CraneTabBar
+import androidx.compose.samples.crane.base.CraneTabs
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.domain.model.Appointment
@@ -92,7 +94,7 @@ fun AppointmentListContent(
         frontLayerScrimColor = Color.Unspecified,
 
         appBar = {
-//            HomeTabBar(CraneScreen.Fly, onTabSelected = { })
+//            HomeTabBar(CraneScreen.Home, onTabSelected = { })
         },
         backLayerContent = {
             Header(
@@ -108,27 +110,27 @@ fun AppointmentListContent(
     )
 
 }
-//
-//@Composable
-//private fun HomeTabBar(
-//    tabSelected: CraneScreen,
-//    onTabSelected: (CraneScreen) -> Unit,
-//    modifier: Modifier = Modifier
-//) {
-//    CraneTabBar(
-//        modifier = modifier
-//            .wrapContentWidth()
-//            .sizeIn(maxWidth = 500.dp),
-//        onMenuClicked = {}
-//    ) { tabBarModifier ->
-//        CraneTabs(
-//            modifier = tabBarModifier,
-//            titles = CraneScreen.values().map { it.name },
-//            tabSelected = tabSelected,
-//            onTabSelected = { newTab -> onTabSelected(CraneScreen.values()[newTab.ordinal]) }
-//        )
-//    }
-//}
+
+@Composable
+private fun HomeTabBar(
+    tabSelected: CraneScreen,
+    onTabSelected: (CraneScreen) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    CraneTabBar(
+        modifier = modifier
+            .wrapContentWidth()
+            .sizeIn(maxWidth = 500.dp),
+        onMenuClicked = {}
+    ) { tabBarModifier ->
+        CraneTabs(
+            modifier = tabBarModifier,
+            titles = CraneScreen.values().map { it.name },
+            tabSelected = tabSelected,
+            onTabSelected = { newTab -> onTabSelected(CraneScreen.values()[newTab.ordinal]) }
+        )
+    }
+}
 
 
 @Composable
@@ -150,8 +152,8 @@ fun Header(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 24.dp),
-            firstName = authData?.customer?.firstName ?: "T",
-            lastName = authData?.customer?.lastName ?: "HZ"
+            firstName = authData?.user?.firstName ?: "T",
+            lastName = authData?.user?.lastName ?: "HZ"
         )
 
         Spacer(modifier = Modifier.padding(16.dp))

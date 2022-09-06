@@ -1,12 +1,12 @@
 package com.example.ibrasaloonapp.network.model
 
-import com.example.ibrasaloonapp.domain.model.Customer
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.domain.util.DomainMapper
 
-class CustomerDtoMapper : DomainMapper<CustomerDto, Customer> {
+class UserDtoMapper : DomainMapper<UserDto, User> {
 
-    override fun mapToDomainModel(model: CustomerDto): Customer {
-        return Customer(
+    override fun mapToDomainModel(model: UserDto): User {
+        return User(
             id = model.id,
             firstName = model.firstName,
             lastName = model.lastName,
@@ -14,8 +14,8 @@ class CustomerDtoMapper : DomainMapper<CustomerDto, Customer> {
         )
     }
 
-    override fun mapFromDomainModel(domainModel: Customer): CustomerDto {
-        return CustomerDto(
+    override fun mapFromDomainModel(domainModel: User): UserDto {
+        return UserDto(
             id = domainModel.id,
             firstName = domainModel.firstName,
             lastName = domainModel.lastName,

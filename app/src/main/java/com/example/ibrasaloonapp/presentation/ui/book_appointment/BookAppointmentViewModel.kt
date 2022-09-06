@@ -125,26 +125,7 @@ constructor(
     private suspend fun getServicesType() {
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
-        val result = repository.getServiceType()
 
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(typesList = result.value)
-            }
-
-            is ApiResult.GenericError -> {
-                appendToMessageQueue(
-                    UIComponent.Dialog(
-                        title = "Error",
-                        description = result.errorMessage
-                    )
-                )
-            }
-
-            is ApiResult.NetworkError -> {
-
-            }
-        }
 
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
     }
@@ -176,9 +157,9 @@ constructor(
 
         val result = repository.bookAppointment(
             AppointmentDto(
-                date = stringToDate(_state.value.date),
-                time = _state.value.time,
-                type = _state.value.serviceType
+//                date = stringToDate(_state.value.date),
+//                time = _state.value.time,
+//                type = _state.value.serviceType
             )
         )
 

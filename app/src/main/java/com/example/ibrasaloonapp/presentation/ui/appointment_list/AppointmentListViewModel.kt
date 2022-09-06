@@ -37,7 +37,7 @@ constructor(
         viewModelScope.launch {
             when (event) {
                 is AppointmentListEvent.GetAppointments -> {
-                    getAppointments()
+//                    getAppointments()
                 }
                 is AppointmentListEvent.OnRemoveHeadFromQueue -> {
                     removeHeadMessage()
@@ -53,7 +53,7 @@ constructor(
     suspend fun cancelAppointment(id: String, index: Int) {
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
-        val result = repository.cancelAppointment(id)
+        val result = repository.unbookAppointment(id)
 
         when (result) {
             is ApiResult.Success -> {
@@ -82,31 +82,6 @@ constructor(
     }
 
 
-    suspend fun getAppointments() {
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
-        val result = repository.getAppointments()
-
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(
-                    activeAppointments = result.value.activeAppointments,
-                    historyAppointments = result.value.historyAppointments
-                )
-                Log.d(TAG, "getAppointments: ${_state.value}")
-            }
-
-            is ApiResult.GenericError -> {
-
-            }
-
-            is ApiResult.NetworkError -> {
-
-            }
-        }
-
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
-    }
 
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {

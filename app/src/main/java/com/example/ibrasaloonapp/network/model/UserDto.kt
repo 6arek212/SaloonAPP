@@ -2,7 +2,7 @@ package com.example.ibrasaloonapp.network.model
 
 import com.google.gson.annotations.SerializedName
 
-data class CustomerDto(
+data class UserDto(
     @SerializedName("_id")
     val id: String,
 

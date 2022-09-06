@@ -7,29 +7,27 @@ import javax.inject.Inject
 class AppointmentDtoMapper
 @Inject
 constructor(
-    private val customerMapper: CustomerDtoMapper
+    private val customerMapper: UserDtoMapper
 ) : DomainMapper<AppointmentDto, Appointment> {
     override fun mapToDomainModel(model: AppointmentDto): Appointment {
         return Appointment(
-            type = model.type,
-            date = model.date,
             id = model.id ?: "",
             customer = model.customer,
-            time = model.time,
             isActive = model.isActive,
-            createdAt = model.createdAt
+            service = model.service,
+            startTime = model.startTime,
+            endTime = model.endTime
         )
     }
 
     override fun mapFromDomainModel(domainModel: Appointment): AppointmentDto {
         return AppointmentDto(
-            type = domainModel.type,
-            date = domainModel.date,
             id = domainModel.id,
             customer = domainModel.customer,
-            time = domainModel.time,
             isActive = domainModel.isActive,
-            createdAt = domainModel.createdAt
+            service = domainModel.service,
+            startTime = domainModel.startTime,
+            endTime = domainModel.endTime
         )
     }
 

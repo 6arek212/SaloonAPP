@@ -8,7 +8,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.ibrasaloonapp.domain.model.AuthData
-import com.example.ibrasaloonapp.domain.model.Customer
+import com.example.ibrasaloonapp.domain.model.User
 
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -24,16 +24,16 @@ val EXPIRES_IN = intPreferencesKey("expiresIn")
 
 fun MutablePreferences.insertAuthData(authData: AuthData) {
     this[TOKEN] = authData.token
-    this[USER_ID] = authData.customer.id
-    this[USER_FIRST_NAME] = authData.customer.firstName
-    this[USER_LAST_NAME] = authData.customer.lastName
-    this[PHONE] = authData.customer.phone
+    this[USER_ID] = authData.user.id
+    this[USER_FIRST_NAME] = authData.user.firstName
+    this[USER_LAST_NAME] = authData.user.lastName
+    this[PHONE] = authData.user.phone
     this[EXPIRES_IN] = authData.expiresIn
 }
 
 fun Preferences.getAuthData(): AuthData {
     return AuthData(
-        Customer(
+        User(
             id = this[USER_ID] ?: "",
             firstName = this[USER_FIRST_NAME] ?: "",
             lastName = this[USER_LAST_NAME] ?: "",

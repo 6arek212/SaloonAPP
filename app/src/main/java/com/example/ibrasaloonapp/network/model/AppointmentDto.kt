@@ -10,19 +10,15 @@ data class AppointmentDto(
     @SerializedName("customer")
     val customer: String? = null,
 
-    @SerializedName("type")
-    val type: String? = null,
+    @SerializedName("service")
+    val service: String? = null,
 
-    @SerializedName("date")
-    val date: String? = null,
+    @SerializedName("start_time")
+    val startTime: String? = null,
 
-    @SerializedName("time")
-    val time: String? = null,
+    @SerializedName("end_time")
+    val endTime: String? = null,
 
     @SerializedName("isActive")
-    val isActive: Boolean? = null,
-
-    @SerializedName("createdAt")
-    val createdAt: String? = null
-) {
-}
+    val isActive: Boolean? = null
+    )

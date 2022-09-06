@@ -8,15 +8,15 @@ import retrofit2.http.Query
 
 interface AuthService {
 
-    @POST("auth/login")
+    @POST("/login")
     suspend fun login(@Body data: LoginDataDto): LoginResponse
 
 
-    @POST("auth/signup")
+    @POST("/signup")
     suspend fun signup()
 
 
-    @POST("auth/refresh-token")
+    @POST("/refresh-token")
     suspend fun refreshToken(@Query("token") token: String)
 
 
