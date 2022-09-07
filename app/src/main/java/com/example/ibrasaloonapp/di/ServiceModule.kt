@@ -2,6 +2,7 @@ package com.example.ibrasaloonapp.di
 
 import com.example.ibrasaloonapp.network.services.AppointmentService
 import com.example.ibrasaloonapp.network.services.AuthService
+import com.example.ibrasaloonapp.network.services.UserService
 import com.example.ibrasaloonapp.network.services.WorkerService
 import dagger.Module
 import dagger.Provides
@@ -33,5 +34,13 @@ object ServiceModule {
     fun provideWorkerService(
         retrofit: Retrofit
     ) = lazy { retrofit.create(WorkerService::class.java) }.value
+
+
+    @Singleton
+    @Provides
+    fun provideUserService(
+        retrofit: Retrofit
+    ) = lazy { retrofit.create(UserService::class.java) }.value
+
 
 }
