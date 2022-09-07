@@ -35,13 +35,13 @@ constructor(
 ) : AuthRepository {
 
 
-    override suspend fun getLoginStatus(): AuthData {
+    override suspend fun getLoginStatus(): AuthData? {
         return application.dataStore.data.first().getAuthData()
     }
 
     override suspend fun login(loginDataDto: LoginDataDto): ApiResult<String> {
         val result = safeApiCall(dispatcher) {
-            val res = authService.login(loginDataDto).authDataDto
+            val res = authService.login(loginDataDto)
             Log.d(TAG, "login: ${res}")
             authDataDtoMapper.mapToDomainModel(res)
         }

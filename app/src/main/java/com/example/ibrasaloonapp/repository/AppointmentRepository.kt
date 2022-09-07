@@ -1,12 +1,14 @@
 package com.example.ibrasaloonapp.repository
 
 import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
-import com.example.ibrasaloonapp.network.model.AppointmentDto
+import com.example.ibrasaloonapp.network.model.BookAppointmentDto
+import com.example.ibrasaloonapp.network.model.UserDto
 
 interface AppointmentRepository {
     suspend fun bookAppointment(
-        appointment: AppointmentDto
+        appointment: BookAppointmentDto
     ): ApiResult<String>
 
     suspend fun unbookAppointment(id: String): ApiResult<String>
@@ -16,6 +18,9 @@ interface AppointmentRepository {
         workerId: String
     ): ApiResult<List<Appointment>>
 
-    suspend fun getAppointment(): ApiResult<Appointment>
+    suspend fun getAppointment(): ApiResult<Appointment?>
+
+    suspend fun getAppointments(): ApiResult<List<Appointment>>
+
 }
 

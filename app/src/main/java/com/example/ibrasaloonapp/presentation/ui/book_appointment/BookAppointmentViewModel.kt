@@ -6,16 +6,15 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ibrasaloonapp.core.getCurrentDateAsString
-import com.example.ibrasaloonapp.core.stringToDate
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.core.getCurrentDateAsString
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
-import com.example.ibrasaloonapp.network.model.AppointmentDto
-import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
+import com.example.ibrasaloonapp.network.model.BookAppointmentDto
 import com.example.ibrasaloonapp.repository.AppointmentRepository
+import com.example.ibrasaloonapp.repository.WorkerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -29,60 +28,81 @@ class BookAppointmentViewModel
 @Inject
 constructor(
     private val repository: AppointmentRepository,
+    private val workerRepository: WorkerRepository,
     private val validateRequired: ValidateRequired
 ) : ViewModel() {
 
-    sealed class UIEvent {
-        object OnBookAppointment : UIEvent()
-    }
 
     private val _state: MutableState<BookAppointmentState> = mutableStateOf(BookAppointmentState())
     val state: State<BookAppointmentState> = _state
 
-    private val _events = Channel<UIEvent>()
+    private val _events = Channel<BookAppointmentUIEvent>()
     val events = _events.receiveAsFlow()
 
     init {
-        onTriggerEvent(BookAppointmentEvent.GetServicesTypes)
-        onTriggerEvent(BookAppointmentEvent.GetAvailableAppointments)
+        onTriggerEvent(BookAppointmentEvent.GetWorkers)
     }
 
     fun onTriggerEvent(event: BookAppointmentEvent) {
         viewModelScope.launch {
             when (event) {
-                is BookAppointmentEvent.DateChanged -> {
+                is BookAppointmentEvent.OnSelectedWorker -> {
                     _state.value = _state.value.copy(
-                        date = event.date,
-                        time = "",
-                        availableAppointmentsTimesList = listOf()
+                        selectedWorker = event.worker,
+                        selectedWorkingDate = null,
+                        selectedService = "",
+                        selectedAppointment = null,
+                        workingDates = listOf(),
+                        services = listOf(),
+                        availableAppointments = listOf()
                     )
-                    getAvailableAppointmentsTimes()
+                    onTriggerEvent(BookAppointmentEvent.GetWorkingDates)
+                    _events.send(BookAppointmentUIEvent.HideSheet)
                 }
-                is BookAppointmentEvent.ServiceTypeChanged -> {
-                    _state.value = _state.value.copy(serviceType = event.type)
+                is BookAppointmentEvent.OnSelectedWorkingDate -> {
+                    _state.value = _state.value.copy(
+                        selectedWorkingDate = event.date,
+                        selectedService = "",
+                        selectedAppointment = null,
+                        services = listOf(),
+                        availableAppointments = listOf()
+                    )
+                    onTriggerEvent(BookAppointmentEvent.GetServices)
+                    _events.send(BookAppointmentUIEvent.HideSheet)
+                }
+                is BookAppointmentEvent.OnSelectedService -> {
+                    _state.value = _state.value.copy(
+                        selectedService = event.service,
+                        selectedAppointment = null,
+                        availableAppointments = listOf()
+                    )
+                    onTriggerEvent(BookAppointmentEvent.GetAvailableAppointments)
+                    _events.send(BookAppointmentUIEvent.HideSheet)
                 }
 
-                is BookAppointmentEvent.TimeChanged -> {
-                    _state.value = _state.value.copy(time = event.time)
+                is BookAppointmentEvent.OnSelectedAppointment -> {
+                    _state.value = _state.value.copy(selectedAppointment = event.appointment)
+                    _events.send(BookAppointmentUIEvent.ExpandSheet)
                 }
 
-                is BookAppointmentEvent.ServiceTypeDropDownExpandChange -> {
-                    _state.value = _state.value.copy(expandDropDown1 = event.value)
+                is BookAppointmentEvent.GetWorkingDates -> {
+                    getWorkingDates()
                 }
 
-                is BookAppointmentEvent.TimeDropDownExpandChange -> {
-                    _state.value = _state.value.copy(expandDropDown2 = event.value)
+                is BookAppointmentEvent.Book -> {
+                    book()
                 }
 
-                is BookAppointmentEvent.Submit -> {
-                    submitData()
+                is BookAppointmentEvent.GetWorkers -> {
+                    getWorkers()
                 }
+
                 is BookAppointmentEvent.GetAvailableAppointments -> {
-                    getAvailableAppointmentsTimes()
+                    getAvailableAppointments()
                 }
 
-                is BookAppointmentEvent.GetServicesTypes -> {
-                    getServicesType()
+                is BookAppointmentEvent.GetServices -> {
+                    getServices()
                 }
 
                 is BookAppointmentEvent.OnRemoveHeadFromQueue -> {
@@ -92,15 +112,22 @@ constructor(
         }
     }
 
-    private suspend fun getAvailableAppointmentsTimes() {
+    private suspend fun getWorkingDates() {
+        val workerId = _state.value.selectedWorker
+        val fromDate = getCurrentDateAsString()
+
+        if (workerId == null)
+            return
+
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
-        val result = repository.getAvailableAppointments(stringToDate(_state.value.date))
+
+        val result = workerRepository.getWorkingDates(workerId.id, fromDate)
 
         when (result) {
             is ApiResult.Success -> {
-                _state.value = _state.value.copy(availableAppointmentsTimesList = result.value)
-                Log.d(TAG, "getAppointments: ${result.value}")
+                _state.value = _state.value.copy(workingDates = result.value)
+                Log.d(TAG, "getAvailableAppointments: ${result.value}")
             }
 
             is ApiResult.GenericError -> {
@@ -122,54 +149,128 @@ constructor(
     }
 
 
-    private suspend fun getServicesType() {
+    private suspend fun getWorkers() {
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
+
+        val result = workerRepository.getWorkers()
+
+        when (result) {
+            is ApiResult.Success -> {
+                _state.value = _state.value.copy(workers = result.value)
+                Log.d(TAG, "getAvailableAppointments: ${result.value}")
+            }
+
+            is ApiResult.GenericError -> {
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Error",
+                        description = result.errorMessage
+                    )
+                )
+            }
+
+            is ApiResult.NetworkError -> {
+
+            }
+        }
 
 
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
     }
 
 
-    private suspend fun submitData() {
-        val dateResult = validateRequired.execute("date", state.value.date)
-        val timeResult = validateRequired.execute(fieldName = "time", state.value.time)
-        val typeResult = validateRequired.execute(fieldName = "type", state.value.serviceType)
+    private suspend fun getAvailableAppointments() {
+        val workerId = _state.value.selectedWorker?.id
+        val workingDate = _state.value.selectedWorkingDate
 
-        val hasError = listOf(
-            dateResult,
-            timeResult,
-            typeResult
-        ).any { !it.successful }
-
-        _state.value = _state.value.copy(
-            dateError = dateResult.errorMessage,
-            timeError = timeResult.errorMessage,
-            serviceTypeError = typeResult.errorMessage
-        )
-
-        if (hasError) {
-            Log.d(TAG, "submitData: error sent to UI")
+        if (workerId == null || workingDate == null)
             return
-        }
 
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
-        val result = repository.bookAppointment(
-            AppointmentDto(
-//                date = stringToDate(_state.value.date),
-//                time = _state.value.time,
-//                type = _state.value.serviceType
-            )
+
+        val result = repository.getAvailableAppointments(
+            workingDate.date,
+            workerId
         )
 
         when (result) {
             is ApiResult.Success -> {
-                onTriggerEvent(BookAppointmentEvent.GetServicesTypes)
-                onTriggerEvent(BookAppointmentEvent.GetAvailableAppointments)
-                _state.value =
-                    _state.value.copy(serviceType = "", time = "", date = getCurrentDateAsString())
-                _events.send(UIEvent.OnBookAppointment)
+                _state.value = _state.value.copy(availableAppointments = result.value)
+                Log.d(TAG, "getAvailableAppointments: ${result.value}")
+            }
+
+            is ApiResult.GenericError -> {
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Error",
+                        description = result.errorMessage
+                    )
+                )
+            }
+
+            is ApiResult.NetworkError -> {
+
+            }
+        }
+
+
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+    }
+
+
+    private suspend fun getServices() {
+        val workerId = _state.value.selectedWorker?.id
+
+        if (workerId == null)
+            return
+
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
+
+        val list = listOf(
+            "Hair Cut",
+            "Wax",
+        )
+
+        _state.value = _state.value.copy(services = list)
+
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+    }
+
+
+    private suspend fun book() {
+        val worker = _state.value.selectedWorker
+        val service = _state.value.selectedService
+        val appointment = _state.value.selectedAppointment
+
+        if (appointment == null || worker == null || service.isBlank())
+            return
+
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
+
+
+        val appointmentDTO =
+            BookAppointmentDto(
+                workerId = worker.id,
+                service = service,
+                appointmentId = appointment.id
+            )
+
+        val result = repository.bookAppointment(appointmentDTO)
+
+        when (result) {
+            is ApiResult.Success -> {
+                _events.send(BookAppointmentUIEvent.OnBookAppointment)
+                _state.value = _state.value.copy(
+                    selectedWorker = null,
+                    selectedWorkingDate = null,
+                    selectedService = "",
+                    selectedAppointment = null,
+                    workingDates = listOf(),
+                    services = listOf(),
+                    availableAppointments = listOf(),
+                )
                 appendToMessageQueue(
                     UIComponent.Dialog(
                         title = "Booked",
@@ -177,7 +278,6 @@ constructor(
                     )
                 )
             }
-
             is ApiResult.GenericError -> {
                 Log.d(TAG, "submitData: ${result.errorMessage}")
                 appendToMessageQueue(

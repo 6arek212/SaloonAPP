@@ -54,9 +54,9 @@ fun SplashView(
                     is MainActivityViewModel.UIEvent.NavigateNow -> {
                         Log.d(TAG, "SplashView: ${state}")
 
-                        navController.navigate(event.route) {
-                            popUpTo(Screen.Splash.route) { inclusive = true }
-                        }
+//                        navController.navigate(event.route) {
+//                            popUpTo(Screen.Splash.route) { inclusive = true }
+//                        }
                     }
                 }
             }

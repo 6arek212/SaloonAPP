@@ -62,13 +62,14 @@ fun LoginView(navController: NavController, viewModel: LoginViewModel = hiltView
 
 
 
+
     LaunchedEffect(Unit) {
         launch {
             events.collect { event ->
                 when (event) {
                     is LoginViewModel.UIEvent.LoggedIn -> {
                         navController.navigate(Screen.AppointmentsList.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
+                            popUpTo(Screen.Home.route) { inclusive = true }
                         }
                     }
                 }

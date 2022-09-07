@@ -16,7 +16,8 @@ constructor(
             isActive = model.isActive,
             service = model.service,
             startTime = model.startTime,
-            endTime = model.endTime
+            endTime = model.endTime,
+            worker = model.worker
         )
     }
 
@@ -27,7 +28,8 @@ constructor(
             isActive = domainModel.isActive,
             service = domainModel.service,
             startTime = domainModel.startTime,
-            endTime = domainModel.endTime
+            endTime = domainModel.endTime,
+            worker = domainModel.worker
         )
     }
 

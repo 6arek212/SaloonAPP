@@ -1,12 +1,8 @@
 package com.example.ibrasaloonapp.presentation.ui.book_appointment
 
-import DropDownMenuComponent
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,14 +15,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.presentation.components.DatePicker
+import com.example.ibrasaloonapp.core.stringDateFormat
+import com.example.ibrasaloonapp.core.stringDateToDateFormat
+import com.example.ibrasaloonapp.core.stringDateToTimeFormat
+import com.example.ibrasaloonapp.presentation.components.CustomChip
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
-import com.example.ibrasaloonapp.presentation.ui.Screen
-import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListEvent
-import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentsListViewModel
-import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import com.example.ibrasaloonapp.presentation.components.HomeAppBar
 import kotlinx.coroutines.launch
 
 private const val TAG = "BookAppointmentView"
@@ -38,17 +32,15 @@ fun BookAppointmentView(
     viewModel: BookAppointmentViewModel = hiltViewModel(),
 ) {
 
-    val timeError = viewModel.state.value.timeError
-    val dateError = viewModel.state.value.dateError
-    val serviceTypeError = viewModel.state.value.serviceTypeError
+    val workers = viewModel.state.value.workers
+    val workingDates = viewModel.state.value.workingDates
+    val services = viewModel.state.value.services
+    val availableAppointments = viewModel.state.value.availableAppointments
 
-    val expandDropDown2 = viewModel.state.value.expandDropDown2
-    val expandDropDown1 = viewModel.state.value.expandDropDown1
-    val typesList = viewModel.state.value.typesList
-    val availableAppointmentsTimesList = viewModel.state.value.availableAppointmentsTimesList
-    val date = viewModel.state.value.date
-    val time = viewModel.state.value.time
-    val serviceType = viewModel.state.value.serviceType
+    val selectedWorker = viewModel.state.value.selectedWorker
+    val selectedWorkingDate = viewModel.state.value.selectedWorkingDate
+    val selectedAppointment = viewModel.state.value.selectedAppointment
+    val selectedService = viewModel.state.value.selectedService
 
     val progressBar = viewModel.state.value.progressBarState
     val queue = viewModel.state.value.errorQueue
@@ -58,210 +50,190 @@ fun BookAppointmentView(
 
     val events = viewModel.events
 
+
+    val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
+    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
+
     LaunchedEffect(Unit) {
         launch {
             events.collect { event ->
                 when (event) {
-                    is BookAppointmentViewModel.UIEvent.OnBookAppointment -> {
+                    is BookAppointmentUIEvent.ExpandSheet -> {
+                        sheetState.expand()
+                    }
 
-                        Log.d(TAG, "BookAppointmentView: ")
+                    is BookAppointmentUIEvent.HideSheet -> {
+                        sheetState.collapse()
+                    }
+
+                    is BookAppointmentUIEvent.OnBookAppointment -> {
+
                     }
                 }
             }
         }
     }
 
+    Scaffold(
+        topBar = {
+            HomeAppBar()
+        }
+    ) {
 
-    DefaultScreenUI(
-        queue = queue,
-        progressBarState = progressBar,
-        onRemoveHeadFromQueue = { viewModel.onTriggerEvent(BookAppointmentEvent.OnRemoveHeadFromQueue) }) {
+        DefaultScreenUI(
+            modifier = Modifier.padding(it),
+            queue = queue,
+            progressBarState = progressBar,
+            onRemoveHeadFromQueue = { viewModel.onTriggerEvent(BookAppointmentEvent.OnRemoveHeadFromQueue) }) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background)
-        )
-        {
+            BottomSheetScaffold(sheetGesturesEnabled = false, scaffoldState = scaffoldState,
+                sheetContent = {
+                    BookAppointmentConfirmation(
+                        pickedDate = selectedAppointment?.startTime,
+                        service = selectedService,
+                        workerName = "${selectedWorker?.firstName} ${selectedWorker?.lastName}",
+                        onBook = { viewModel.onTriggerEvent(BookAppointmentEvent.Book) }
+                    )
+                }) {
 
-            Image(
-                painter = painterResource(id = R.drawable.barber_shop_brief),
-                contentDescription = "",
-                modifier = Modifier
-                    .heightIn(min = 200.dp)
-                    .widthIn(min = 200.dp)
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 16.dp, end = 16.dp)
-
-            )
-
-
-
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-                    .verticalScroll(scrollState)
-            ) {
-
-                Text(text = "Book An Appointment", style = MaterialTheme.typography.overline)
-
-                Divider(
+                Column(
                     modifier = Modifier
-                        .padding(top = 16.dp)
-                        .fillMaxWidth()
-                        .height(.5.dp), color = MaterialTheme.colors.onBackground
-                )
-
-                Spacer(modifier = Modifier.padding(16.dp))
-
-
-
-                DatePicker(
-                    error = dateError,
-                    label = "Pick Date",
-                    datePicked = date,
-                    updatedDate = { updatedDate ->
-                        viewModel.onTriggerEvent(BookAppointmentEvent.DateChanged(updatedDate))
-                    })
-
-                Spacer(modifier = Modifier.padding(16.dp))
-
-
-                DropDownMenuComponent(
-                    error = timeError,
-                    label = "Pick time",
-                    expanded = expandDropDown2,
-                    selectedOptionText = time,
-                    onExpandedChange = {
-                        viewModel.onTriggerEvent(BookAppointmentEvent.TimeDropDownExpandChange(!expandDropDown2))
-                    },
-                    onDismissRequest = {
-                        viewModel.onTriggerEvent(BookAppointmentEvent.TimeDropDownExpandChange(false))
-                    }
+                        .fillMaxSize()
+                        .padding(8.dp)
+                        .verticalScroll(scrollState)
                 ) {
-                    for (time in availableAppointmentsTimesList) {
 
-                        DropdownMenuItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            onClick = {
-                                viewModel.onTriggerEvent(
-                                    BookAppointmentEvent.TimeDropDownExpandChange(
-                                        false
+                    Text(text = "Book An Appointment", style = MaterialTheme.typography.h3)
+
+                    Spacer(modifier = Modifier.padding(16.dp))
+
+                    Text(text = "Worker:")
+
+                    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                        for (worker in workers) {
+                            CustomChip(
+                                text = "${worker.firstName} ${worker.lastName}",
+                                onClick = {
+                                    viewModel.onTriggerEvent(
+                                        BookAppointmentEvent.OnSelectedWorker(worker)
                                     )
-                                )
-                                viewModel.onTriggerEvent(BookAppointmentEvent.TimeChanged(time))
-                            }) {
-                            Column {
-
-                                Text(
-                                    text = time,
-                                    style = MaterialTheme.typography.body1,
-                                    color = MaterialTheme.colors.onSurface
-                                )
-
-                                Divider(
-                                    modifier = Modifier
-                                        .padding(top = 8.dp, bottom = 8.dp)
-                                        .fillMaxWidth()
-                                        .height(.5.dp), color = MaterialTheme.colors.onBackground
-                                )
-
-                            }
-
-
+                                }, isSelected = worker == selectedWorker
+                            )
                         }
                     }
-                }
 
 
-                Spacer(modifier = Modifier.padding(16.dp))
+                    AnimatedVisibility(visible = selectedWorker != null) {
+                        Column() {
+                            Text(text = "Pick a day:")
 
-
-                DropDownMenuComponent(
-                    error = serviceTypeError,
-                    label = "Pick type",
-                    expanded = expandDropDown1,
-                    selectedOptionText = serviceType,
-                    onExpandedChange = {
-                        viewModel.onTriggerEvent(
-                            BookAppointmentEvent.ServiceTypeDropDownExpandChange(
-                                !expandDropDown1
-                            )
-                        )
-                    },
-                    onDismissRequest = {
-                        viewModel.onTriggerEvent(
-                            BookAppointmentEvent.ServiceTypeDropDownExpandChange(
-                                false
-                            )
-                        )
-                    }
-                ) {
-                    for (type in typesList) {
-
-                        DropdownMenuItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            onClick = {
-                                viewModel.onTriggerEvent(
-                                    BookAppointmentEvent.ServiceTypeDropDownExpandChange(
-                                        false
+                            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                                for (workingDate in workingDates) {
+                                    CustomChip(
+                                        text = stringDateToDateFormat(workingDate.date),
+                                        onClick = {
+                                            viewModel.onTriggerEvent(
+                                                BookAppointmentEvent.OnSelectedWorkingDate(
+                                                    workingDate
+                                                )
+                                            )
+                                        }, isSelected = workingDate == selectedWorkingDate
                                     )
-                                )
-                                viewModel.onTriggerEvent(
-                                    BookAppointmentEvent.ServiceTypeChanged(
-                                        type
-                                    )
-                                )
-                            }) {
-                            Column {
-
-                                Text(
-                                    text = type,
-                                    style = MaterialTheme.typography.body1,
-                                    color = MaterialTheme.colors.onSurface
-                                )
-
-                                Divider(
-                                    modifier = Modifier
-                                        .padding(top = 8.dp, bottom = 8.dp)
-                                        .fillMaxWidth()
-                                        .height(.5.dp), color = MaterialTheme.colors.onBackground
-                                )
-
+                                }
                             }
-
-
                         }
                     }
+
+
+
+                    AnimatedVisibility(visible = selectedWorkingDate != null) {
+
+                        Column() {
+                            Text(text = "Service:")
+
+                            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+
+                                for (ser in services) {
+                                    CustomChip(
+                                        text = ser,
+                                        onClick = {
+                                            viewModel.onTriggerEvent(
+                                                BookAppointmentEvent.OnSelectedService(ser)
+                                            )
+                                        }, isSelected = ser == selectedService
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+
+
+                    AnimatedVisibility(visible = selectedService.isNotBlank()) {
+                        Column() {
+                            Text(text = "Pick an appointment:")
+
+                            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                                for (appointment in availableAppointments) {
+                                    CustomChip(
+                                        text = appointment.startTime?.let {
+                                            stringDateToTimeFormat(
+                                                appointment.startTime
+                                            )
+                                        } ?: "",
+                                        onClick = {
+                                            viewModel.onTriggerEvent(
+                                                BookAppointmentEvent.OnSelectedAppointment(
+                                                    appointment
+                                                )
+                                            )
+                                        }, isSelected = appointment == selectedAppointment
+                                    )
+                                }
+                            }
+                        }
+
+                    }
+
+
                 }
 
-
-
-
-
-
-
-                Spacer(modifier = Modifier.padding(16.dp))
-
-
-                Button(
-                    contentPadding = PaddingValues(16.dp),
-                    onClick = { viewModel.onTriggerEvent(BookAppointmentEvent.Submit) },
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Text(text = "Book it !", style = MaterialTheme.typography.button)
-                }
-
-                Spacer(modifier = Modifier.padding(16.dp))
 
             }
 
         }
     }
+}
+
+
+@Composable
+fun BookAppointmentConfirmation(
+    pickedDate: String? = null,
+    service: String? = null,
+    workerName: String? = null,
+    onBook: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(.5f)
+            .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Appointment Information")
+
+        Spacer(modifier = Modifier.padding(16.dp))
+
+        Text(text = "${pickedDate?.let { stringDateFormat(pickedDate) }} for a ${service}")
+
+        Text(text = "With ${workerName}")
+
+
+        Spacer(modifier = Modifier.padding(16.dp))
+
+        Button(onClick = { onBook() }) {
+            Text(text = "Confirm And Book")
+        }
+    }
+
+
 }

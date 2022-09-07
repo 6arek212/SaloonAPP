@@ -13,14 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.stringDateToDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
 
 
 @Composable
 fun AppointmentCard(
     modifier: Modifier = Modifier,
-    time: String = "12:00",
-    date: String = "August 08,2022"
+    appointment: Appointment
 ) {
     Card(
         modifier = modifier.heightIn(min = 100.dp),
@@ -44,12 +44,16 @@ fun AppointmentCard(
             Spacer(modifier = Modifier.padding(8.dp))
 
             Text(
-                text = time,
+                text = "${appointment.service} - Done By " +
+                        "${appointment.worker.firstName}" +
+                        " ${appointment.worker.lastName}",
                 style = MaterialTheme.typography.body1,
                 color = MaterialTheme.colors.onSurface
             )
+
+
             Text(
-                text = date,
+                text = stringDateToDateFormat(appointment.startTime),
                 style = MaterialTheme.typography.body1,
                 color = MaterialTheme.colors.onSurface
             )

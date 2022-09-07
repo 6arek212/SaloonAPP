@@ -37,33 +37,54 @@ constructor(
         viewModelScope.launch {
             when (event) {
                 is AppointmentListEvent.GetAppointments -> {
-//                    getAppointments()
+                    getAppointments()
                 }
                 is AppointmentListEvent.OnRemoveHeadFromQueue -> {
                     removeHeadMessage()
                 }
-                is AppointmentListEvent.CancelAppointment -> {
-                    cancelAppointment(event.id, event.index)
+                is AppointmentListEvent.UnBookAppointment -> {
+                    unbook(event.id, event.index)
                 }
             }
         }
     }
 
+    private suspend fun getAppointments() {
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
-    suspend fun cancelAppointment(id: String, index: Int) {
+        val result = repository.getAppointments()
+
+        when (result) {
+            is ApiResult.Success -> {
+                _state.value = _state.value.copy(appointments = result.value)
+            }
+
+            is ApiResult.GenericError -> {
+
+            }
+
+            is ApiResult.NetworkError -> {
+
+            }
+        }
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+    }
+
+
+    suspend fun unbook(id: String, index: Int) {
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
         val result = repository.unbookAppointment(id)
 
         when (result) {
             is ApiResult.Success -> {
-                val list = ArrayList(_state.value.activeAppointments)
+                val list = ArrayList(_state.value.appointments)
                 list.removeAt(index)
-                _state.value = _state.value.copy(activeAppointments = list)
+                _state.value = _state.value.copy(appointments = list)
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Canceled",
-                        description = "You'r appointment has been canceled",
+                        title = "Unbooked",
+                        description = "You'r appointment has been unbooked",
                         confirmButton = true
                     )
                 )
@@ -80,8 +101,6 @@ constructor(
 
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
     }
-
-
 
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {

@@ -56,7 +56,7 @@ constructor(
         viewModelScope.launch {
             val authData = authRepository.getLoginStatus()
 //            delay(3000L)
-            if (authData.token.isNotBlank()) {
+            if (authData != null) {
                 _state.value = state.value.copy(isLoggedIn = true, authData = authData)
                 _events.send(UIEvent.NavigateNow(Screen.AppointmentsList.route))
             } else {

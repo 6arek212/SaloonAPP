@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
 
-    suspend fun getLoginStatus(): AuthData
+    suspend fun getLoginStatus(): AuthData?
 
     suspend fun login(loginDataDto: LoginDataDto): ApiResult<String>
 

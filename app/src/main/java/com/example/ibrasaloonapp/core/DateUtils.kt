@@ -9,7 +9,7 @@ import java.util.*
 private const val TAG = "DateUtils"
 
 fun getCurrentDateAsString(): String {
-    return SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date())
+    return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 }
 
 
@@ -28,6 +28,36 @@ fun stringToDate(str: String): String {
 }
 
 fun stringDateFormat(str: String): String {
+    try {
+        val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+        val date = sdfInput.parse(str)
+        val sdfOutput = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
+        val formatted = sdfOutput.format(date)
+        return formatted.toString()
+    } catch (e: ParseException) {
+        // handle the failure
+        Log.e(TAG, "formatDate:${e.message} ")
+        return ""
+    }
+}
+
+
+fun stringDateToTimeFormat(str: String): String {
+    try {
+        val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+        val date = sdfInput.parse(str)
+        val sdfOutput = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val formatted = sdfOutput.format(date)
+        return formatted.toString()
+    } catch (e: ParseException) {
+        // handle the failure
+        Log.e(TAG, "formatDate:${e.message} ")
+        return ""
+    }
+}
+
+
+fun stringDateToDateFormat(str: String): String {
     try {
         val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
         val date = sdfInput.parse(str)

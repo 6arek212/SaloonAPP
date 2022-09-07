@@ -2,9 +2,9 @@ package com.example.ibrasaloonapp.repository
 
 import com.example.ibrasaloonapp.core.ServiceType
 import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
-import com.example.ibrasaloonapp.network.model.AppointmentDto
-import com.example.ibrasaloonapp.network.model.AppointmentDtoMapper
+import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.services.AppointmentService
 import com.example.trainingapp.util.safeApiCall
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,12 +18,18 @@ class AppointmentRepositoryImpl
 constructor(
     private val service: AppointmentService,
     private val mapper: AppointmentDtoMapper,
+    private val userMapper: UserDtoMapper,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AppointmentRepository {
 
+    override suspend fun getAppointments(): ApiResult<List<Appointment>> {
+        return safeApiCall(dispatcher) {
+            mapper.toDomainList(service.getUserAppointments().appointments)
+        }
+    }
 
     override suspend fun bookAppointment(
-        appointment: AppointmentDto
+        appointment: BookAppointmentDto
     ): ApiResult<String> {
         return safeApiCall(dispatcher = dispatcher) {
             service.bookAppointment(appointment).message
@@ -36,9 +42,11 @@ constructor(
         }
     }
 
-    override suspend fun getAppointment(): ApiResult<Appointment> {
+    override suspend fun getAppointment(): ApiResult<Appointment?> {
         return safeApiCall(dispatcher = dispatcher) {
-            mapper.mapToDomainModel(service.getAppointment().appointment)
+            service.getAppointment().appointment?.let {
+                mapper.mapToDomainModel(it)
+            }
         }
     }
 
@@ -57,9 +65,6 @@ constructor(
         }
     }
 }
-
-
-
 
 
 val fakeAvailableDates = listOf(

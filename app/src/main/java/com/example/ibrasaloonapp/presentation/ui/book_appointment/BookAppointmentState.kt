@@ -4,24 +4,24 @@ import com.example.ibrasaloonapp.core.getCurrentDateAsString
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.User
+import com.example.ibrasaloonapp.domain.model.WorkingDate
 import java.util.*
 
 data class BookAppointmentState(
-    val date: String = getCurrentDateAsString(),
-    val dateError: String? = null,
-    val serviceType: String = "",
-    val serviceTypeError: String? = null,
-    val time: String = "",
-    val timeError: String? = null,
+    val workers: List<User> = listOf(),
+    val workingDates: List<WorkingDate> = listOf(),
+    val services: List<String> = listOf(),
+    val availableAppointments: List<Appointment> = listOf(),
 
-    val availableAppointmentsTimesList: List<String> = listOf(),
-    val typesList: List<String> = listOf(),
-
-    val expandDropDown1: Boolean = false,
-    val expandDropDown2: Boolean = false,
+    val selectedWorker: User? = null,
+    val selectedWorkingDate: WorkingDate? = null,
+    val selectedService: String = "",
+    val selectedAppointment: Appointment? = null,
 
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf())
 
-    ) {
+) {
 }

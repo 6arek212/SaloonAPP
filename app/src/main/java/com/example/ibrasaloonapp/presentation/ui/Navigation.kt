@@ -8,21 +8,27 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
+import com.example.ibrasaloonapp.presentation.ui.home.HomeView
 import com.example.ibrasaloonapp.presentation.ui.login.LoginView
 import com.example.ibrasaloonapp.presentation.ui.signup.SignupView
 import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
 
 
 @Composable
-fun Navigation(firstRoute: String = Screen.Splash.route) {
+fun Navigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.AppointmentsList.route) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Home.route
+    ) {
         splash(navController = navController)
         login(navController = navController)
         signup(navController = navController)
+        home(navController = navController)
         appointmentList(navController = navController)
         bookAppointment(navController = navController)
+
     }
 }
 
@@ -53,10 +59,22 @@ fun NavGraphBuilder.signup(
     navController: NavController,
 ) {
     composable(
-        route = Screen.Login.route,
+        route = Screen.Signup.route,
         arguments = emptyList()
     ) {
         SignupView(navController = navController)
+    }
+}
+
+
+fun NavGraphBuilder.home(
+    navController: NavController,
+) {
+    composable(
+        route = Screen.Home.route,
+        arguments = emptyList()
+    ) {
+        HomeView(navController = navController)
     }
 }
 

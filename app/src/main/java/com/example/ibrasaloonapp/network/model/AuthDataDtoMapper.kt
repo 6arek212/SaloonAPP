@@ -10,7 +10,7 @@ constructor(val userDtoMapper: UserDtoMapper) : DomainMapper<AuthDataDto, AuthDa
 
     override fun mapToDomainModel(model: AuthDataDto): AuthData {
         return AuthData(
-            user = userDtoMapper.mapToDomainModel(model.customer),
+            user = userDtoMapper.mapToDomainModel(model.user),
             token = model.token,
             expiresIn = model.expiresIn
         )
@@ -18,7 +18,7 @@ constructor(val userDtoMapper: UserDtoMapper) : DomainMapper<AuthDataDto, AuthDa
 
     override fun mapFromDomainModel(domainModel: AuthData): AuthDataDto {
         return AuthDataDto(
-            customer = userDtoMapper.mapFromDomainModel(domainModel.user),
+            user = userDtoMapper.mapFromDomainModel(domainModel.user),
             token = domainModel.token,
             expiresIn = domainModel.expiresIn
         )

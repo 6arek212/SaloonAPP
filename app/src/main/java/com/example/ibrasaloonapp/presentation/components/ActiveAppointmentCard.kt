@@ -22,7 +22,7 @@ import com.example.ibrasaloonapp.presentation.theme.RedLite
 fun ActiveAppointmentCard(
     modifier: Modifier = Modifier,
     appointment: Appointment,
-    onCancel : () -> Unit
+    onCancel: () -> Unit
 ) {
 
     Card(
@@ -61,7 +61,7 @@ fun ActiveAppointmentCard(
                 Spacer(modifier = Modifier.padding(8.dp))
 
                 Text(
-                    text = appointment.type ?: "",
+                    text = "",
                     style = MaterialTheme.typography.body1,
                     color = MaterialTheme.colors.onSurface
                 )
@@ -71,8 +71,8 @@ fun ActiveAppointmentCard(
                     modifier = Modifier
                         .fillMaxWidth(.6f)
                         .align(Alignment.CenterHorizontally),
-                    date = appointment.date ?: "",
-                    time = appointment.time ?: ""
+                    date = "",
+                    time = ""
                 )
 
                 Spacer(modifier = Modifier.padding(8.dp))

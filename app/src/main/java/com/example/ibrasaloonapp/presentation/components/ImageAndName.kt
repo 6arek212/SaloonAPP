@@ -35,7 +35,7 @@ fun ImageAndName(
         ) {
             Text(
                 text = "${firstName.first()} ${lastName.first()}",
-                style = MaterialTheme.typography.h4,
+                style = MaterialTheme.typography.h5,
                 color = MaterialTheme.colors.onPrimary
             )
         }

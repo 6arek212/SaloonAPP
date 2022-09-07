@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.network.model
 
+import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.domain.util.DomainMapper
 
@@ -21,5 +22,13 @@ class UserDtoMapper : DomainMapper<UserDto, User> {
             lastName = domainModel.lastName,
             phone = domainModel.phone
         )
+    }
+
+    fun toDomainList(initial: List<UserDto>): List<User> {
+        return initial.map { userDto -> mapToDomainModel(userDto) }
+    }
+
+    fun fromDomainList(initial: List<User>): List<UserDto> {
+        return initial.map { user -> mapFromDomainModel(user) }
     }
 }

@@ -1,5 +1,7 @@
 package com.example.ibrasaloonapp.di
 
+import com.example.ibrasaloonapp.repository.AuthRepository
+import com.example.trainingapp.util.AuthInterceptor
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -11,24 +13,27 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-const val BASE_API = "http://192.168.1.46:3000/api/"
+const val BASE_API = "http://192.168.1.46:4000/api/"
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RetrofitModule {
 
+//    @Singleton
+//    @Provides
+//    fun provideAuthInterceptor(
+//        authRepository: AuthRepository
+//    ): AuthInterceptor = lazy { AuthInterceptor(authRepository) }.value
 
     @Singleton
     @Provides
     fun provideRetrofit(
-//        errorInterceptor: ErrorInterceptor,
-//        authInterceptor: AuthInterceptor,
-//        tokenAuthenticator: TokenAuthenticator
+        authInterceptor: AuthInterceptor
     ): Retrofit {
+
+
         val client = OkHttpClient.Builder()
-//            .authenticator(tokenAuthenticator)
-//            .addInterceptor(authInterceptor)
-//            .addInterceptor(errorInterceptor)
+            .addInterceptor(authInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)

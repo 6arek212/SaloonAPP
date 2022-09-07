@@ -31,7 +31,10 @@ fun MutablePreferences.insertAuthData(authData: AuthData) {
     this[EXPIRES_IN] = authData.expiresIn
 }
 
-fun Preferences.getAuthData(): AuthData {
+fun Preferences.getAuthData(): AuthData? {
+    if (this[USER_ID] == null || this[TOKEN] == null)
+        return null
+
     return AuthData(
         User(
             id = this[USER_ID] ?: "",

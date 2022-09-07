@@ -1,16 +1,22 @@
 package com.example.ibrasaloonapp.presentation.ui.book_appointment
 
+import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.User
+import com.example.ibrasaloonapp.domain.model.WorkingDate
+
 sealed class BookAppointmentEvent {
-    data class DateChanged(val date: String) : BookAppointmentEvent()
-    data class ServiceTypeChanged(val type: String) : BookAppointmentEvent()
-    data class TimeChanged(val time: String) : BookAppointmentEvent()
 
-    data class ServiceTypeDropDownExpandChange(val value: Boolean) : BookAppointmentEvent()
-    data class TimeDropDownExpandChange(val value: Boolean) : BookAppointmentEvent()
+    class OnSelectedWorker(val worker: User) : BookAppointmentEvent()
+    class OnSelectedWorkingDate(val date: WorkingDate) : BookAppointmentEvent()
+    class OnSelectedService(val service: String) : BookAppointmentEvent()
+    class OnSelectedAppointment(val appointment: Appointment) : BookAppointmentEvent()
 
-    object Submit : BookAppointmentEvent()
-    object GetServicesTypes : BookAppointmentEvent()
+
+    object GetWorkingDates : BookAppointmentEvent()
+    object Book : BookAppointmentEvent()
+    object GetServices : BookAppointmentEvent()
     object GetAvailableAppointments : BookAppointmentEvent()
+    object GetWorkers : BookAppointmentEvent()
     object OnRemoveHeadFromQueue : BookAppointmentEvent()
 
 }

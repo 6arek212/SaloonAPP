@@ -19,15 +19,16 @@ import com.example.ibrasaloonapp.core.domain.UIComponent
  */
 @Composable
 fun DefaultScreenUI(
+    modifier: Modifier = Modifier,
     queue: Queue<UIComponent> = Queue(mutableListOf()),
     onRemoveHeadFromQueue: () -> Unit,
     progressBarState: ProgressBarState = ProgressBarState.Idle,
     dialogOnConfirm: () -> Unit = {},
     content: @Composable () -> Unit,
-    ) {
+) {
     val scaffoldState = rememberScaffoldState()
     Scaffold(
-        modifier = Modifier.statusBarsPadding(),
+        modifier = modifier.statusBarsPadding(),
         scaffoldState = scaffoldState,
     ) { padding ->
 
