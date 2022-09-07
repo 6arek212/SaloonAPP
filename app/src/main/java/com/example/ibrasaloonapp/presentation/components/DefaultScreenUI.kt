@@ -4,6 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.BookOnline
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,6 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.domain.model.MenuItem
+import com.example.ibrasaloonapp.presentation.ui.Screen
+import com.example.ibrasaloonapp.presentation.ui.home.DrawerBody
+import com.example.ibrasaloonapp.presentation.ui.home.DrawerHeader
 
 
 /**
@@ -27,6 +36,7 @@ fun DefaultScreenUI(
     content: @Composable () -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
+
     Scaffold(
         modifier = modifier.statusBarsPadding(),
         scaffoldState = scaffoldState,

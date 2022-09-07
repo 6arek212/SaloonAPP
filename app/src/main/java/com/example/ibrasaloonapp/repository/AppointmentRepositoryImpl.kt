@@ -38,7 +38,7 @@ constructor(
 
     override suspend fun unbookAppointment(id: String): ApiResult<String> {
         return safeApiCall(dispatcher = dispatcher) {
-            service.unbookAppointment(id).message
+            service.unbookAppointment(UnBookDto(id)).message
         }
     }
 

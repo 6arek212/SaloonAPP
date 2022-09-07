@@ -34,6 +34,10 @@ sealed class Screen(val route: String, val arguments: List<NamedNavArgument>) {
         arguments = emptyList()
     )
 
+    object Profile : Screen(
+        route = "Profile",
+        arguments = emptyList()
+    )
 
 
 }

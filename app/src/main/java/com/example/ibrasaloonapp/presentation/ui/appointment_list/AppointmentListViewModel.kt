@@ -43,7 +43,7 @@ constructor(
                     removeHeadMessage()
                 }
                 is AppointmentListEvent.UnBookAppointment -> {
-                    unbook(event.id, event.index)
+                    unbook(id = event.id, index = event.index)
                 }
             }
         }
@@ -84,8 +84,7 @@ constructor(
                 appendToMessageQueue(
                     UIComponent.Dialog(
                         title = "Unbooked",
-                        description = "You'r appointment has been unbooked",
-                        confirmButton = true
+                        description = "You'r appointment has been unbooked"
                     )
                 )
             }

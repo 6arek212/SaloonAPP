@@ -6,6 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.BookOnline
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -31,7 +36,7 @@ fun DrawerHeader() {
 @Composable
 fun DrawerBody(
     modifier: Modifier = Modifier,
-    items: List<MenuItem>,
+    items: List<MenuItem> ,
     itemTextStyle: TextStyle = TextStyle(fontSize = 18.sp),
     onClick: (MenuItem) -> Unit
 ) {

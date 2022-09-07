@@ -24,5 +24,5 @@ data class AppointmentDto(
     val endTime: String,
 
     @SerializedName("isActive")
-    val isActive: Boolean? = null
+    val isActive: Boolean
 )

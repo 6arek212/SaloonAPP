@@ -2,6 +2,7 @@ package com.example.ibrasaloonapp.network.services
 
 import com.example.ibrasaloonapp.network.model.AppointmentDto
 import com.example.ibrasaloonapp.network.model.BookAppointmentDto
+import com.example.ibrasaloonapp.network.model.UnBookDto
 import com.example.ibrasaloonapp.network.responses.*
 import retrofit2.http.*
 
@@ -20,7 +21,7 @@ interface AppointmentService {
 
     @POST("appointments/unbook")
     suspend fun unbookAppointment(
-        @Body appointmentId: String
+        @Body dto: UnBookDto
     ): MessageResponse
 
 

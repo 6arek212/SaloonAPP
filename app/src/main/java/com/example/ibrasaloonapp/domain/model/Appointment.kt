@@ -6,7 +6,7 @@ data class Appointment(
     val service: String? = null,
     val startTime: String,
     val endTime: String,
-    val isActive: Boolean? = null,
+    val isActive: Boolean,
     val customer: String? = null,
     val worker: User
 ) {

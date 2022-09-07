@@ -24,6 +24,7 @@ import com.example.ibrasaloonapp.core.stringDateToDateFormat
 import com.example.ibrasaloonapp.core.stringDateToTimeFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.MenuItem
+import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.HomeAppBar
 import com.example.ibrasaloonapp.presentation.components.ImageAndName
 import com.example.ibrasaloonapp.presentation.components.StoryCard
@@ -39,44 +40,9 @@ fun HomeView(navController: NavController, viewModel: HomeViewModel = hiltViewMo
 
     val appointment = viewModel.state.value.appointment
 
-    Scaffold(
-        drawerContent = {
-            DrawerHeader()
-            DrawerBody(items = listOf(
-                MenuItem(
-                    id = "home",
-                    title = "Home",
-                    contentDescription = "Go to home",
-                    icon = Icons.Filled.Home
-                ),
-                MenuItem(
-                    id = "appointments",
-                    title = "Appointments",
-                    contentDescription = "Go to appointments",
-                    icon = Icons.Filled.BookOnline
-                ),
-                MenuItem(
-                    id = "profile",
-                    title = "Profile",
-                    contentDescription = "Go to profile",
-                    icon = Icons.Filled.AccountBox
-                ),
-                MenuItem(
-                    id = "logout",
-                    title = "Logout",
-                    contentDescription = "logout",
-                    icon = Icons.Filled.ExitToApp
-                )
-            ), onClick = { item ->
-                if (item.id == "appointments") {
-                    navController.navigate(Screen.AppointmentsList.route)
-                }
-            })
-        }
-    ) {
 
+    DefaultScreenUI(onRemoveHeadFromQueue = { /*TODO*/ }) {
         BackdropScaffold(
-            modifier = Modifier.padding(it),
             scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
             frontLayerScrimColor = Color.Unspecified,
             appBar = {
