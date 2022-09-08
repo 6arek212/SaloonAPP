@@ -4,8 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,39 +13,31 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.presentation.theme.Gray2
 
 
 @Composable
-fun StoryCard(modifier: Modifier = Modifier, image: Int) {
-    Column(
-        modifier = modifier
-            .padding(8.dp)
-    ) {
-        Image(
-            modifier = Modifier
-                .height(200.dp)
-                .width(150.dp)
-                .clip(MaterialTheme.shapes.small),
-            painter = painterResource(id = image),
-            contentDescription = "",
-            contentScale = ContentScale.Crop
-        )
+fun ImageChip(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit,
+    isSelected: Boolean
+) {
 
+    Row(modifier = modifier) {
 
         Surface(
             elevation = 10.dp,
             modifier = Modifier
-                .size(64.dp)
-                .align(Alignment.CenterHorizontally)
-                .offset(y = -15.dp),
-            shape = CircleShape,
-            color = Color.Transparent
+                .zIndex(1f)
+                .size(45.dp)
+                .offset(15.dp)
+                .wrapContentWidth()
+                .wrapContentHeight(),
+            shape = CircleShape
         ) {
-
             Image(
                 modifier = Modifier
                     .fillMaxSize()
@@ -61,9 +51,20 @@ fun StoryCard(modifier: Modifier = Modifier, image: Int) {
         }
 
 
+        CustomChip(
+            modifier = modifier,
+            contentPaddingValues = PaddingValues(
+                start = 24.dp,
+                top = 6.dp,
+                end = 8.dp,
+                bottom = 6.dp
+            ),
+            text = text,
+            onClick = onClick,
+            isSelected = isSelected
+        )
+
     }
 
 
 }
-
-

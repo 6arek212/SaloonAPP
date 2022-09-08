@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.presentation.theme
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -9,80 +10,83 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.ibrasaloonapp.R
 
-private val SF_FONT = FontFamily(
-    Font(R.font.sf_light_italic, FontWeight.W300),
-    Font(R.font.sf_regular, FontWeight.W400),
-    Font(R.font.sf_medium, FontWeight.W500),
-    Font(R.font.sf_semi_bold_italic, FontWeight.W600),
-    Font(R.font.sf_bold, FontWeight.W600),
-)
+private val Poppins_Font = FontFamily(
+    Font(R.font.poppins_thin, FontWeight.W100),
+    Font(R.font.poppins_extralight, FontWeight.W200),
+    Font(R.font.poppins_light, FontWeight.W300),
+    Font(R.font.poppins_regular, FontWeight.W400),
+    Font(R.font.poppins_medium, FontWeight.W500),
+    Font(R.font.poppins_semibold, FontWeight.W600),
+    Font(R.font.poppins_bold, FontWeight.W700),
+    Font(R.font.poppins_extrabold, FontWeight.W800),
+    )
 
 
 // Set of Material typography styles to start with
 val SFTypography = Typography(
     h1 = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.W500,
+        fontFamily = Poppins_Font,
+        fontWeight = FontWeight.W800,
         fontSize = 30.sp,
     ),
     h2 = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.W500,
+        fontFamily = Poppins_Font,
+        fontWeight = FontWeight.W700,
         fontSize = 24.sp,
     ),
     h3 = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.W500,
+        fontFamily = Poppins_Font,
+        fontWeight = FontWeight.W600,
         fontSize = 20.sp,
     ),
     h4 = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.W400,
+        fontFamily = Poppins_Font,
+        fontWeight = FontWeight.W500,
         fontSize = 18.sp,
     ),
     h5 = TextStyle(
-        fontFamily = SF_FONT,
+        fontFamily = Poppins_Font,
         fontWeight = FontWeight.W400,
         fontSize = 16.sp,
     ),
     h6 = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.W400,
+        fontFamily = Poppins_Font,
+        fontWeight = FontWeight.W300,
         fontSize = 14.sp,
     ),
     subtitle1 = TextStyle(
-        fontFamily = SF_FONT,
+        fontFamily = Poppins_Font,
         fontWeight = FontWeight.W500,
         fontSize = 16.sp,
     ),
     subtitle2 = TextStyle(
-        fontFamily = SF_FONT,
+        fontFamily = Poppins_Font,
         fontWeight = FontWeight.W400,
         fontSize = 14.sp,
     ),
     body1 = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.Normal,
+        fontFamily = Poppins_Font,
+        fontWeight = FontWeight.W400,
         fontSize = 16.sp
     ),
     body2 = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.Light,
-        fontSize = 14.sp
+        fontFamily = Poppins_Font,
+        fontWeight =  FontWeight.W400,
+        fontSize = 12.sp
     ),
     button = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.W400,
-        fontSize = 15.sp,
-        color = Color.White
+        fontFamily = Poppins_Font,
+        fontWeight = FontWeight.W300,
+        fontSize = 16.sp,
+        color = Gray1
     ),
     caption = TextStyle(
-        fontFamily = SF_FONT,
-        fontWeight = FontWeight.Normal,
+        fontFamily = Poppins_Font,
+        fontWeight = FontWeight.W200,
         fontSize = 12.sp
     ),
     overline = TextStyle(
-        fontFamily = SF_FONT,
+        fontFamily = Poppins_Font,
         fontWeight = FontWeight.W300,
         fontSize = 26.sp
     )

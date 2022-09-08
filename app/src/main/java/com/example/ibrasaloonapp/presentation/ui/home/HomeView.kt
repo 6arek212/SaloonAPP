@@ -4,33 +4,25 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.stringDateToDateFormat
 import com.example.ibrasaloonapp.core.stringDateToTimeFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
-import com.example.ibrasaloonapp.domain.model.MenuItem
-import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
-import com.example.ibrasaloonapp.presentation.components.HomeAppBar
-import com.example.ibrasaloonapp.presentation.components.ImageAndName
-import com.example.ibrasaloonapp.presentation.components.StoryCard
-import com.example.ibrasaloonapp.presentation.theme.Gray2
-import com.example.ibrasaloonapp.presentation.theme.Orange
-import com.example.ibrasaloonapp.presentation.theme.Red
+import com.example.ibrasaloonapp.presentation.components.*
+import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
 
 
@@ -49,11 +41,13 @@ fun HomeView(navController: NavController, viewModel: HomeViewModel = hiltViewMo
                 HomeAppBar()
             },
             backLayerContent = {
-                backLayer() { navController.navigate(Screen.BookAppointment.route) }
+                BackLayer()
             },
             frontLayerContent = {
-                frontLayer(appointment = appointment)
-            }
+                FrontLayer(appointment = appointment) { navController.navigate(Screen.BookAppointment.route) }
+            },
+            frontLayerElevation = 10.dp,
+            frontLayerBackgroundColor = Gray1
         )
     }
 
@@ -61,9 +55,9 @@ fun HomeView(navController: NavController, viewModel: HomeViewModel = hiltViewMo
 
 
 @Composable
-fun backLayer(navigateToBookAppointment: () -> Unit) {
+fun BackLayer() {
 
-    Column() {
+    Column {
 
         ImageAndName(
             modifier = Modifier
@@ -75,38 +69,24 @@ fun backLayer(navigateToBookAppointment: () -> Unit) {
 
         Spacer(modifier = Modifier.padding(16.dp))
 
-        Button(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            contentPadding = PaddingValues(horizontal = 28.dp, vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Orange),
-            shape = MaterialTheme.shapes.medium,
-            onClick = { navigateToBookAppointment() }) {
-            androidx.compose.material.Text(
-                text = "Book Appointment",
-                style = MaterialTheme.typography.h3,
-                color = MaterialTheme.colors.onPrimary,
-            )
-        }
 
-        Spacer(modifier = Modifier.padding(16.dp))
     }
 
 }
 
 @Composable
-fun frontLayer(appointment: Appointment?) {
+fun FrontLayer(appointment: Appointment?, navigateToBookAppointment: () -> Unit) {
     val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background)
-            .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
-        appointment?.let {
-            CurrentAppointment(appointment = appointment)
-        }
+        Appointment(
+            appointment = appointment,
+            navigateToBookAppointment = navigateToBookAppointment
+        )
 
         Spacer(modifier = Modifier.padding(16.dp))
 
@@ -125,27 +105,97 @@ fun frontLayer(appointment: Appointment?) {
 
 
 @Composable
+fun Appointment(
+    modifier: Modifier = Modifier,
+    appointment: Appointment?,
+    navigateToBookAppointment: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 400.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Orange,
+                        Orange2
+                    )
+                )
+            )
+            .padding(8.dp, 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Button(
+            modifier = Modifier,
+            contentPadding = PaddingValues(horizontal = 28.dp, vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+            border = BorderStroke(1.dp, Gray1),
+            shape = MaterialTheme.shapes.large,
+            onClick = { navigateToBookAppointment() }
+        ) {
+            Text(
+                text = "Book",
+                style = MaterialTheme.typography.h4,
+                color = Gray1,
+            )
+        }
+
+        appointment?.let {
+
+            Spacer(modifier = Modifier.padding(16.dp))
+
+
+            Text(
+                text = stringResource(id = R.string.you_have_appointment),
+                color = Color.White,
+                style = MaterialTheme.typography.h3
+            )
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            Text(
+                text = "${stringDateToDateFormat(appointment.startTime)} at ${
+                    stringDateToTimeFormat(
+                        appointment.startTime
+                    )
+                }",
+                color = Color.White,
+                style = MaterialTheme.typography.body1
+            )
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            ImageChip(
+                modifier = Modifier.fillMaxWidth(),
+                text = "${appointment.worker.firstName} ${appointment.worker.lastName}",
+                onClick = { },
+                isSelected = false
+            )
+        }
+
+
+    }
+}
+
+
+@Composable
 fun OurStaff() {
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "Our Great Staff",
-            color = MaterialTheme.colors.onBackground,
-            style = MaterialTheme.typography.h2
-        )
-
-        Divider(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(Gray2)
-        )
+    Column {
+        SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.our_staff))
 
         Spacer(modifier = Modifier.padding(8.dp))
 
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Image(
                 modifier = Modifier
                     .width(100.dp)
@@ -168,58 +218,11 @@ fun OurStaff() {
 
 
 @Composable
-fun CurrentAppointment(modifier: Modifier = Modifier, appointment: Appointment?) {
-    appointment?.let {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colors.secondary)
-                .padding(8.dp, 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Text(
-                text = "You have an appointment",
-                color = Red,
-                style = MaterialTheme.typography.h3
-            )
-
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            Text(
-                text = "${stringDateToDateFormat(appointment.startTime)} at ${
-                    stringDateToTimeFormat(
-                        appointment.startTime
-                    )
-                } for ${appointment.worker.firstName} ${appointment.worker.lastName}",
-                color = MaterialTheme.colors.onSecondary,
-                style = MaterialTheme.typography.body1
-            )
-
-        }
-
-    }
-}
-
-
-@Composable
 fun Stories() {
     val scrollState = rememberScrollState()
 
     Column {
-        Text(
-            text = "Stories",
-            color = MaterialTheme.colors.onBackground,
-            style = MaterialTheme.typography.h2
-        )
-
-        Divider(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(Gray2)
-        )
+        SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.stories))
 
         Spacer(modifier = Modifier.padding(8.dp))
 
@@ -245,27 +248,17 @@ fun AboutUs() {
             .padding(bottom = 20.dp)
             .fillMaxWidth()
     ) {
+        SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.about_us))
 
-        Text(
-            text = "About Us",
-            color = MaterialTheme.colors.onBackground,
-            style = MaterialTheme.typography.h2
-        )
-
-        Divider(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(Gray2)
-        )
 
         Spacer(modifier = Modifier.padding(8.dp))
 
 
         Text(
-            text = "This page has a unique feel, thanks to the deconstructed action figures representing the founders, Leigh Whipday and Jonny Lander.",
-            style = MaterialTheme.typography.body1
+            modifier = Modifier.padding(8.dp),
+            text = stringResource(id = R.string.about_us_details),
+            style = MaterialTheme.typography.body2,
+            color = Black4
         )
     }
 }

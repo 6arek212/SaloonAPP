@@ -88,7 +88,7 @@ fun Navigation() {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.Profile.route
+            startDestination = Screen.Home.route
         ) {
             splash(navController = navController)
             login(navController = navController)
@@ -227,3 +227,4 @@ val drawerItems = listOf(
         icon = Icons.Filled.ExitToApp
     )
 )
+

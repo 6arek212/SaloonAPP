@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IbraHands</string>
+    <string name="hello">שלום,</string>
+    <string name="you_have_appointment">יש לך תור</string>
+    <string name="our_staff">הצות שלנו</string>
+    <string name="stories">סטוריז</string>
+    <string name="about_us">קצת עלינו</string>
+    <string name="about_us_details">"הסיפור שלנו מתחיל בחדר קטן בבאקה אלגרביה , התחלנו עם מספר מצומצם של לקחות ולאט לאט גדלנו "</string>
+    <string name="book">הזמן תור</string>
+    <string name="book_appointment">הזמנת תור</string>
+    <string name="profile">פרטי</string>
+    <string name="appointments">תורים</string>
+    <string name="logut">התנתק</string>
+    <string name="first_name">שם פרטי</string>
+    <string name="last_name">שם משפחה</string>
+    <string name="phone">טלפון</string>
+    <string name="edit_profile">ערכת פרטים</string>
+    <string name="pick_appointment">בחר תור</string>
+    <string name="pick_service">בחר שירות</string>
+    <string name="pick_day">בחר יום</string>
+    <string name="pick_worker">בחר עובד</string>
+    <string name="update">עדכן</string>
+    <string name="appointment_info">פרטי תור</string>
+    <string name="confirm_and_book">אשר והזמן</string>
+    <string name="no_appointments">אין תורים</string>
+</resources>

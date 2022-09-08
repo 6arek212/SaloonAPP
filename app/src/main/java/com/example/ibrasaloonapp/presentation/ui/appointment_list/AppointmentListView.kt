@@ -20,9 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.User
@@ -68,7 +70,7 @@ fun AppointmentListView(
             ) {
 
                 Text(
-                    text = "Appointments",
+                    text = stringResource(id = R.string.appointments),
                     color = MaterialTheme.colors.onBackground,
                     style = MaterialTheme.typography.h2
                 )
@@ -90,9 +92,9 @@ fun AppointmentListView(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                if(appointments.isEmpty()){
+                if (appointments.isEmpty()) {
                     item {
-                        Empty(text = "No Appointments")
+                        Empty(text = stringResource(id = R.string.no_appointments))
                     }
                 }
 
@@ -100,7 +102,9 @@ fun AppointmentListView(
                     items = appointments,
                     key = { index, item -> item.id },
                     span = { index, appointment ->
-                        if (index == 0 && appointment.isActive) GridItemSpan(maxLineSpan) else GridItemSpan(maxCurrentLineSpan)
+                        if (index == 0 && appointment.isActive) GridItemSpan(maxLineSpan) else GridItemSpan(
+                            maxCurrentLineSpan
+                        )
                     }) { index, appointment ->
                     AppointmentCard(appointment = appointment, onUnbook = {
                         viewModel.onTriggerEvent(

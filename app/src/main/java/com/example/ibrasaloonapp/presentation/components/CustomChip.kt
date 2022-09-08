@@ -1,11 +1,19 @@
 package com.example.ibrasaloonapp.presentation.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.ibrasaloonapp.presentation.theme.Orange
+import com.example.ibrasaloonapp.presentation.theme.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -13,20 +21,27 @@ fun CustomChip(
     modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
-    isSelected: Boolean
+    isSelected: Boolean,
+    backgroundColor: Color = Gray1,
+    contentPaddingValues: PaddingValues = PaddingValues(vertical = 6.dp, horizontal = 8.dp)
 ) {
 
-    Chip(
-        modifier = Modifier.padding(end = 8.dp),
-        onClick = {
-            onClick()
-        },
-        colors = ChipDefaults.chipColors(
-            backgroundColor = if (isSelected) Orange else MaterialTheme.colors.primaryVariant,
-            contentColor = MaterialTheme.colors.onSurface
-        )
+    Surface(
+        modifier = modifier.clip(MaterialTheme.shapes.large),
+        elevation = if (isSelected) 4.dp else 0.dp,
+        color = if (isSelected) Orange else backgroundColor,
+        onClick = onClick,
+        shape = MaterialTheme.shapes.large
     ) {
-        Text(text = "${text}")
+        Box(modifier = Modifier
+            .padding(contentPaddingValues)) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = text,
+                style = MaterialTheme.typography.body2,
+                color = if (isSelected) Gray1 else Black2
+            )
+        }
     }
 
 }

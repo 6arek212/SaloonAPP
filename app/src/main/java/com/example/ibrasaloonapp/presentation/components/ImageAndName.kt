@@ -1,18 +1,25 @@
 package com.example.ibrasaloonapp.presentation.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ibrasaloonapp.presentation.theme.Purple
+import com.example.ibrasaloonapp.presentation.theme.Black1
+import com.example.ibrasaloonapp.presentation.theme.Gray1
+import com.example.ibrasaloonapp.presentation.theme.Gray2
+import com.example.ibrasaloonapp.presentation.theme.Gray3
 
 @Composable
 fun ImageAndName(
@@ -25,26 +32,33 @@ fun ImageAndName(
 
     Row(modifier = modifier) {
 
-        Box(
+        Surface(
             modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colors.primaryVariant)
-                .padding(8.dp),
-            contentAlignment = Alignment.Center
+                .size(40.dp),
+            elevation = 8.dp,
+            color = Gray1,
+            border = BorderStroke(2.dp, Gray2),
+            shape = CircleShape
         ) {
-            Text(
-                text = "${firstName.first()} ${lastName.first()}",
-                style = MaterialTheme.typography.h5,
-                color = MaterialTheme.colors.onPrimary
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "${firstName.first()} ${lastName.first()}",
+                    style = MaterialTheme.typography.h5,
+                    color = Black1
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.padding(16.dp))
+
+        Spacer(modifier = Modifier.padding(8.dp))
 
         Text(
             modifier = Modifier.align(Alignment.CenterVertically),
-            text = "Hello",
+            text = "Hello,",
             style = MaterialTheme.typography.h4,
             color = MaterialTheme.colors.onPrimary
         )
@@ -53,7 +67,16 @@ fun ImageAndName(
 
         Text(
             modifier = Modifier.align(Alignment.CenterVertically),
-            text = "${firstName} ${lastName}",
+            text = firstName,
+            style = MaterialTheme.typography.h3,
+            color = MaterialTheme.colors.onPrimary
+        )
+
+        Spacer(modifier = Modifier.padding(2.dp))
+
+        Text(
+            modifier = Modifier.align(Alignment.CenterVertically),
+            text = lastName,
             style = MaterialTheme.typography.h3,
             color = MaterialTheme.colors.onPrimary
         )

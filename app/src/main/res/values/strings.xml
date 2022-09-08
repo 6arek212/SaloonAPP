@@ -1,3 +1,30 @@
 <resources>
-    <string name="app_name">IbraSaloonAPP</string>
+    <string name="app_name">IbraHands</string>
+
+
+    <string name="hello">Hello,</string>
+    <string name="you_have_appointment">You have an appointment</string>
+    <string name="our_staff">Our Staff</string>
+    <string name="stories">Stories</string>
+    <string name="about_us">About Us</string>
+    <string name="about_us_details">"Our story begins with a small barber shop located in Baqa elgarbia , We began with a small customer base and through time we got big "</string>
+    <string name="book_appointment">Book Appointment</string>
+    <string name="book">Book</string>
+    <string name="profile">Profile</string>
+    <string name="appointments">Appointmnets</string>
+    <string name="logut">Logout</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="phone">Phone</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="update">Update</string>
+    <string name="pick_worker">Pick Worker</string>
+    <string name="pick_day">Pick day</string>
+    <string name="pick_service">Pick service</string>
+    <string name="pick_appointment">Pick appointment</string>
+    <string name="appointment_info">Appointment Information</string>
+    <string name="confirm_and_book">Confirm And Book</string>
+    <string name="no_appointments">No Appointments</string>
+
+
 </resources>

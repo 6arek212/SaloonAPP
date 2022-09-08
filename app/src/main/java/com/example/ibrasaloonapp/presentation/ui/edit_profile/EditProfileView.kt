@@ -9,11 +9,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
@@ -47,7 +49,7 @@ fun EditProfileView(
 
 
                 Text(
-                    text = "Edit Profile",
+                    text = stringResource(id = R.string.edit_profile),
                     color = MaterialTheme.colors.onBackground,
                     style = MaterialTheme.typography.h2
                 )
@@ -68,7 +70,7 @@ fun EditProfileView(
                 OutlinedTextField(
                     modifier = Modifier,
                     label = {
-                        Text(text = "First Name")
+                        Text(text = stringResource(id = R.string.first_name))
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -91,7 +93,7 @@ fun EditProfileView(
                 OutlinedTextField(
                     modifier = Modifier,
                     label = {
-                        Text(text = "Last Name")
+                        Text(text = stringResource(id = R.string.last_name))
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -125,7 +127,7 @@ fun EditProfileView(
                     value = phone,
                     singleLine = true,
                     leadingIcon = {
-                        Icon(Icons.Filled.Phone, "Phone")
+                        Icon(Icons.Filled.Phone, stringResource(id = R.string.phone))
                     },
                     textStyle = MaterialTheme.typography.h4
                 )
@@ -137,7 +139,7 @@ fun EditProfileView(
                     onClick = {
                        viewModel.onTriggerEvent(EditProfileEvent.UpdateProfile)
                     }) {
-                    Text(text = "Update")
+                    Text(text = stringResource(id = R.string.update))
                 }
 
 
