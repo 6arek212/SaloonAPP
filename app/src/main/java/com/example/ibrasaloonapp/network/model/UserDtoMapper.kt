@@ -11,7 +11,8 @@ class UserDtoMapper : DomainMapper<UserDto, User> {
             id = model.id,
             firstName = model.firstName,
             lastName = model.lastName,
-            phone = model.phone
+            phone = model.phone,
+            role = model.role
         )
     }
 
@@ -20,7 +21,8 @@ class UserDtoMapper : DomainMapper<UserDto, User> {
             id = domainModel.id,
             firstName = domainModel.firstName,
             lastName = domainModel.lastName,
-            phone = domainModel.phone
+            phone = domainModel.phone,
+            role = domainModel.role
         )
     }
 

@@ -8,7 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ibrasaloonapp.core.domain.ProgressBarState
+import com.example.ibrasaloonapp.core.domain.Queue
+import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.presentation.ui.Screen
+import com.example.ibrasaloonapp.presentation.ui.UIState
 import com.example.ibrasaloonapp.presentation.ui.login.LoginState
 import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.example.ibrasaloonapp.repository.AuthRepository
@@ -34,8 +38,6 @@ constructor(
 ) : ViewModel() {
 
     //TODO: NETWORK STATUS !!!!
-
-
     private val _state: MutableState<AuthState> = mutableStateOf(AuthState())
     val state: State<AuthState> = _state
 

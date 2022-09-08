@@ -11,8 +11,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
@@ -21,14 +23,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.domain.model.MenuItem
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
+import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
 import com.example.ibrasaloonapp.presentation.ui.home.DrawerBody
 import com.example.ibrasaloonapp.presentation.ui.home.DrawerHeader
 import com.example.ibrasaloonapp.presentation.ui.home.HomeView
 import com.example.ibrasaloonapp.presentation.ui.login.LoginView
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileView
+import com.example.ibrasaloonapp.presentation.ui.profile.ProfileViewModel
 import com.example.ibrasaloonapp.presentation.ui.signup.SignupView
 import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +88,7 @@ fun Navigation() {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.AppointmentsList.route
+            startDestination = Screen.Profile.route
         ) {
             splash(navController = navController)
             login(navController = navController)
@@ -92,6 +97,7 @@ fun Navigation() {
             appointmentList(navController = navController)
             bookAppointment(navController = navController)
             profile(navController = navController)
+            editProfile(navController = navController)
         }
     }
 }
@@ -175,6 +181,22 @@ fun NavGraphBuilder.profile(
         arguments = emptyList()
     ) {
         ProfileView(navController = navController)
+    }
+}
+
+fun NavGraphBuilder.editProfile(
+    navController: NavController,
+) {
+    composable(
+        route = Screen.EditProfile.route + "/{userId}/{firstName}/{lastName}/{phone}",
+        arguments = Screen.EditProfile.arguments
+    ) {
+        val previousViewModel: ProfileViewModel? = navController
+            .previousBackStackEntry?.let {
+                hiltViewModel(it)
+            }
+
+        EditProfileView(navController = navController, profileViewModel = previousViewModel)
     }
 }
 

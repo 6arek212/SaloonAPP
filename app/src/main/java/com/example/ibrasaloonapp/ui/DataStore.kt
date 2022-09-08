@@ -40,7 +40,8 @@ fun Preferences.getAuthData(): AuthData? {
             id = this[USER_ID] ?: "",
             firstName = this[USER_FIRST_NAME] ?: "",
             lastName = this[USER_LAST_NAME] ?: "",
-            phone = this[PHONE] ?: ""
+            phone = this[PHONE] ?: "",
+            role = ""
         ),
         token = this[TOKEN] ?: "",
         expiresIn = this[EXPIRES_IN] ?: 0

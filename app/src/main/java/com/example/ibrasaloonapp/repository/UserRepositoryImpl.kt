@@ -4,6 +4,7 @@ import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.network.model.UserDtoMapper
+import com.example.ibrasaloonapp.network.model.UserUpdateDto
 import com.example.ibrasaloonapp.network.services.UserService
 import com.example.trainingapp.util.safeApiCall
 import kotlinx.coroutines.CoroutineDispatcher
@@ -30,9 +31,9 @@ constructor(
         }
     }
 
-    override suspend fun updateUser(user: User): ApiResult<String> {
+    override suspend fun updateUser(user: UserUpdateDto): ApiResult<User> {
         return safeApiCall(dispatcher) {
-            userService.updateUser().message
+            userDtoMapper.mapToDomainModel(userService.updateUser(user).user)
         }
     }
 

@@ -13,6 +13,9 @@ data class UserDto(
     val lastName: String,
 
     @SerializedName("phone")
-    val phone: String
+    val phone: String,
+
+    @SerializedName("role")
+    val role: String
 ) {
 }

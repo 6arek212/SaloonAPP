@@ -1,10 +1,12 @@
 package com.example.ibrasaloonapp.presentation.ui
 
 import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 sealed class Screen(val route: String, val arguments: List<NamedNavArgument>) {
 
-    object Splash: Screen(
+    object Splash : Screen(
         route = "Splash",
         arguments = emptyList()
     )
@@ -39,5 +41,22 @@ sealed class Screen(val route: String, val arguments: List<NamedNavArgument>) {
         arguments = emptyList()
     )
 
+    object EditProfile : Screen(
+        route = "EditProfile",
+        arguments = listOf(
+            navArgument("userId") {
+                type = NavType.StringType
+            },
+            navArgument("firstName") {
+                type = NavType.StringType
+            },
+            navArgument("lastName") {
+                type = NavType.StringType
+            },
+            navArgument("phone") {
+                type = NavType.StringType
+            }
+        )
+    )
 
 }
