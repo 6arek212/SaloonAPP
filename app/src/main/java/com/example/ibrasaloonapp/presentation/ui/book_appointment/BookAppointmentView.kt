@@ -74,7 +74,7 @@ fun BookAppointmentView(
                     }
 
                     is BookAppointmentUIEvent.OnBookAppointment -> {
-
+                        sheetState.collapse()
                     }
                 }
             }
@@ -120,7 +120,10 @@ fun BookAppointmentView(
 
                     Spacer(modifier = Modifier.padding(16.dp))
 
-                    Text(text = stringResource(id = R.string.pick_worker), style = MaterialTheme.typography.h4)
+                    Text(
+                        text = stringResource(id = R.string.pick_worker),
+                        style = MaterialTheme.typography.h4
+                    )
 
                     Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                         for (worker in workers) {
@@ -131,7 +134,8 @@ fun BookAppointmentView(
                                     viewModel.onTriggerEvent(
                                         BookAppointmentEvent.OnSelectedWorker(worker)
                                     )
-                                }, isSelected = worker == selectedWorker
+                                }, isSelected = worker == selectedWorker,
+                                url = worker.image
                             )
                         }
                     }
@@ -140,7 +144,10 @@ fun BookAppointmentView(
 
                     AnimatedVisibility(visible = selectedWorker != null) {
                         Column() {
-                            Text(text = stringResource(id = R.string.pick_day), style = MaterialTheme.typography.h4)
+                            Text(
+                                text = stringResource(id = R.string.pick_day),
+                                style = MaterialTheme.typography.h4
+                            )
 
                             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                                 for (workingDate in workingDates) {
@@ -166,7 +173,10 @@ fun BookAppointmentView(
                     AnimatedVisibility(visible = selectedWorkingDate != null) {
 
                         Column() {
-                            Text(text = stringResource(id = R.string.pick_service), style = MaterialTheme.typography.h4)
+                            Text(
+                                text = stringResource(id = R.string.pick_service),
+                                style = MaterialTheme.typography.h4
+                            )
 
                             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
 
@@ -190,7 +200,10 @@ fun BookAppointmentView(
 
                     AnimatedVisibility(visible = selectedService.isNotBlank()) {
                         Column() {
-                            Text(text = stringResource(id = R.string.pick_appointment), style = MaterialTheme.typography.h4)
+                            Text(
+                                text = stringResource(id = R.string.pick_appointment),
+                                style = MaterialTheme.typography.h4
+                            )
 
                             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                                 for (appointment in availableAppointments) {
@@ -262,11 +275,11 @@ fun BookAppointmentConfirmation(
         Spacer(modifier = Modifier.padding(16.dp))
 
         Text(
-            text = "${pickedDate?.let { stringDateFormat(pickedDate) }} for a ${service}",
+            text = "${pickedDate?.let { stringDateFormat(pickedDate) }} ${stringResource(id = R.string.for_a)} ${service}",
             style = MaterialTheme.typography.body1
         )
 
-        Text(text = "With ${workerName}", style = MaterialTheme.typography.body1)
+        Text(text = "${stringResource(id = R.string.with)} ${workerName}", style = MaterialTheme.typography.body1)
 
 
         Spacer(modifier = Modifier.padding(16.dp))
@@ -277,7 +290,10 @@ fun BookAppointmentConfirmation(
             shape = MaterialTheme.shapes.small,
             contentPadding = PaddingValues(vertical = 8.dp, horizontal = 34.dp)
         ) {
-            Text(text = stringResource(id = R.string.confirm_and_book), style = MaterialTheme.typography.h5)
+            Text(
+                text = stringResource(id = R.string.confirm_and_book),
+                style = MaterialTheme.typography.h5
+            )
         }
     }
 

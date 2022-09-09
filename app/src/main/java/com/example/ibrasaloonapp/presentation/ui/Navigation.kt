@@ -14,13 +14,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.MenuItem
+import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
@@ -38,7 +41,36 @@ import java.lang.Exception
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Navigation() {
+fun Navigation(mainViewModel: MainActivityViewModel) {
+
+    val drawerItems = listOf(
+        MenuItem(
+            id = Screen.Home.route,
+            title = stringResource(id = R.string.home),
+            contentDescription = "Go to home",
+            icon = Icons.Filled.Home
+        ),
+        MenuItem(
+            id = Screen.AppointmentsList.route,
+            title = stringResource(id = R.string.appointments),
+            contentDescription = "Go to appointments",
+            icon = Icons.Filled.BookOnline
+        ),
+        MenuItem(
+            id = Screen.Profile.route,
+            title = stringResource(id = R.string.profile),
+            contentDescription = "Go to profile",
+            icon = Icons.Filled.AccountBox
+        ),
+        MenuItem(
+            id = "logout",
+            title = stringResource(id = R.string.logut),
+            contentDescription = "logout",
+            icon = Icons.Filled.ExitToApp
+        )
+    )
+
+
 
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
@@ -93,7 +125,7 @@ fun Navigation() {
             splash(navController = navController)
             login(navController = navController)
             signup(navController = navController)
-            home(navController = navController)
+            home(navController = navController, mainViewModel = mainViewModel)
             appointmentList(navController = navController)
             bookAppointment(navController = navController)
             profile(navController = navController)
@@ -139,12 +171,13 @@ fun NavGraphBuilder.signup(
 
 fun NavGraphBuilder.home(
     navController: NavController,
+    mainViewModel: MainActivityViewModel
 ) {
     composable(
         route = Screen.Home.route,
         arguments = emptyList()
     ) {
-        HomeView(navController = navController)
+        HomeView(navController = navController, mainViewModel = mainViewModel)
     }
 }
 
@@ -201,30 +234,4 @@ fun NavGraphBuilder.editProfile(
 }
 
 
-val drawerItems = listOf(
-    MenuItem(
-        id = Screen.Home.route,
-        title = "Home",
-        contentDescription = "Go to home",
-        icon = Icons.Filled.Home
-    ),
-    MenuItem(
-        id = Screen.AppointmentsList.route,
-        title = "Appointments",
-        contentDescription = "Go to appointments",
-        icon = Icons.Filled.BookOnline
-    ),
-    MenuItem(
-        id = Screen.Profile.route,
-        title = "Profile",
-        contentDescription = "Go to profile",
-        icon = Icons.Filled.AccountBox
-    ),
-    MenuItem(
-        id = "logout",
-        title = "Logout",
-        contentDescription = "logout",
-        icon = Icons.Filled.ExitToApp
-    )
-)
 

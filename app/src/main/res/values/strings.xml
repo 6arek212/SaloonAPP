@@ -2,7 +2,7 @@
     <string name="app_name">IbraHands</string>
 
 
-    <string name="hello">Hello,</string>
+    <string name="hello">Hello</string>
     <string name="you_have_appointment">You have an appointment</string>
     <string name="our_staff">Our Staff</string>
     <string name="stories">Stories</string>
@@ -25,6 +25,12 @@
     <string name="appointment_info">Appointment Information</string>
     <string name="confirm_and_book">Confirm And Book</string>
     <string name="no_appointments">No Appointments</string>
+    <string name="you_dont_have_appointment">You dont have an appointment, Maby its time for a new hair cut</string>
+    <string name="at">at</string>
+    <string name="home">Home</string>
+    <string name="with">With</string>
+    <string name="for_a">for a</string>
+    <string name="role">Role</string>
 
 
 </resources>

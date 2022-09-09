@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">IbraHands</string>
-    <string name="hello">שלום,</string>
+    <string name="hello">שלום</string>
     <string name="you_have_appointment">יש לך תור</string>
     <string name="our_staff">הצות שלנו</string>
     <string name="stories">סטוריז</string>
@@ -24,4 +24,10 @@
     <string name="appointment_info">פרטי תור</string>
     <string name="confirm_and_book">אשר והזמן</string>
     <string name="no_appointments">אין תורים</string>
+    <string name="you_dont_have_appointment">אין לך תור, אולי זה הזמן לתספורת</string>
+    <string name="at">ב</string>
+    <string name="home">הבית</string>
+    <string name="with">עם</string>
+    <string name="for_a">עבור</string>
+    <string name="role">תפקיד</string>
 </resources>

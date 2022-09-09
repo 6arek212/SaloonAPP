@@ -39,7 +39,7 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                Navigation()
+                Navigation(viewModel)
             }
         }
     }

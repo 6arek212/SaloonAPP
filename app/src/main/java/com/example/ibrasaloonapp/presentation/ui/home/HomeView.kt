@@ -21,6 +21,9 @@ import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.stringDateToDateFormat
 import com.example.ibrasaloonapp.core.stringDateToTimeFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.AuthData
+import com.example.ibrasaloonapp.domain.model.User
+import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
@@ -28,10 +31,14 @@ import com.example.ibrasaloonapp.presentation.ui.Screen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeView(navController: NavController, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeView(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
 
     val appointment = viewModel.state.value.appointment
-
+    val user = mainViewModel.state.value.authData?.user
 
     DefaultScreenUI(onRemoveHeadFromQueue = { /*TODO*/ }) {
         BackdropScaffold(
@@ -41,7 +48,7 @@ fun HomeView(navController: NavController, viewModel: HomeViewModel = hiltViewMo
                 HomeAppBar()
             },
             backLayerContent = {
-                BackLayer()
+                BackLayer(user)
             },
             frontLayerContent = {
                 FrontLayer(appointment = appointment) { navController.navigate(Screen.BookAppointment.route) }
@@ -55,21 +62,19 @@ fun HomeView(navController: NavController, viewModel: HomeViewModel = hiltViewMo
 
 
 @Composable
-fun BackLayer() {
+fun BackLayer(user: User?) {
 
-    Column {
-
-        ImageAndName(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 24.dp),
-            firstName = "Tarik",
-            lastName = "Husin"
-        )
-
-        Spacer(modifier = Modifier.padding(16.dp))
-
-
+    user?.let {
+        Column {
+            ImageName(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 24.dp),
+                firstName = it.firstName,
+                lastName = it.lastName
+            )
+            Spacer(modifier = Modifier.padding(16.dp))
+        }
     }
 
 }
@@ -88,7 +93,6 @@ fun FrontLayer(appointment: Appointment?, navigateToBookAppointment: () -> Unit)
             navigateToBookAppointment = navigateToBookAppointment
         )
 
-        Spacer(modifier = Modifier.padding(16.dp))
 
         OurStaff()
 
@@ -136,16 +140,16 @@ fun Appointment(
             onClick = { navigateToBookAppointment() }
         ) {
             Text(
-                text = "Book",
+                text = stringResource(id = R.string.book),
                 style = MaterialTheme.typography.h4,
                 color = Gray1,
             )
         }
 
+        Spacer(modifier = Modifier.padding(16.dp))
+
+
         appointment?.let {
-
-            Spacer(modifier = Modifier.padding(16.dp))
-
 
             Text(
                 text = stringResource(id = R.string.you_have_appointment),
@@ -156,11 +160,9 @@ fun Appointment(
             Spacer(modifier = Modifier.padding(4.dp))
 
             Text(
-                text = "${stringDateToDateFormat(appointment.startTime)} at ${
-                    stringDateToTimeFormat(
-                        appointment.startTime
-                    )
-                }",
+                text = "${stringDateToDateFormat(appointment.startTime)} " +
+                        "${stringResource(id = R.string.at)} " +
+                        stringDateToTimeFormat(appointment.startTime),
                 color = Color.White,
                 style = MaterialTheme.typography.body1
             )
@@ -174,8 +176,19 @@ fun Appointment(
                 modifier = Modifier.fillMaxWidth(),
                 text = "${appointment.worker.firstName} ${appointment.worker.lastName}",
                 onClick = { },
-                isSelected = false
+                isSelected = false,
+                url = appointment.worker.image
             )
+        }
+
+        if (appointment == null) {
+
+            Text(
+                text = stringResource(id = R.string.you_dont_have_appointment),
+                color = Color.White,
+                style = MaterialTheme.typography.h3
+            )
+
         }
 
 
@@ -186,7 +199,13 @@ fun Appointment(
 @Composable
 fun OurStaff() {
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 300.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(White)
+    ) {
         SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.our_staff))
 
         Spacer(modifier = Modifier.padding(8.dp))
@@ -221,7 +240,13 @@ fun OurStaff() {
 fun Stories() {
     val scrollState = rememberScrollState()
 
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 300.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(White)
+    ) {
         SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.stories))
 
         Spacer(modifier = Modifier.padding(8.dp))
@@ -245,8 +270,11 @@ fun Stories() {
 fun AboutUs() {
     Column(
         modifier = Modifier
-            .padding(bottom = 20.dp)
             .fillMaxWidth()
+            .heightIn(min = 300.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(White)
+            .padding(bottom = 20.dp)
     ) {
         SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.about_us))
 
@@ -254,12 +282,14 @@ fun AboutUs() {
         Spacer(modifier = Modifier.padding(8.dp))
 
 
-        Text(
-            modifier = Modifier.padding(8.dp),
-            text = stringResource(id = R.string.about_us_details),
-            style = MaterialTheme.typography.body2,
-            color = Black4
-        )
+        Box(modifier = Modifier.padding(8.dp)) {
+            Text(
+                modifier = Modifier,
+                text = stringResource(id = R.string.about_us_details),
+                style = MaterialTheme.typography.body2,
+                color = Black4
+            )
+        }
     }
 }
 

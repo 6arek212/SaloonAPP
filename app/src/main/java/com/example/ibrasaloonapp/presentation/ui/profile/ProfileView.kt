@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -41,7 +42,7 @@ fun ProfileView(
 
         DefaultScreenUI(
             progressBarState = progress,
-            onRemoveHeadFromQueue = {  }) {
+            onRemoveHeadFromQueue = { }) {
 
             Column(
                 modifier = Modifier
@@ -55,7 +56,7 @@ fun ProfileView(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Profile",
+                        text = stringResource(id = R.string.profile),
                         color = MaterialTheme.colors.onBackground,
                         style = MaterialTheme.typography.h2
                     )
@@ -110,25 +111,28 @@ fun ProfileView(
                         Spacer(modifier = Modifier.padding(24.dp))
 
 
-                        Text(text = "Role: ${user.role}", style = MaterialTheme.typography.h4)
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
                         Text(
-                            text = "First Name: ${user.firstName}",
+                            text = "${stringResource(id = R.string.role)}: ${user.role}",
                             style = MaterialTheme.typography.h4
                         )
 
                         Spacer(modifier = Modifier.padding(8.dp))
 
                         Text(
-                            text = "Last Name: ${user.lastName}",
+                            text = "${stringResource(id = R.string.first_name)}: ${user.firstName}",
                             style = MaterialTheme.typography.h4
                         )
 
                         Spacer(modifier = Modifier.padding(8.dp))
 
-                        Text(text = "Phone: ${user.phone}", style = MaterialTheme.typography.h4)
+                        Text(
+                            text = "${stringResource(id = R.string.last_name)}: ${user.lastName}",
+                            style = MaterialTheme.typography.h4
+                        )
+
+                        Spacer(modifier = Modifier.padding(8.dp))
+
+                        Text(text = "${stringResource(id = R.string.phone)}: ${user.phone}", style = MaterialTheme.typography.h4)
                     }
                 }
 

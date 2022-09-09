@@ -49,7 +49,7 @@ constructor(
 
         return when (result) {
             is ApiResult.Success -> {
-                Log.d(TAG, "login: logged in success")
+                Log.d(TAG, "login: logged in success ${result.value}")
                 application.dataStore.edit { settings ->
                     settings.insertAuthData(result.value)
                 }
