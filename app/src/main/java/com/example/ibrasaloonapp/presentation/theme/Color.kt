@@ -20,10 +20,16 @@ val Gray2 = Color(0xFFFEFEFE)
 val Gray3 = Color(0xFFF2F2F2)
 val Gray4 = Color(0xFFEAECED)
 
-val PurpleGrey2 = Color(0xFFE4E1EE)
+val P1 = Color(0xFF9971EE)
+val P2 = Color(0xFF8859EB)
+
+
 
 val Orange = Color(0xFFFF9B02)
 val Orange2 = Color(0xFFFD7501)
+
+
+val BlackLight1 = Color(0xFF6B6B6B)
 
 val Black1 = Color(0xFF222222)
 val Black2 = Color(0xFF1D1B1B)

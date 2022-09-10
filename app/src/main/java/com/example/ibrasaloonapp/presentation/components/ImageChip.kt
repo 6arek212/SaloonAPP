@@ -35,37 +35,16 @@ fun ImageChip(
 
     Row(modifier = modifier) {
 
-        Surface(
-            elevation = 10.dp,
+        CircularImage(
             modifier = Modifier
                 .zIndex(1f)
                 .size(45.dp)
                 .offset(15.dp)
                 .wrapContentWidth()
                 .wrapContentHeight(),
-            shape = CircleShape
-        ) {
-            Log.d(TAG, "ImageChip: ${url}")
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape)
-                    .shadow(8.dp, CircleShape),
-
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(if (url != null) "https://saloon-ibra-api.herokuapp.com/imgs/${url}" else null)
-                    .crossfade(true)
-                    .build(),
-                placeholder = painterResource(R.drawable.person_place_holder),
-                contentDescription = "",
-                contentScale = ContentScale.Crop,
-                error = painterResource(id = R.drawable.error_image_generic),
-                fallback = painterResource(id = R.drawable.person_place_holder),
-
-                )
-        }
-
+            elevation = 8.dp,
+            url = if (url != null) "https://saloon-ibra-api.herokuapp.com/imgs/${url}" else null,
+        )
 
         CustomChip(
             modifier = modifier,

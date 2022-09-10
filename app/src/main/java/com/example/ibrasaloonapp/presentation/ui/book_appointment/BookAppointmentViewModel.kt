@@ -115,6 +115,7 @@ constructor(
     private suspend fun getWorkingDates() {
         val workerId = _state.value.selectedWorker
         val fromDate = getCurrentDateAsString()
+        Log.d(TAG, "getWorkingDates: ${fromDate}")
 
         if (workerId == null)
             return
@@ -122,7 +123,7 @@ constructor(
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
 
-        val result = workerRepository.getWorkingDates(workerId.id, fromDate)
+        val result = workerRepository.getWorkingDates(workerId = workerId.id, fromDate = fromDate)
 
         when (result) {
             is ApiResult.Success -> {

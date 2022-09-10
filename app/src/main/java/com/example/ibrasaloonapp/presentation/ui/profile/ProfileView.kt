@@ -1,28 +1,44 @@
 package com.example.ibrasaloonapp.presentation.ui.profile
 
 import android.util.Log
+import androidx.annotation.Px
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BorderColor
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.BottomCenter
+import androidx.compose.ui.Alignment.Companion.BottomStart
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius.Companion.Zero
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
-import com.example.ibrasaloonapp.presentation.theme.Gray2
+import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
 
 
@@ -33,8 +49,6 @@ fun ProfileView(
     navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
-    Log.d(TAG, "ProfileView: ${viewModel.toString()}")
-
     val user = viewModel.state.value.user
     val progress = viewModel.uiState.value.progressBarState
 
@@ -47,97 +61,145 @@ fun ProfileView(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colors.background)
-                    .padding(8.dp),
+                    .background(MaterialTheme.colors.background),
             ) {
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.profile),
-                        color = MaterialTheme.colors.onBackground,
-                        style = MaterialTheme.typography.h2
-                    )
 
-                    IconButton(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically),
-                        onClick = {
-                            navController.navigate(Screen.EditProfile.route + "/${user.id}/${user.firstName}/${user.lastName}/${user.phone}")
-                        }) {
-                        Icon(imageVector = Icons.Filled.BorderColor, contentDescription = "")
-                    }
-                }
-
-
-                Divider(
+                Top(
                     modifier = Modifier
-                        .padding(top = 8.dp)
                         .fillMaxWidth()
-                        .height(2.dp)
-                        .background(Gray2)
+                        .zIndex(1f),
+                    navigateToUpdatePage = {
+                        navController.navigate(Screen.EditProfile.route + "/${user.id}/${user.firstName}/${user.lastName}/${user.phone}")
+                    }
                 )
 
-                Spacer(modifier = Modifier.padding(24.dp))
 
-
-                Surface(
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    elevation = 8.dp,
-                    shape = MaterialTheme.shapes.medium,
+                        .fillMaxWidth()
+                        .heightIn(min = 250.dp, max = 300.dp)
+                        .offset(y = -16.dp)
                 ) {
-                    Column(
+
+                    AsyncImage(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(if (user.image != null) "https://saloon-ibra-api.herokuapp.com/imgs/${user.image}" else null)
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(R.drawable.person_place_holder),
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(id = R.drawable.error_image_generic),
+                        fallback = painterResource(id = R.drawable.person_place_holder),
 
-
-                        Image(
-                            modifier = Modifier
-                                .size(150.dp)
-                                .clip(CircleShape)
-                                .align(CenterHorizontally)
-                                .border(2.dp, Gray2, CircleShape),
-                            painter = painterResource(id = R.drawable.woker1),
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop
                         )
 
 
-                        Spacer(modifier = Modifier.padding(24.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    .2f to Color.Black,
+                                    1f to Black4,
+                                ), alpha = .5f
+                            )
+                    )
 
+                    Text(
+                        modifier = Modifier
+                            .align(BottomStart)
+                            .padding(8.dp),
+                        text = "${user.firstName} ${user.lastName}",
+                        style = MaterialTheme.typography.h4,
+                        color = White
+                    )
 
-                        Text(
-                            text = "${stringResource(id = R.string.role)}: ${user.role}",
-                            style = MaterialTheme.typography.h4
-                        )
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        Text(
-                            text = "${stringResource(id = R.string.first_name)}: ${user.firstName}",
-                            style = MaterialTheme.typography.h4
-                        )
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        Text(
-                            text = "${stringResource(id = R.string.last_name)}: ${user.lastName}",
-                            style = MaterialTheme.typography.h4
-                        )
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        Text(text = "${stringResource(id = R.string.phone)}: ${user.phone}", style = MaterialTheme.typography.h4)
-                    }
                 }
+
 
             }
         }
 
     }
+}
+
+
+@Composable
+fun Top(modifier: Modifier = Modifier, navigateToUpdatePage: () -> Unit) {
+
+
+    Surface(
+        modifier = modifier,
+        color = Orange,
+        shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+        elevation = 8.dp
+    ) {
+
+        Column {
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 150.dp),
+                color = MaterialTheme.colors.primary,
+                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+            ) {
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(Alignment.Top)
+                        .padding(8.dp),
+                    verticalAlignment = CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.profile),
+                        color = Gray1,
+                        style = MaterialTheme.typography.h2
+                    )
+                }
+            }
+
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    modifier = Modifier.align(CenterVertically),
+                    style = MaterialTheme.typography.h4,
+                    text = "Barber",
+                    color = MaterialTheme.colors.onPrimary
+                )
+
+
+                IconButton(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .border(1.dp, Gray1, CircleShape)
+                        .align(Alignment.CenterVertically),
+                    onClick = {
+                        navigateToUpdatePage()
+                    }) {
+                    Icon(
+                        tint = MaterialTheme.colors.onPrimary,
+                        imageVector = Icons.Filled.BorderColor,
+                        contentDescription = "",
+                    )
+                }
+            }
+
+
+        }
+
+    }
+
 }

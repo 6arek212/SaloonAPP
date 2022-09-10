@@ -8,8 +8,31 @@ import java.util.*
 
 private const val TAG = "DateUtils"
 
+//"yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+//yyyy-MM-dd'T'HH:mm:ssZ
+
+/*
+val c = Calendar.getInstance()
+    c.set(Calendar.HOUR_OF_DAY, 0)
+    c.set(Calendar.MINUTE, 0)
+    c.set(Calendar.SECOND, 0)
+    c.set(Calendar.MILLISECOND, 0)
+ */
+
 fun getCurrentDateAsString(): String {
-    return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    val c = Calendar.getInstance()
+    val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault()).format(c.time)
+    return date
+}
+
+fun getDateAsString(): String {
+    val c = Calendar.getInstance()
+    c.set(Calendar.HOUR_OF_DAY, 0)
+    c.set(Calendar.MINUTE, 0)
+    c.set(Calendar.SECOND, 0)
+    c.set(Calendar.MILLISECOND, 0)
+    val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault()).format(c.time)
+    return date
 }
 
 

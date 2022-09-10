@@ -1,7 +1,9 @@
 package com.example.ibrasaloonapp.presentation.ui
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -71,7 +73,6 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
     )
 
 
-
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -79,6 +80,7 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
         scaffoldState = scaffoldState,
+        drawerBackgroundColor = MaterialTheme.colors.primary,
         drawerContent = {
             DrawerHeader()
             DrawerBody(items = drawerItems, onClick = { item ->
@@ -113,14 +115,14 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
                 scope.launch {
                     scaffoldState.drawerState.close()
                 }
-            })
+            }, itemTextStyle = MaterialTheme.typography.body1)
         }
     ) {
 
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.Home.route
+            startDestination = Screen.BookAppointment.route
         ) {
             splash(navController = navController)
             login(navController = navController)

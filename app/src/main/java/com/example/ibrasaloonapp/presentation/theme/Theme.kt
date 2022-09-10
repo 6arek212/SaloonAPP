@@ -22,7 +22,7 @@ private val DarkColorPalette = darkColors(
 
 private val LightColorPalette = lightColors(
     primary = Black2,
-    primaryVariant = PurpleVariant,
+    primaryVariant = Black4,
     onPrimary = Gray1,
     secondary = PurpleLite,
     onSecondary = Black1,
@@ -30,7 +30,8 @@ private val LightColorPalette = lightColors(
     background = Gray1,
     onBackground = Black1,
     surface = Gray1,
-    onSurface = Black2
+    onSurface = Black2,
+    secondaryVariant = Black2
 )
 
 @Composable
