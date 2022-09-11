@@ -25,12 +25,20 @@
     <string name="appointment_info">Appointment Information</string>
     <string name="confirm_and_book">Confirm And Book</string>
     <string name="no_appointments">No Appointments</string>
-    <string name="you_dont_have_appointment">You dont have an appointment, Maby its time for a new hair cut</string>
+    <string name="you_dont_have_appointment">You don\'t have an appointment , Maybe its time for a new hair cut</string>
+    <string name="time_for_haircut">Maybe its time for a new hair cut</string>
     <string name="at">at</string>
     <string name="home">Home</string>
     <string name="with">With</string>
     <string name="for_a">for a</string>
     <string name="role">Role</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="hair_cut">Hair Cut</string>
+    <string name="wax">Wax</string>
+    <string name="unbook">Unbook</string>
+    <string name="active_appointment">Active Appointment</string>
 
 
 </resources>

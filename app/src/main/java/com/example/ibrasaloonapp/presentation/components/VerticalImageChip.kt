@@ -28,7 +28,7 @@ import com.example.ibrasaloonapp.presentation.theme.Red
 private const val TAG = "ImageChip"
 
 @Composable
-fun ImageChip(
+fun VerticalImageChip(
     modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
@@ -38,14 +38,14 @@ fun ImageChip(
 ) {
 
 
-    Row(modifier = modifier.width(IntrinsicSize.Max)) {
+    Column(modifier = modifier.width(IntrinsicSize.Max)) {
 
         CircularImage(
             modifier = Modifier
-                .align(Alignment.Top)
+                .align(Alignment.CenterHorizontally)
                 .zIndex(1f)
                 .size(imageSize)
-                .offset(x = 15.dp),
+                .offset(y = 15.dp),
             elevation = 8.dp,
             url = if (url != null) "https://saloon-ibra-api.herokuapp.com/imgs/${url}" else null,
         )
@@ -53,10 +53,10 @@ fun ImageChip(
         CustomChip(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.Bottom),
+                .align(Alignment.CenterHorizontally),
             contentPaddingValues = PaddingValues(
-                start = 24.dp,
-                top = 6.dp,
+                start = 8.dp,
+                top = 24.dp,
                 end = 8.dp,
                 bottom = 6.dp
             ),

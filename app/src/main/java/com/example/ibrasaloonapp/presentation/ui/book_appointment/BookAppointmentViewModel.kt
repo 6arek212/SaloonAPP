@@ -1,15 +1,18 @@
 package com.example.ibrasaloonapp.presentation.ui.book_appointment
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.core.getCurrentDateAsString
+import com.example.ibrasaloonapp.core.getDateAsString
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.BookAppointmentDto
@@ -29,7 +32,8 @@ class BookAppointmentViewModel
 constructor(
     private val repository: AppointmentRepository,
     private val workerRepository: WorkerRepository,
-    private val validateRequired: ValidateRequired
+    private val validateRequired: ValidateRequired,
+    private val application: Application
 ) : ViewModel() {
 
 
@@ -114,7 +118,7 @@ constructor(
 
     private suspend fun getWorkingDates() {
         val workerId = _state.value.selectedWorker
-        val fromDate = getCurrentDateAsString()
+        val fromDate = getDateAsString()
         Log.d(TAG, "getWorkingDates: ${fromDate}")
 
         if (workerId == null)
@@ -128,7 +132,7 @@ constructor(
         when (result) {
             is ApiResult.Success -> {
                 _state.value = _state.value.copy(workingDates = result.value)
-                Log.d(TAG, "getAvailableAppointments: ${result.value}")
+                Log.d(TAG, "getWorkingDates: ${result.value}")
             }
 
             is ApiResult.GenericError -> {
@@ -159,7 +163,7 @@ constructor(
         when (result) {
             is ApiResult.Success -> {
                 _state.value = _state.value.copy(workers = result.value)
-                Log.d(TAG, "getAvailableAppointments: ${result.value}")
+                Log.d(TAG, "getWorkers: ${result.value}")
             }
 
             is ApiResult.GenericError -> {
@@ -192,7 +196,7 @@ constructor(
 
 
         val result = repository.getAvailableAppointments(
-            workingDate.date,
+            workingDate.id,
             workerId
         )
 
@@ -221,17 +225,15 @@ constructor(
     }
 
 
-    private suspend fun getServices() {
-        val workerId = _state.value.selectedWorker?.id
 
-        if (workerId == null)
-            return
+    private suspend fun getServices() {
+        val workerId = _state.value.selectedWorker?.id ?: return
 
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
 
         val list = listOf(
-            "Hair Cut",
-            "Wax",
+            ServiceType.HairCut("Hair Cut",application.getString(R.string.hair_cut)),
+            ServiceType.HairCut("Wax",application.getString(R.string.wax)),
         )
 
         _state.value = _state.value.copy(services = list)

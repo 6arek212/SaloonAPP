@@ -122,7 +122,7 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.BookAppointment.route
+            startDestination = Screen.AppointmentsList.route
         ) {
             splash(navController = navController)
             login(navController = navController)

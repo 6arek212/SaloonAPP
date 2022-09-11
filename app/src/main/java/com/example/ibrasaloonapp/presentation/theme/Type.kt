@@ -71,7 +71,7 @@ val SFTypography = Typography(
     ),
     body2 = TextStyle(
         fontFamily = Poppins_Font,
-        fontWeight =  FontWeight.W400,
+        fontWeight =  FontWeight.W600,
         fontSize = 12.sp
     ),
     button = TextStyle(

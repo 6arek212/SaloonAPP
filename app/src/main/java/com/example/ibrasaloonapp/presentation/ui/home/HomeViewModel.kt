@@ -11,6 +11,7 @@ import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.repository.AppointmentRepository
+import com.example.ibrasaloonapp.repository.WorkerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +23,8 @@ private const val TAG = "HomeViewModel"
 class HomeViewModel
 @Inject
 constructor(
-    private val appointmentsRepository: AppointmentRepository
+    private val appointmentsRepository: AppointmentRepository,
+    private val workerRepository: WorkerRepository
 ) : ViewModel() {
 
     private val _state: MutableState<HomeState> = mutableStateOf(HomeState())
@@ -35,9 +37,12 @@ constructor(
     fun onTriggerEvent(event: HomeEvent) {
         viewModelScope.launch {
             when (event) {
-
                 is HomeEvent.GetAppointment -> {
                     getAppointment()
+                }
+
+                is HomeEvent.GetWorkers -> {
+                    getWorkers()
                 }
             }
 
@@ -72,6 +77,36 @@ constructor(
 
 
         _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
+    }
+
+
+    private suspend fun getWorkers() {
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
+
+
+        val result = workerRepository.getWorkers()
+
+        when (result) {
+            is ApiResult.Success -> {
+                _state.value = _state.value.copy(workers = result.value)
+            }
+
+            is ApiResult.GenericError -> {
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Error",
+                        description = result.errorMessage
+                    )
+                )
+            }
+
+            is ApiResult.NetworkError -> {
+
+            }
+        }
+
+
+        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
     }
 
 

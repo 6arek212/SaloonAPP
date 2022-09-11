@@ -2,6 +2,8 @@ package com.example.ibrasaloonapp.presentation.ui.home
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -11,22 +13,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.core.stringDateToDateFormat
-import com.example.ibrasaloonapp.core.stringDateToTimeFormat
+import com.example.ibrasaloonapp.core.TimePatterns
+import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
-import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
+import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentEvent
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -38,6 +43,7 @@ fun HomeView(
 ) {
 
     val appointment = viewModel.state.value.appointment
+    val workers = viewModel.state.value.workers
     val user = mainViewModel.state.value.authData?.user
 
     DefaultScreenUI(onRemoveHeadFromQueue = { /*TODO*/ }) {
@@ -51,7 +57,10 @@ fun HomeView(
                 BackLayer(user)
             },
             frontLayerContent = {
-                FrontLayer(appointment = appointment) { navController.navigate(Screen.BookAppointment.route) }
+                FrontLayer(
+                    appointment = appointment,
+                    workers = workers
+                ) { navController.navigate(Screen.BookAppointment.route) }
             },
             frontLayerElevation = 10.dp,
             frontLayerBackgroundColor = Gray1
@@ -80,7 +89,11 @@ fun BackLayer(user: User?) {
 }
 
 @Composable
-fun FrontLayer(appointment: Appointment?, navigateToBookAppointment: () -> Unit) {
+fun FrontLayer(
+    appointment: Appointment?,
+    workers: List<User>,
+    navigateToBookAppointment: () -> Unit
+) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -94,7 +107,7 @@ fun FrontLayer(appointment: Appointment?, navigateToBookAppointment: () -> Unit)
         )
 
 
-        OurStaff()
+        OurStaff(workers = workers)
 
         Spacer(modifier = Modifier.padding(16.dp))
 
@@ -149,6 +162,8 @@ fun Appointment(
         Spacer(modifier = Modifier.padding(16.dp))
 
 
+
+
         appointment?.let {
 
             Text(
@@ -160,17 +175,25 @@ fun Appointment(
             Spacer(modifier = Modifier.padding(4.dp))
 
             Text(
-                text = "${stringDateToDateFormat(appointment.startTime)} " +
+                text = "${
+                    stringDateFormat(
+                        appointment.startTime,
+                        TimePatterns.EEEE_MM_DD,
+                        LocalContext.current
+                    )
+                } " +
                         "${stringResource(id = R.string.at)} " +
-                        stringDateToTimeFormat(appointment.startTime),
+                        stringDateFormat(
+                            appointment.startTime,
+                            TimePatterns.TIME_ONLY,
+                            LocalContext.current
+                        ),
                 color = Color.White,
                 style = MaterialTheme.typography.body1
             )
 
             Spacer(modifier = Modifier.padding(4.dp))
 
-
-            Spacer(modifier = Modifier.padding(4.dp))
 
             ImageChip(
                 modifier = Modifier.fillMaxWidth(),
@@ -184,11 +207,13 @@ fun Appointment(
         if (appointment == null) {
 
             Text(
+                modifier = Modifier,
+                textAlign = TextAlign.Center,
                 text = stringResource(id = R.string.you_dont_have_appointment),
                 color = Color.White,
-                style = MaterialTheme.typography.h3
+                style = MaterialTheme.typography.h3,
+                lineHeight = 30.sp
             )
-
         }
 
 
@@ -197,7 +222,7 @@ fun Appointment(
 
 
 @Composable
-fun OurStaff() {
+fun OurStaff(workers: List<User>) {
 
     Column(
         modifier = Modifier
@@ -206,27 +231,30 @@ fun OurStaff() {
             .clip(MaterialTheme.shapes.medium)
             .background(White)
     ) {
-        SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.our_staff))
+        SubTitle(
+            modifier = Modifier.padding(8.dp),
+            text = stringResource(id = R.string.our_staff)
+        )
 
         Spacer(modifier = Modifier.padding(8.dp))
 
 
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp)
-                    .clip(CircleShape)
-                    .border(1.dp, Gray2, CircleShape),
-                painter = painterResource(id = R.drawable.woker1),
-                contentDescription = "",
-                contentScale = ContentScale.Crop
-            )
 
-            Text(text = "Ibraheem Tohme")
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(items = workers) { worker ->
+                ImageChip(
+                    modifier = Modifier,
+                    text = "${worker.firstName} ${worker.lastName}",
+                    onClick = {},
+                    isSelected = true,
+                    url = worker.image,
+                    imageSize = 70.dp
+                )
+            }
         }
 
 
@@ -247,7 +275,10 @@ fun Stories() {
             .clip(MaterialTheme.shapes.medium)
             .background(White)
     ) {
-        SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.stories))
+        SubTitle(
+            modifier = Modifier.padding(8.dp),
+            text = stringResource(id = R.string.stories)
+        )
 
         Spacer(modifier = Modifier.padding(8.dp))
 
@@ -276,7 +307,10 @@ fun AboutUs() {
             .background(White)
             .padding(bottom = 20.dp)
     ) {
-        SubTitle(modifier = Modifier.padding(8.dp), text = stringResource(id = R.string.about_us))
+        SubTitle(
+            modifier = Modifier.padding(8.dp),
+            text = stringResource(id = R.string.about_us)
+        )
 
 
         Spacer(modifier = Modifier.padding(8.dp))

@@ -24,10 +24,18 @@
     <string name="appointment_info">פרטי תור</string>
     <string name="confirm_and_book">אשר והזמן</string>
     <string name="no_appointments">אין תורים</string>
-    <string name="you_dont_have_appointment">אין לך תור, אולי זה הזמן לתספורת</string>
+    <string name="you_dont_have_appointment">אין לך תור ,  אולי זה הזמן לתספורת</string>
     <string name="at">ב</string>
     <string name="home">הבית</string>
     <string name="with">עם</string>
     <string name="for_a">עבור</string>
     <string name="role">תפקיד</string>
+    <string name="today">היום</string>
+    <string name="tomorrow">מחר</string>
+    <string name="yesterday">אתמול</string>
+    <string name="hair_cut">תספורת</string>
+    <string name="wax">ואקס</string>
+    <string name="unbook">בטל תור</string>
+    <string name="active_appointment">תור פעיל</string>
+    <string name="time_for_haircut">" אולי זה הזמן לתספורת"</string>
 </resources>

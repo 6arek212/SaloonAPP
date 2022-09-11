@@ -12,7 +12,7 @@ import java.util.*
 data class BookAppointmentState(
     val workers: List<User> = listOf(),
     val workingDates: List<WorkingDate> = listOf(),
-    val services: List<String> = listOf(),
+    val services: List<ServiceType> = listOf(),
     val availableAppointments: List<Appointment> = listOf(),
 
     val selectedWorker: User? = null,
@@ -24,4 +24,8 @@ data class BookAppointmentState(
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf())
 
 ) {
+}
+
+sealed class ServiceType(val v: String, val t: String) {
+    class HairCut(val name: String, val value: String) : ServiceType(v = name, t = value)
 }

@@ -66,54 +66,48 @@ fun AppointmentListView(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(MaterialTheme.colors.primary)
                     .padding(16.dp)
             ) {
 
                 Text(
                     text = stringResource(id = R.string.appointments),
-                    color = MaterialTheme.colors.onBackground,
+                    color = MaterialTheme.colors.onPrimary,
                     style = MaterialTheme.typography.h2
                 )
 
-                Divider(
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .background(Gray2)
-                )
+
 
                 Spacer(modifier = Modifier.padding(8.dp))
             }
 
-            LazyVerticalGrid(
-                contentPadding = PaddingValues(8.dp),
-                columns = GridCells.Adaptive(150.dp),
+            LazyColumn(
+                contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (appointments.isEmpty()) {
                     item {
-                        Empty(text = stringResource(id = R.string.no_appointments))
+                        Empty(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            text = stringResource(id = R.string.no_appointments)
+                        )
                     }
                 }
 
                 itemsIndexed(
                     items = appointments,
-                    key = { index, item -> item.id },
-                    span = { index, appointment ->
-                        if (index == 0 && appointment.isActive) GridItemSpan(maxLineSpan) else GridItemSpan(
-                            maxCurrentLineSpan
-                        )
-                    }) { index, appointment ->
-                    AppointmentCard(appointment = appointment, onUnbook = {
-                        viewModel.onTriggerEvent(
-                            AppointmentListEvent.UnBookAppointment(
-                                appointment.id,
-                                index
+                    key = { index, item -> item.id }) { index, appointment ->
+                    AppointmentCard(
+                        modifier = Modifier,
+                        appointment = appointment, onUnbook = {
+                            viewModel.onTriggerEvent(
+                                AppointmentListEvent.UnBookAppointment(
+                                    appointment.id,
+                                    index
+                                )
                             )
-                        )
-                    })
+                        })
                 }
             }
         }

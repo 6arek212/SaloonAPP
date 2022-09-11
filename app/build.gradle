@@ -127,6 +127,7 @@ dependencies {
     //FlowRow
     //implementation "com.google.accompanist:accompanist-flowlayout:0.20.0"
 
-    //snapper
+    //swipe refresh
+//    implementation 'com.google.accompanist:accompanist-webview:0.26.2-beta'
 
 }

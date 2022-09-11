@@ -1,29 +1,29 @@
 package com.example.ibrasaloonapp.presentation.components
 
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.core.stringDateToDateFormat
+import com.example.ibrasaloonapp.core.TimePatterns
+import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
-import com.example.ibrasaloonapp.presentation.theme.Green
-import com.example.ibrasaloonapp.presentation.theme.Red
+import com.example.ibrasaloonapp.presentation.theme.*
 
 private const val TAG = "AppointmentCard"
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AppointmentCard(
     modifier: Modifier = Modifier,
@@ -38,67 +38,99 @@ fun AppointmentCard(
         backgroundColor = MaterialTheme.colors.surface,
         shape = MaterialTheme.shapes.small
     ) {
-        ConstraintLayout() {
-            val (active, text, button) = createRefs()
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            if (appointment.isActive) {
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier) {
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clip(CircleShape)
+                                .background(Green)
+                                .width(15.dp)
+                                .height(15.dp)
+                        )
+                        Spacer(modifier = Modifier.padding(16.dp))
+                    }
 
-            Box(modifier = Modifier.constrainAs(active) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-            }) {
-                if (appointment.isActive) {
-                    Box(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clip(CircleShape)
-                            .background(Green)
-                            .width(15.dp)
-                            .height(15.dp)
+                    Spacer(modifier = Modifier.padding(4.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.active_appointment),
+                        style = MaterialTheme.typography.h4,
+                        color = MaterialTheme.colors.onSurface
                     )
-                    Spacer(modifier = Modifier.padding(16.dp))
                 }
             }
 
 
-            Column(modifier = Modifier.padding(16.dp).constrainAs(text) {
-                start.linkTo(active.end)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-            }) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
                 Text(
-                    text = "${appointment.service} - Done By " +
-                            "${appointment.worker.firstName}" +
-                            " ${appointment.worker.lastName}",
+                    text = "${appointment.service}",
                     style = MaterialTheme.typography.body1,
                     color = MaterialTheme.colors.onSurface
                 )
 
 
+
                 Text(
-                    text = stringDateToDateFormat(appointment.startTime),
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSurface
+                    text = "${
+                        stringDateFormat(
+                            appointment.startTime,
+                            TimePatterns.EEEE_MM_DD,
+                            LocalContext.current
+                        )
+                    } " +
+                            "${stringResource(id = R.string.at)} " +
+                            stringDateFormat(
+                                appointment.startTime,
+                                TimePatterns.TIME_ONLY,
+                                LocalContext.current
+                            ),
+                    color = MaterialTheme.colors.onSurface,
+                    style = MaterialTheme.typography.body1
+                )
+
+
+
+
+                Spacer(modifier = Modifier.padding(8.dp))
+
+
+                ImageChip(
+                    modifier = Modifier,
+                    text = appointment.worker.firstName +
+                            " ${appointment.worker.lastName}",
+                    url = appointment.worker.image,
+                    onClick = { /*TODO*/ },
+                    isSelected = true
                 )
             }
 
 
-
             Button(
-                modifier = Modifier.constrainAs(button) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
-                    start.linkTo(text.end)
-                    height = Dimension.fillToConstraints
-                    width = Dimension.fillToConstraints
-                },
+                modifier = Modifier.fillMaxWidth(),
                 onClick = onUnbook,
                 colors = ButtonDefaults.buttonColors(backgroundColor = Red)
 
             ) {
-                Text(text = "unbook")
+                Text(text = stringResource(id = R.string.unbook))
             }
-
         }
 
     }

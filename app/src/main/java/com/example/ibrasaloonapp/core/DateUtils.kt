@@ -1,6 +1,9 @@
 package com.example.ibrasaloonapp.core
 
+import android.content.Context
+import android.text.format.DateUtils
 import android.util.Log
+import com.example.ibrasaloonapp.R
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -36,57 +39,77 @@ fun getDateAsString(): String {
 }
 
 
-fun stringToDate(str: String): String {
-    try {
-        val sdfInput = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        val date = sdfInput.parse(str)
-        val sdfOutput = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val formatted = sdfOutput.format(date)
-        return formatted.toString()
-    } catch (e: ParseException) {
-        // handle the failure
-        Log.e(TAG, "formatDate:${e.message} ")
-        return ""
-    }
-}
+//fun stringDateFormat(str: String): String {
+//    try {
+//        val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+//        val date = sdfInput.parse(str)
+//        val sdfOutput = SimpleDateFormat("MMM dd, yyyy HH:mmZ", Locale.getDefault())
+//        val formatted = sdfOutput.format(date)
+//        return formatted.toString()
+//    } catch (e: ParseException) {
+//        // handle the failure
+//        Log.e(TAG, "formatDate:${e.message} ")
+//        return ""
+//    }
+//}
+//
+//
+//fun stringDateToTimeFormat(str: String): String {
+//    try {
+//        val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+//        val date = sdfInput.parse(str)
+//        val sdfOutput = SimpleDateFormat("HH:mm", Locale.getDefault())
+//        sdfOutput.timeZone = TimeZone.getDefault()
+//        val formatted = sdfOutput.format(date)
+//        return formatted.toString()
+//    } catch (e: ParseException) {
+//        // handle the failure
+//        Log.e(TAG, "formatDate:${e.message} ")
+//        return ""
+//    }
+//}
 
-fun stringDateFormat(str: String): String {
-    try {
-        val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
-        val date = sdfInput.parse(str)
-        val sdfOutput = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault())
-        val formatted = sdfOutput.format(date)
-        return formatted.toString()
-    } catch (e: ParseException) {
-        // handle the failure
-        Log.e(TAG, "formatDate:${e.message} ")
-        return ""
-    }
-}
-
-
-fun stringDateToTimeFormat(str: String): String {
-    try {
-        val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
-        val date = sdfInput.parse(str)
-        val sdfOutput = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val formatted = sdfOutput.format(date)
-        return formatted.toString()
-    } catch (e: ParseException) {
-        // handle the failure
-        Log.e(TAG, "formatDate:${e.message} ")
-        return ""
-    }
+enum class TimePatterns(val value: String) {
+    DAY_ONLY("EEEE"),
+    MONTH_ONLY("MMMM"),
+    TIME_ONLY("HH:mm"),
+    DATE_MM_DD("MMM dd"),
+    DATE_MMM_DD_YYYY("MMM dd, yyyy"),
+    EEEE_MM_DD("EEEE, MMM dd"),
+    DATE_TIME("EEEE MMM dd, yyyy at HH:mm:ss")
 }
 
 
-fun stringDateToDateFormat(str: String): String {
+fun stringDateFormat(
+    str: String,
+    pattern: TimePatterns = TimePatterns.DATE_MM_DD,
+    context: Context
+): String {
     try {
-        val sdfInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
-        val date = sdfInput.parse(str)
-        val sdfOutput = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        val formatted = sdfOutput.format(date)
-        return formatted.toString()
+        val readDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
+        readDate.timeZone = TimeZone.getTimeZone("UTC");
+        val date = readDate.parse(str) ?: throw Exception("Error parsing date")
+
+        val writeDate = SimpleDateFormat(pattern.value, Locale.getDefault())
+        val s = writeDate.format(date)
+        val ssDate = writeDate.parse(s) ?: throw Exception("Error parsing date")
+
+        val c1 = Calendar.getInstance()
+        c1.timeInMillis = ssDate.time
+        val now = Calendar.getInstance()
+
+        if (pattern == TimePatterns.DATE_MM_DD || pattern == TimePatterns.DATE_MMM_DD_YYYY || pattern == TimePatterns.EEEE_MM_DD) {
+            if (now.get(Calendar.DATE) == c1.get(Calendar.DATE)
+            ) {
+                return context.getString(R.string.today)
+            } else if (c1.get(Calendar.DATE) - now.get(Calendar.DATE) == 1) {
+                return context.getString(R.string.tomorrow)
+            } else if (now.get(Calendar.DATE) - c1.get(Calendar.DATE) == 1) {
+                return context.getString(R.string.yesterday)
+            }
+        }
+
+        return s
     } catch (e: ParseException) {
         // handle the failure
         Log.e(TAG, "formatDate:${e.message} ")

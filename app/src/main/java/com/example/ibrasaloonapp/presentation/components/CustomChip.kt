@@ -1,10 +1,8 @@
 package com.example.ibrasaloonapp.presentation.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,15 +24,21 @@ fun CustomChip(
     contentPaddingValues: PaddingValues = PaddingValues(vertical = 6.dp, horizontal = 8.dp)
 ) {
 
-    Surface(
-        modifier = modifier.clip(MaterialTheme.shapes.large),
+    Card(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.large)
+            .widthIn(min = 70.dp)
+        ,
         elevation = if (isSelected) 4.dp else 0.dp,
-        color = if (isSelected) Orange else backgroundColor,
+        backgroundColor = if (isSelected) Orange else backgroundColor,
         onClick = onClick,
-        shape = MaterialTheme.shapes.large
-    ) {
-        Box(modifier = Modifier
-            .padding(contentPaddingValues)) {
+        shape = MaterialTheme.shapes.large,
+
+        ) {
+        Box(
+            modifier = Modifier
+                .padding(contentPaddingValues)
+        ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = text,

@@ -56,6 +56,7 @@ fun DrawerBody(
         items(items = items, key = { item -> item.id }) { item ->
             Row(
                 modifier = Modifier
+                    .padding(bottom = 16.dp)
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.large)
                     .border(1.dp, Gray1, MaterialTheme.shapes.large)

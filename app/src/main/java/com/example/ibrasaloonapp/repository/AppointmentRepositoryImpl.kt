@@ -52,13 +52,13 @@ constructor(
 
 
     override suspend fun getAvailableAppointments(
-        date: String,
+        workingDateId: String,
         workerId: String
     ): ApiResult<List<Appointment>> {
         return safeApiCall(dispatcher = dispatcher) {
             mapper.toDomainList(
                 service.getAvailableAppointments(
-                    date = date,
+                    workingDateId = workingDateId,
                     workerId = workerId
                 ).availableAppointments
             )
