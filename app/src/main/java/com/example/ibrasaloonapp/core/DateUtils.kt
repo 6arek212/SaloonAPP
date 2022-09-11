@@ -74,6 +74,7 @@ enum class TimePatterns(val value: String) {
     MONTH_ONLY("MMMM"),
     TIME_ONLY("HH:mm"),
     DATE_MM_DD("MMM dd"),
+    REGULAR_DATE("dd/MM/yyyy"),
     DATE_MMM_DD_YYYY("MMM dd, yyyy"),
     EEEE_MM_DD("EEEE, MMM dd"),
     DATE_TIME("EEEE MMM dd, yyyy HH:mm")
@@ -101,7 +102,7 @@ fun stringDateFormat(
         c1.timeInMillis = ssDate.time
         val now = Calendar.getInstance()
 
-        if (pattern == TimePatterns.DATE_MM_DD || pattern == TimePatterns.DATE_MMM_DD_YYYY || pattern == TimePatterns.EEEE_MM_DD) {
+        if (pattern == TimePatterns.DATE_MM_DD || pattern == TimePatterns.DATE_MMM_DD_YYYY) {
             if (now.get(Calendar.DATE) == c1.get(Calendar.DATE)
             ) {
                 return context.getString(R.string.today)

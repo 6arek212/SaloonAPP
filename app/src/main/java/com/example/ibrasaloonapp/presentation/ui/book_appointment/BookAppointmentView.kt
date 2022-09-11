@@ -107,7 +107,7 @@ fun BookAppointmentView(
                 sheetGesturesEnabled = false,
                 scaffoldState = scaffoldState,
                 sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
-                sheetElevation = 8.dp,
+                sheetElevation = 16.dp,
                 sheetContent = {
                     BookAppointmentConfirmation(
                         pickedDate = selectedAppointment?.startTime,
@@ -398,11 +398,31 @@ fun BookAppointmentConfirmation(
                 pickedDate?.let {
                     stringDateFormat(
                         pickedDate,
-                        TimePatterns.DATE_TIME,
+                        TimePatterns.DAY_ONLY,
                         LocalContext.current
                     )
                 }
-            } ${stringResource(id = R.string.for_a)} ${service}",
+            }," +
+                    " ${
+                        pickedDate?.let {
+                            stringDateFormat(
+                                pickedDate,
+                                TimePatterns.REGULAR_DATE,
+                                LocalContext.current
+                            )
+                        }
+                    }" +
+                    " ${stringResource(id = R.string.at)}" +
+                    " ${
+                        pickedDate?.let {
+                            stringDateFormat(
+                                pickedDate,
+                                TimePatterns.TIME_ONLY,
+                                LocalContext.current
+                            )
+                        }
+                    }" +
+                    " ${stringResource(id = R.string.for_a)} ${service}",
             style = MaterialTheme.typography.h6,
             textAlign = TextAlign.Center
         )
