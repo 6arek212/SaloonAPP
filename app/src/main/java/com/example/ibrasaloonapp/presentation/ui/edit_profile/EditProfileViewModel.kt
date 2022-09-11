@@ -5,14 +5,16 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.UserUpdateDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,8 +29,16 @@ constructor(
     private val userRepository: UserRepository
 ) : BaseViewModel() {
 
+    sealed class UIEvent {
+        class UpdateUser(val user: User) : UIEvent()
+    }
+
     private val _state: MutableState<EditProfileState> = mutableStateOf(EditProfileState())
     val state: State<EditProfileState> = _state
+
+
+    private val _events = Channel<UIEvent>()
+    val events = _events.receiveAsFlow()
 
 
     init {
@@ -91,6 +101,7 @@ constructor(
         when (result) {
             is ApiResult.Success -> {
                 Log.d(TAG, "updateProfile: updated")
+                _events.send(UIEvent.UpdateUser(result.value))
                 appendToMessageQueue(
                     UIComponent.Dialog(
                         title = "Updated",

@@ -76,7 +76,7 @@ enum class TimePatterns(val value: String) {
     DATE_MM_DD("MMM dd"),
     DATE_MMM_DD_YYYY("MMM dd, yyyy"),
     EEEE_MM_DD("EEEE, MMM dd"),
-    DATE_TIME("EEEE MMM dd, yyyy at HH:mm:ss")
+    DATE_TIME("EEEE MMM dd, yyyy HH:mm")
 }
 
 
@@ -86,6 +86,9 @@ fun stringDateFormat(
     context: Context
 ): String {
     try {
+
+        Log.d(TAG, "stringDateFormat: input ${str}")
+
         val readDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
         readDate.timeZone = TimeZone.getTimeZone("UTC");
         val date = readDate.parse(str) ?: throw Exception("Error parsing date")
@@ -108,6 +111,7 @@ fun stringDateFormat(
                 return context.getString(R.string.yesterday)
             }
         }
+        Log.d(TAG, "stringDateFormat: output ${s}")
 
         return s
     } catch (e: ParseException) {

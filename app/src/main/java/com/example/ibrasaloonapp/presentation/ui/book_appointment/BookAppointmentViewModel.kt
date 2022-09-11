@@ -264,7 +264,6 @@ constructor(
 
         when (result) {
             is ApiResult.Success -> {
-                _events.send(BookAppointmentUIEvent.OnBookAppointment)
                 _state.value = _state.value.copy(
                     selectedWorker = null,
                     selectedWorkingDate = null,
@@ -280,6 +279,7 @@ constructor(
                         description = "the appointment has been booked"
                     )
                 )
+                _events.send(BookAppointmentUIEvent.OnBookAppointment(result.value))
             }
             is ApiResult.GenericError -> {
                 Log.d(TAG, "submitData: ${result.errorMessage}")

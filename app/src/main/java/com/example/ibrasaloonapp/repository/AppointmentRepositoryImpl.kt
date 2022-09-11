@@ -30,9 +30,9 @@ constructor(
 
     override suspend fun bookAppointment(
         appointment: BookAppointmentDto
-    ): ApiResult<String> {
+    ): ApiResult<Appointment> {
         return safeApiCall(dispatcher = dispatcher) {
-            service.bookAppointment(appointment).message
+            mapper.mapToDomainModel(service.bookAppointment(appointment).appointment)
         }
     }
 

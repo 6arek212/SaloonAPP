@@ -8,6 +8,7 @@ import com.example.ibrasaloonapp.core.domain.UIComponent
 data class AppointmentListState(
     val appointments: List<Appointment> = listOf(),
     val activeAppointment: Appointment? = null,
+    val isRefreshing: Boolean = false,
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf())
 )

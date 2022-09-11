@@ -36,6 +36,11 @@ constructor(
     fun onTriggerEvent(event: AppointmentListEvent) {
         viewModelScope.launch {
             when (event) {
+                is AppointmentListEvent.Refresh -> {
+                    _state.value = _state.value.copy(isRefreshing = true)
+                    getAppointments()
+                    _state.value = _state.value.copy(isRefreshing = false)
+                }
                 is AppointmentListEvent.GetAppointments -> {
                     getAppointments()
                 }

@@ -32,6 +32,9 @@ import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
+import com.example.ibrasaloonapp.presentation.ui.home.HomeEvent
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -46,6 +49,7 @@ fun AppointmentListView(
 //    }
 
     val queue = viewModel.state.value.errorQueue
+    val isRefreshing = viewModel.state.value.isRefreshing
     val progressBar = viewModel.state.value.progressBarState
     val appointments = viewModel.state.value.appointments
 
@@ -81,37 +85,44 @@ fun AppointmentListView(
                 Spacer(modifier = Modifier.padding(8.dp))
             }
 
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                if (appointments.isEmpty()) {
-                    item {
-                        Empty(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            text = stringResource(id = R.string.no_appointments)
-                        )
-                    }
-                }
 
-                itemsIndexed(
-                    items = appointments,
-                    key = { index, item -> item.id }) { index, appointment ->
-                    AppointmentCard(
-                        modifier = Modifier,
-                        appointment = appointment, onUnbook = {
-                            viewModel.onTriggerEvent(
-                                AppointmentListEvent.UnBookAppointment(
-                                    appointment.id,
-                                    index
-                                )
+
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { viewModel.onTriggerEvent(AppointmentListEvent.Refresh) }) {
+
+                LazyColumn(
+                    modifier=Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    if (appointments.isEmpty()) {
+                        item {
+                            Empty(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = stringResource(id = R.string.no_appointments)
                             )
-                        })
+                        }
+                    }
+
+                    itemsIndexed(
+                        items = appointments,
+                        key = { index, item -> item.id }) { index, appointment ->
+                        AppointmentCard(
+                            modifier = Modifier,
+                            appointment = appointment, onUnbook = {
+                                viewModel.onTriggerEvent(
+                                    AppointmentListEvent.UnBookAppointment(
+                                        appointment.id,
+                                        index
+                                    )
+                                )
+                            })
+                    }
                 }
             }
         }
-
     }
 }
 

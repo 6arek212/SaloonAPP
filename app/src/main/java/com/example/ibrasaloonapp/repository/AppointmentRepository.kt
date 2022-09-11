@@ -9,7 +9,7 @@ import com.example.ibrasaloonapp.network.model.UserDto
 interface AppointmentRepository {
     suspend fun bookAppointment(
         appointment: BookAppointmentDto
-    ): ApiResult<String>
+    ): ApiResult<Appointment>
 
     suspend fun unbookAppointment(id: String): ApiResult<String>
 

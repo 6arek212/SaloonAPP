@@ -32,6 +32,7 @@ constructor(
 
     init {
         onTriggerEvent(HomeEvent.GetAppointment)
+        onTriggerEvent(HomeEvent.GetWorkers)
     }
 
     fun onTriggerEvent(event: HomeEvent) {
@@ -43,6 +44,17 @@ constructor(
 
                 is HomeEvent.GetWorkers -> {
                     getWorkers()
+                }
+
+                is HomeEvent.UpdateAppointment -> {
+                    _state.value = _state.value.copy(appointment = event.appointment)
+                }
+
+                is HomeEvent.Refresh -> {
+                    _state.value = _state.value.copy(refreshing = true)
+                    getAppointment()
+                    getWorkers()
+                    _state.value = _state.value.copy(refreshing = false)
                 }
             }
 
@@ -89,6 +101,7 @@ constructor(
         when (result) {
             is ApiResult.Success -> {
                 _state.value = _state.value.copy(workers = result.value)
+                Log.d(TAG, "getWorkers: ${result.value}")
             }
 
             is ApiResult.GenericError -> {

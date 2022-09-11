@@ -32,6 +32,8 @@ import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentEvent
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -44,6 +46,7 @@ fun HomeView(
 
     val appointment = viewModel.state.value.appointment
     val workers = viewModel.state.value.workers
+    val refreshing = viewModel.state.value.refreshing
     val user = mainViewModel.state.value.authData?.user
 
     DefaultScreenUI(onRemoveHeadFromQueue = { /*TODO*/ }) {
@@ -59,7 +62,9 @@ fun HomeView(
             frontLayerContent = {
                 FrontLayer(
                     appointment = appointment,
-                    workers = workers
+                    workers = workers,
+                    isRefreshing = refreshing,
+                    onTriggerEvent = viewModel::onTriggerEvent
                 ) { navController.navigate(Screen.BookAppointment.route) }
             },
             frontLayerElevation = 10.dp,
@@ -92,32 +97,37 @@ fun BackLayer(user: User?) {
 fun FrontLayer(
     appointment: Appointment?,
     workers: List<User>,
-    navigateToBookAppointment: () -> Unit
+    isRefreshing: Boolean,
+    onTriggerEvent: (HomeEvent) -> Unit,
+    navigateToBookAppointment: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-    ) {
-        Appointment(
-            appointment = appointment,
-            navigateToBookAppointment = navigateToBookAppointment
-        )
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = { onTriggerEvent(HomeEvent.Refresh) }) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+        ) {
+            Appointment(
+                appointment = appointment,
+                navigateToBookAppointment = navigateToBookAppointment
+            )
 
 
-        OurStaff(workers = workers)
+            OurStaff(workers = workers)
 
-        Spacer(modifier = Modifier.padding(16.dp))
+            Spacer(modifier = Modifier.padding(16.dp))
 
-        Stories()
+            Stories()
 
-        Spacer(modifier = Modifier.padding(16.dp))
+            Spacer(modifier = Modifier.padding(16.dp))
 
-        AboutUs()
+            AboutUs()
+        }
     }
-
 }
 
 
@@ -242,17 +252,17 @@ fun OurStaff(workers: List<User>) {
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(25.dp, Alignment.CenterHorizontally),
         ) {
             items(items = workers) { worker ->
-                ImageChip(
+                VerticalImageChip(
                     modifier = Modifier,
                     text = "${worker.firstName} ${worker.lastName}",
                     onClick = {},
-                    isSelected = true,
+                    isSelected = false,
                     url = worker.image,
-                    imageSize = 70.dp
+                    imageSize = 100.dp
                 )
             }
         }

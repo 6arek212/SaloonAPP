@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,23 +19,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.stringDateFormat
+import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.User
+import com.example.ibrasaloonapp.domain.model.WorkingDate
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import kotlinx.coroutines.launch
 
 private const val TAG = "BookAppointmentView"
+const val APPOINTMENT_KEY = "APPOINTMENT_KEY"
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BookAppointmentView(
     navController: NavController,
     viewModel: BookAppointmentViewModel = hiltViewModel(),
+    popBackStack: (appointment: Appointment) -> Unit
 ) {
 
     val workers = viewModel.state.value.workers
@@ -59,7 +66,6 @@ fun BookAppointmentView(
     val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
 
-    val chipModifier = Modifier.padding(end = 4.dp)
 
 
     LaunchedEffect(Unit) {
@@ -76,6 +82,7 @@ fun BookAppointmentView(
 
                     is BookAppointmentUIEvent.OnBookAppointment -> {
                         sheetState.collapse()
+                        popBackStack(event.appointment)
                     }
                 }
             }
@@ -118,150 +125,229 @@ fun BookAppointmentView(
                         .verticalScroll(scrollState)
                 ) {
 
-                    SubTitle(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = stringResource(id = R.string.book_appointment)
+                    TitleSection(popBackStack = navController::popBackStack)
+
+
+                    Spacer(modifier = Modifier.padding(16.dp))
+
+
+                    Workers(
+                        workers = workers,
+                        onTriggerEvent = viewModel::onTriggerEvent,
+                        selectedWorker = selectedWorker,
+                    )
+
+
+                    Spacer(modifier = Modifier.padding(16.dp))
+
+
+                    PickDay(
+                        selectedWorker = selectedWorker,
+                        workingDates = workingDates,
+                        onTriggerEvent = viewModel::onTriggerEvent,
+                        selectedWorkingDate = selectedWorkingDate
+                    )
+
+
+                    Spacer(modifier = Modifier.padding(16.dp))
+
+                    PickService(
+                        selectedWorkingDate = selectedWorkingDate,
+                        services = services,
+                        onTriggerEvent = viewModel::onTriggerEvent,
+                        selectedService = selectedService
                     )
 
                     Spacer(modifier = Modifier.padding(16.dp))
 
-                    Text(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = stringResource(id = R.string.pick_worker),
-                        style = MaterialTheme.typography.h4
+
+                    PickAppointment(
+                        selectedAppointment = selectedAppointment,
+                        availableAppointments = availableAppointments,
+                        onTriggerEvent = viewModel::onTriggerEvent,
+                        selectedService = selectedService
                     )
-
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(8.dp)
-                    ) {
-                        items(items = workers) { worker ->
-                            ImageChip(
-                                modifier = chipModifier,
-                                text = "${worker.firstName} ${worker.lastName}",
-                                onClick = {
-                                    viewModel.onTriggerEvent(
-                                        BookAppointmentEvent.OnSelectedWorker(worker)
-                                    )
-                                }, isSelected = worker == selectedWorker,
-                                url = worker.image,
-                                imageSize = 55.dp
-                            )
-                        }
-                    }
-
-
-
-                    Spacer(modifier = Modifier.padding(16.dp))
-
-                    AnimatedVisibility(visible = selectedWorker != null) {
-                        Column() {
-                            Text(
-                                modifier = Modifier.padding(start = 8.dp),
-                                text = stringResource(id = R.string.pick_day),
-                                style = MaterialTheme.typography.h4
-                            )
-
-                            LazyRow(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentPadding = PaddingValues(8.dp)
-                            ) {
-                                items(items = workingDates) { workingDate ->
-                                    CustomChip(
-                                        modifier = chipModifier,
-                                        text = stringDateFormat(
-                                            workingDate.date,
-                                            TimePatterns.DATE_MM_DD,
-                                            LocalContext.current
-                                        ),
-                                        onClick = {
-                                            viewModel.onTriggerEvent(
-                                                BookAppointmentEvent.OnSelectedWorkingDate(
-                                                    workingDate
-                                                )
-                                            )
-                                        }, isSelected = workingDate == selectedWorkingDate
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-
-                    Spacer(modifier = Modifier.padding(16.dp))
-
-                    AnimatedVisibility(visible = selectedWorkingDate != null) {
-
-                        Column() {
-                            Text(
-                                modifier = Modifier.padding(start = 8.dp),
-                                text = stringResource(id = R.string.pick_service),
-                                style = MaterialTheme.typography.h4
-                            )
-
-                            LazyRow(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentPadding = PaddingValues(8.dp)
-                            ) {
-                                items(items = services) { ser ->
-                                    CustomChip(
-                                        modifier = chipModifier,
-                                        text = ser.t,
-                                        onClick = {
-                                            viewModel.onTriggerEvent(
-                                                BookAppointmentEvent.OnSelectedService(ser.t)
-                                            )
-                                        }, isSelected = ser.t == selectedService
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.padding(16.dp))
-
-
-                    AnimatedVisibility(visible = selectedService.isNotBlank()) {
-                        Column() {
-                            Text(
-                                modifier = Modifier.padding(start = 8.dp),
-                                text = stringResource(id = R.string.pick_appointment),
-                                style = MaterialTheme.typography.h4
-                            )
-
-
-                            LazyRow(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentPadding = PaddingValues(8.dp)
-                            ) {
-                                items(items = availableAppointments) { appointment ->
-                                    CustomChip(
-                                        modifier = chipModifier,
-                                        text = stringDateFormat(
-                                            appointment.startTime,
-                                            TimePatterns.TIME_ONLY,
-                                            LocalContext.current
-                                        ),
-                                        onClick = {
-                                            viewModel.onTriggerEvent(
-                                                BookAppointmentEvent.OnSelectedAppointment(
-                                                    appointment
-                                                )
-                                            )
-                                        }, isSelected = appointment == selectedAppointment
-                                    )
-                                }
-                            }
-                        }
-
-                    }
-
 
                 }
 
 
             }
 
+        }
+    }
+}
+
+@Composable
+fun TitleSection(popBackStack: () -> Boolean) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+
+        IconButton(onClick = { popBackStack() }) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "back arrow"
+            )
+        }
+
+        Spacer(modifier = Modifier.padding(4.dp))
+
+        SubTitle(
+            modifier = Modifier.padding(),
+            text = stringResource(id = R.string.book_appointment)
+        )
+    }
+}
+
+@Composable
+fun PickAppointment(
+    selectedAppointment: Appointment?,
+    availableAppointments: List<Appointment>,
+    onTriggerEvent: (BookAppointmentEvent) -> Unit,
+    selectedService: String
+) {
+    AnimatedVisibility(visible = selectedService.isNotBlank()) {
+        Column() {
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = stringResource(id = R.string.pick_appointment),
+                style = MaterialTheme.typography.h4
+            )
+
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+            ) {
+                items(items = availableAppointments) { appointment ->
+                    CustomChip(
+                        text = stringDateFormat(
+                            appointment.startTime,
+                            TimePatterns.TIME_ONLY,
+                            LocalContext.current
+                        ),
+                        onClick = {
+                            onTriggerEvent(
+                                BookAppointmentEvent.OnSelectedAppointment(
+                                    appointment
+                                )
+                            )
+                        }, isSelected = appointment == selectedAppointment
+                    )
+                }
+            }
+        }
+
+    }
+}
+
+@Composable
+fun PickService(
+    selectedWorkingDate: WorkingDate?,
+    services: List<ServiceType>,
+    onTriggerEvent: (BookAppointmentEvent) -> Unit,
+    selectedService: String
+) {
+    AnimatedVisibility(visible = selectedWorkingDate != null) {
+
+        Column() {
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = stringResource(id = R.string.pick_service),
+                style = MaterialTheme.typography.h4
+            )
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+            ) {
+                items(items = services) { ser ->
+                    CustomChip(
+                        text = ser.t,
+                        onClick = {
+                            onTriggerEvent(
+                                BookAppointmentEvent.OnSelectedService(ser.t)
+                            )
+                        }, isSelected = ser.t == selectedService
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PickDay(
+    selectedWorker: User?,
+    workingDates: List<WorkingDate>,
+    onTriggerEvent: (BookAppointmentEvent) -> Unit,
+    selectedWorkingDate: WorkingDate?
+) {
+
+    AnimatedVisibility(visible = selectedWorker != null) {
+        Column() {
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = stringResource(id = R.string.pick_day),
+                style = MaterialTheme.typography.h4
+            )
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+            ) {
+                items(items = workingDates) { workingDate ->
+                    CustomChip(
+                        text = stringDateFormat(
+                            workingDate.date,
+                            TimePatterns.DATE_MM_DD,
+                            LocalContext.current
+                        ),
+                        onClick = {
+                            onTriggerEvent(
+                                BookAppointmentEvent.OnSelectedWorkingDate(
+                                    workingDate
+                                )
+                            )
+                        }, isSelected = workingDate == selectedWorkingDate
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun Workers(
+    modifier: Modifier = Modifier,
+    workers: List<User>,
+    onTriggerEvent: (BookAppointmentEvent) -> Unit,
+    selectedWorker: User?
+) {
+    Text(
+        modifier = Modifier.padding(start = 8.dp),
+        text = stringResource(id = R.string.pick_worker),
+        style = MaterialTheme.typography.h4
+    )
+
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+    ) {
+        items(items = workers) { worker ->
+            ImageChip(
+                text = "${worker.firstName} ${worker.lastName}",
+                onClick = {
+                    onTriggerEvent(
+                        BookAppointmentEvent.OnSelectedWorker(worker)
+                    )
+                }, isSelected = worker == selectedWorker,
+                url = worker.image,
+                imageSize = 55.dp
+            )
         }
     }
 }
@@ -282,11 +368,16 @@ fun BookAppointmentConfirmation(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(.5f)
-            .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 modifier = Modifier.align(Alignment.CenterVertically),
                 text = stringResource(id = R.string.appointment_info),
@@ -307,17 +398,19 @@ fun BookAppointmentConfirmation(
                 pickedDate?.let {
                     stringDateFormat(
                         pickedDate,
-                        TimePatterns.DATE_MMM_DD_YYYY,
+                        TimePatterns.DATE_TIME,
                         LocalContext.current
                     )
                 }
             } ${stringResource(id = R.string.for_a)} ${service}",
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.h6,
+            textAlign = TextAlign.Center
         )
 
         Text(
             text = "${stringResource(id = R.string.with)} ${workerName}",
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.h6,
+            textAlign = TextAlign.Center
         )
 
 

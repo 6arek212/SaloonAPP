@@ -8,6 +8,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -16,19 +18,27 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
+import com.example.ibrasaloonapp.presentation.ui.Screen
+import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileViewModel
+import kotlinx.coroutines.launch
 
 
 private const val TAG = "EditProfileView"
+
+const val USER_KEY = "user_key"
+
 
 @Composable
 fun EditProfileView(
     navController: NavController,
     profileViewModel: ProfileViewModel?,
-    viewModel: EditProfileViewModel = hiltViewModel()
+    viewModel: EditProfileViewModel = hiltViewModel(),
+    popBackStack: (user: User) -> Unit
 ) {
     profileViewModel?.let {
         Log.d(TAG, "EditProfileView: ${profileViewModel}")
@@ -37,8 +47,26 @@ fun EditProfileView(
         val phone = viewModel.state.value.phone
         val progress = viewModel.uiState.value.progressBarState
         val queue = viewModel.uiState.value.errorQueue
+        val events = viewModel.events
 
-        DefaultScreenUI(queue = queue,progressBarState = progress, onRemoveHeadFromQueue = { viewModel.onTriggerEvent(EditProfileEvent.OnRemoveHeadFromQueue) }) {
+        LaunchedEffect(Unit) {
+            launch {
+                events.collect { event ->
+                    when (event) {
+                        is EditProfileViewModel.UIEvent.UpdateUser -> {
+//                            profileViewModel.onTriggerEvent(ProfileEvent.UpdateUser(event.user))
+                            popBackStack(event.user)
+                        }
+                    }
+                }
+            }
+        }
+
+
+        DefaultScreenUI(
+            queue = queue,
+            progressBarState = progress,
+            onRemoveHeadFromQueue = { viewModel.onTriggerEvent(EditProfileEvent.OnRemoveHeadFromQueue) }) {
 
             Column(
                 modifier = Modifier
@@ -47,12 +75,24 @@ fun EditProfileView(
                     .padding(16.dp)
             ) {
 
+                Row(verticalAlignment = Alignment.CenterVertically) {
 
-                Text(
-                    text = stringResource(id = R.string.edit_profile),
-                    color = MaterialTheme.colors.onBackground,
-                    style = MaterialTheme.typography.h2
-                )
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "back arrow"
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.padding(4.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.edit_profile),
+                        color = MaterialTheme.colors.onBackground,
+                        style = MaterialTheme.typography.h2
+                    )
+                }
+
 
 
 
@@ -137,7 +177,7 @@ fun EditProfileView(
                 Button(
                     contentPadding = PaddingValues(16.dp),
                     onClick = {
-                       viewModel.onTriggerEvent(EditProfileEvent.UpdateProfile)
+                        viewModel.onTriggerEvent(EditProfileEvent.UpdateProfile)
                     }) {
                     Text(text = stringResource(id = R.string.update))
                 }

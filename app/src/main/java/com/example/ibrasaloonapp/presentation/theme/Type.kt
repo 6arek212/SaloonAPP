@@ -41,17 +41,17 @@ val SFTypography = Typography(
     ),
     h4 = TextStyle(
         fontFamily = Poppins_Font,
-        fontWeight = FontWeight.W500,
+        fontWeight = FontWeight.W600,
         fontSize = 18.sp,
     ),
     h5 = TextStyle(
         fontFamily = Poppins_Font,
-        fontWeight = FontWeight.W400,
+        fontWeight = FontWeight.W600,
         fontSize = 16.sp,
     ),
     h6 = TextStyle(
         fontFamily = Poppins_Font,
-        fontWeight = FontWeight.W300,
+        fontWeight = FontWeight.W500,
         fontSize = 14.sp,
     ),
     subtitle1 = TextStyle(

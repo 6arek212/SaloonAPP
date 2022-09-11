@@ -56,7 +56,7 @@ fun VerticalImageChip(
                 .align(Alignment.CenterHorizontally),
             contentPaddingValues = PaddingValues(
                 start = 8.dp,
-                top = 24.dp,
+                top = 8.dp,
                 end = 8.dp,
                 bottom = 6.dp
             ),

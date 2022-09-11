@@ -17,7 +17,7 @@ interface AppointmentService {
     @POST("appointments/book")
     suspend fun bookAppointment(
         @Body data: BookAppointmentDto
-    ): MessageResponse
+    ): AppointmentNotNulResponse
 
     @POST("appointments/unbook")
     suspend fun unbookAppointment(

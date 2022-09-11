@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -24,15 +25,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.MenuItem
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
+import com.example.ibrasaloonapp.presentation.ui.book_appointment.APPOINTMENT_KEY
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
-import com.example.ibrasaloonapp.presentation.ui.home.DrawerBody
-import com.example.ibrasaloonapp.presentation.ui.home.DrawerHeader
-import com.example.ibrasaloonapp.presentation.ui.home.HomeView
+import com.example.ibrasaloonapp.presentation.ui.edit_profile.USER_KEY
+import com.example.ibrasaloonapp.presentation.ui.home.*
 import com.example.ibrasaloonapp.presentation.ui.login.LoginView
+import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileView
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileViewModel
 import com.example.ibrasaloonapp.presentation.ui.signup.SignupView
@@ -122,7 +126,7 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.AppointmentsList.route
+            startDestination = Screen.Home.route
         ) {
             splash(navController = navController)
             login(navController = navController)
@@ -178,8 +182,24 @@ fun NavGraphBuilder.home(
     composable(
         route = Screen.Home.route,
         arguments = emptyList()
-    ) {
-        HomeView(navController = navController, mainViewModel = mainViewModel)
+    ) { backStackEntry ->
+
+        val appointment = backStackEntry
+            .savedStateHandle
+            .getLiveData<Appointment>(APPOINTMENT_KEY)
+            .observeAsState().value
+
+        val viewModel: HomeViewModel = hiltViewModel()
+
+        appointment?.let {
+            viewModel.onTriggerEvent(HomeEvent.UpdateAppointment(appointment))
+        }
+
+        HomeView(
+            navController = navController,
+            viewModel = viewModel,
+            mainViewModel = mainViewModel
+        )
     }
 }
 
@@ -203,7 +223,11 @@ fun NavGraphBuilder.bookAppointment(
         route = Screen.BookAppointment.route,
         arguments = emptyList()
     ) {
-        BookAppointmentView(navController = navController)
+        BookAppointmentView(navController = navController, popBackStack = { appointment ->
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set(APPOINTMENT_KEY, appointment)
+        })
     }
 }
 
@@ -213,9 +237,21 @@ fun NavGraphBuilder.profile(
 ) {
     composable(
         route = Screen.Profile.route,
-        arguments = emptyList()
-    ) {
-        ProfileView(navController = navController)
+        arguments = emptyList(),
+    ) { backStackEntry ->
+
+        val user = backStackEntry
+            .savedStateHandle
+            .getLiveData<User>(USER_KEY)
+            .observeAsState().value
+
+        val viewModel: ProfileViewModel = hiltViewModel()
+
+        user?.let {
+            viewModel.onTriggerEvent(ProfileEvent.UpdateUser(user))
+        }
+
+        ProfileView(navController = navController, viewModel = viewModel)
     }
 }
 
@@ -231,7 +267,14 @@ fun NavGraphBuilder.editProfile(
                 hiltViewModel(it)
             }
 
-        EditProfileView(navController = navController, profileViewModel = previousViewModel)
+        EditProfileView(
+            navController = navController,
+            profileViewModel = previousViewModel,
+            popBackStack = { user ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(USER_KEY, user)
+            })
     }
 }
 

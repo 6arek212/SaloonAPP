@@ -3,7 +3,7 @@
     <string name="app_name">IbraHands</string>
     <string name="hello">שלום</string>
     <string name="you_have_appointment">יש לך תור</string>
-    <string name="our_staff">הצות שלנו</string>
+    <string name="our_staff">הצוות שלנו</string>
     <string name="stories">סטוריז</string>
     <string name="about_us">קצת עלינו</string>
     <string name="about_us_details">"הסיפור שלנו מתחיל בחדר קטן בבאקה אלגרביה , התחלנו עם מספר מצומצם של לקחות ולאט לאט גדלנו "</string>
@@ -27,8 +27,8 @@
     <string name="you_dont_have_appointment">אין לך תור ,  אולי זה הזמן לתספורת</string>
     <string name="at">ב</string>
     <string name="home">הבית</string>
-    <string name="with">עם</string>
-    <string name="for_a">עבור</string>
+    <string name="with">אצל</string>
+    <string name="for_a">ל</string>
     <string name="role">תפקיד</string>
     <string name="today">היום</string>
     <string name="tomorrow">מחר</string>
