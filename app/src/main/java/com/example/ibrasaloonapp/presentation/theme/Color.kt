@@ -9,7 +9,7 @@ val PurpleLite = Color(0xFFF8F6FF)
 
 val White = Color(0xffffffff)
 
-val BluePrimary = Color(0xFF116DFF)
+val Blue= Color(0xFF1D6BE6)
 
 val Green = Color(0xFF32C240)
 val Red = Color(0xFFE22D2D)

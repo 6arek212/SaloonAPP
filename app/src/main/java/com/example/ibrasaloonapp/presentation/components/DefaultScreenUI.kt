@@ -1,6 +1,7 @@
 package com.example.ibrasaloonapp.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
@@ -40,12 +42,13 @@ fun DefaultScreenUI(
     Scaffold(
         modifier = modifier.statusBarsPadding(),
         scaffoldState = scaffoldState,
+        backgroundColor = Color.Transparent
     ) { padding ->
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(MaterialTheme.colors.background)
+                .fillMaxSize()
                 .padding(padding)
         ) {
             content()

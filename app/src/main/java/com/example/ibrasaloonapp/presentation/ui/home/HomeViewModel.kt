@@ -10,6 +10,7 @@ import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.presentation.ui.login.LoginEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,6 +39,18 @@ constructor(
     fun onTriggerEvent(event: HomeEvent) {
         viewModelScope.launch {
             when (event) {
+                is HomeEvent.DismissLoginDialog -> {
+                    _state.value = _state.value.copy(showLoginDialog = false)
+                }
+
+                is HomeEvent.ShowLoginDialog -> {
+                    _state.value = _state.value.copy(showLoginDialog = true)
+                }
+
+                is HomeEvent.OnRemoveHeadFromQueue -> {
+                    removeHeadMessage()
+                }
+
                 is HomeEvent.GetAppointment -> {
                     getAppointment()
                 }

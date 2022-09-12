@@ -40,4 +40,11 @@
     <string name="time_for_haircut">" אולי זה הזמן לתספורת"</string>
     <string name="login">כנס</string>
     <string name="verify">ודא</string>
+    <string name="lets_start">בוא נתחיל</string>
+    <string name="the_login_process">תהליך הכניסה למערכת</string>
+    <string name="go_back">חזור אחורה</string>
+    <string name="didnt_receive_code">לא קיבלת קוד?</string>
+    <string name="requrest_again">שלח שוב</string>
+    <string name="login_or_create_account">כנס או צור חשבון חדש</string>
+    <string name="hello_there_lets_login_first">שלום אורח , כנס למערכת תחילה</string>
 </resources>

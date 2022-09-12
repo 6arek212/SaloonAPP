@@ -31,13 +31,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
+import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
+import com.example.ibrasaloonapp.presentation.components.SubTitle
+import com.example.ibrasaloonapp.presentation.components.TimeCircularProgressBar
+import com.example.ibrasaloonapp.presentation.theme.Blue
+import com.example.ibrasaloonapp.presentation.theme.Red
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginView(navController: NavController, viewModel: LoginViewModel = hiltViewModel()) {
+fun LoginView(
+    onLoggedIn: (AuthData) -> Unit = {},
+    navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
 
     val phone = viewModel.state.value.phone
     val phoneError = viewModel.state.value.phoneError
@@ -50,15 +59,17 @@ fun LoginView(navController: NavController, viewModel: LoginViewModel = hiltView
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
+    val interactionSource = remember { MutableInteractionSource() }
 
     LaunchedEffect(Unit) {
         launch {
             events.collect { event ->
                 when (event) {
                     is LoginViewModel.UIEvent.LoggedIn -> {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Home.route) { inclusive = true }
-                        }
+//                        navController.navigate(Screen.Home.route) {
+//                            popUpTo(Screen.Home.route) { inclusive = true }
+//                        }
+                        onLoggedIn(event.authData)
                     }
                 }
             }
@@ -72,65 +83,45 @@ fun LoginView(navController: NavController, viewModel: LoginViewModel = hiltView
         onRemoveHeadFromQueue = { viewModel.onTriggerEvent(LoginEvent.OnRemoveHeadFromQueue) },
         queue = queue
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(scrollState)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) { focusManager.clearFocus() }
+        ) {
 
-        Box(modifier = Modifier.clickable(
-            indication = null,
-            interactionSource = remember { MutableInteractionSource() },
-            onClick = { focusManager.clearFocus() }
-        )) {
-
-            Surface(
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.fillMaxSize()
-            ) {}
-
-            Surface(
-                color = MaterialTheme.colors.background,
-                modifier = Modifier
-                    .fillMaxHeight(.8f)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(bottomEnd = 60.dp, bottomStart = 60.dp)
-            ) {
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .verticalScroll(scrollState)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.barber_shop_brief),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .align(CenterHorizontally)
-                            .height(200.dp)
-                            .width(200.dp)
-                    )
+            SubTitle(text = stringResource(id = R.string.login))
 
 
-                    Spacer(modifier = Modifier.padding(24.dp))
+            Spacer(modifier = Modifier.padding(12.dp))
 
-                    AnimatedVisibility(visible = showCode) {
-                        CodeSection(
-                            onTriggerEvent = viewModel::onTriggerEvent,
-                            code = code,
-                            moveFocus = focusManager::moveFocus
-                        )
-                    }
+            Text(text = stringResource(id = R.string.lets_start), style = MaterialTheme.typography.h2)
+            Text(text = stringResource(id = R.string.the_login_process), style = MaterialTheme.typography.h3)
 
+            Spacer(modifier = Modifier.padding(2.dp))
 
-                    AnimatedVisibility(visible = !showCode) {
-                        PhoneSection(
-                            phone = phone,
-                            phoneError = phoneError,
-                            progress = progress,
-                            onTriggerEvent = viewModel::onTriggerEvent
-                        )
-                    }
-
-                }
-
+            AnimatedVisibility(visible = showCode) {
+                CodeSection(
+                    onTriggerEvent = viewModel::onTriggerEvent,
+                    code = code,
+                    moveFocus = focusManager::moveFocus
+                )
             }
+
+
+            AnimatedVisibility(visible = !showCode) {
+                PhoneSection(
+                    phone = phone,
+                    phoneError = phoneError,
+                    progress = progress,
+                    onTriggerEvent = viewModel::onTriggerEvent
+                )
+            }
+
         }
 
     }
@@ -152,7 +143,6 @@ private fun PhoneSection(
     ) {
 
 
-        Spacer(modifier = Modifier.padding(16.dp))
         TextFields(
             modifier = Modifier
                 .fillMaxWidth()
@@ -195,7 +185,7 @@ private fun TextFields(
         OutlinedTextField(
             modifier = modifier,
             label = {
-                Text(text = "Phone")
+                Text(text = stringResource(id = R.string.phone))
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -325,11 +315,22 @@ fun CodeSection(
 
             Spacer(modifier = Modifier.padding(4.dp))
 
-            Text(text = "Go Back")
+            Text(text = stringResource(id = R.string.go_back) , style = MaterialTheme.typography.body1)
         }
 
+        Spacer(modifier = Modifier.padding(4.dp))
 
-        Spacer(modifier = Modifier.padding(8.dp))
+        TimeCircularProgressBar(
+            animationDuration = 1000 * 60,
+            percentage = 1f,
+            number = 60,
+            color = Red,
+            animDelay = 500,
+            radius = 26.dp
+        )
+
+
+        Spacer(modifier = Modifier.padding(4.dp))
 
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -365,9 +366,9 @@ fun CodeSection(
             Spacer(modifier = Modifier.padding(4.dp))
 
             Row {
-                Text(text = "Didn't receive code?")
+                Text(text = stringResource(id = R.string.didnt_receive_code), style = MaterialTheme.typography.caption)
                 Spacer(modifier = Modifier.padding(4.dp))
-                Text(text = "Request again")
+                Text(text = stringResource(id = R.string.requrest_again), color = Blue, style = MaterialTheme.typography.caption)
             }
         }
     }

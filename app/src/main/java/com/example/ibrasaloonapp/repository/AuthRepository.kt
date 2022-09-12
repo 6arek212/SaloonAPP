@@ -11,11 +11,12 @@ interface AuthRepository {
 
     suspend fun sendAuthVerification(phone: String): ApiResult<String>
 
-    suspend fun login(loginDataDto: LoginDataDto): ApiResult<String>
+    suspend fun login(loginDataDto: LoginDataDto): ApiResult<AuthData>
 
     suspend fun signup(): ApiResult<String>
 
     suspend fun getLoginStatus(): AuthData?
 
+    suspend fun logout()
 
 }

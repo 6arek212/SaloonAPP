@@ -10,6 +10,7 @@ import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.core.getCurrentDateAsString
+import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
 import com.example.ibrasaloonapp.domain.use_case.ValidatePassword
 import com.example.ibrasaloonapp.domain.use_case.ValidatePhoneNumber
@@ -234,7 +235,8 @@ constructor(
         when (result) {
             is ApiResult.Success -> {
                 Log.d(TAG, "login: logged in success")
-                _events.send(UIEvent.LoggedIn)
+                _events.send(UIEvent.LoggedIn(result.value))
+                rest()
             }
 
             is ApiResult.GenericError -> {
@@ -263,8 +265,18 @@ constructor(
     }
 
 
+    private fun rest() {
+        _state.value = _state.value.copy(
+            phone = "",
+            phoneError = null,
+            showCode = false,
+            verifyCode = OPT4Digits("", "", "", "")
+        )
+        verifyId = null
+    }
+
     sealed class UIEvent {
-        object LoggedIn : UIEvent()
+        class LoggedIn(val authData: AuthData) : UIEvent()
     }
 
 }

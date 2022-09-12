@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
+import com.example.ibrasaloonapp.presentation.components.TimeCircularProgressBar
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import kotlinx.coroutines.delay
@@ -81,7 +82,7 @@ fun SplashView(
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-        CircularProgressBar(
+        TimeCircularProgressBar(
             percentage = 1f,
             number = 100,
             color = MaterialTheme.colors.surface,
@@ -92,47 +93,3 @@ fun SplashView(
 }
 
 
-@Composable
-fun CircularProgressBar(
-    percentage: Float,
-    number: Int,
-    fontSize: TextUnit = 28.sp,
-    radius: Dp = 50.dp,
-    color: Color = Color.Green,
-    strokeWidth: Dp = 8.dp,
-    animationDuration: Int = 1000,
-    animDelay: Int = 0
-) {
-
-
-    val curPercentage = remember { Animatable(0f) }
-
-    LaunchedEffect(percentage) {
-        curPercentage.animateTo(
-            percentage,
-            animationSpec = tween(durationMillis = animationDuration, delayMillis = animDelay)
-        )
-    }
-
-    Box(modifier = Modifier.size(radius * 2f), contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.size(radius * 2f)) {
-            drawArc(
-                color = color,
-                startAngle = -90f,
-                sweepAngle = 360 * curPercentage.value,
-                useCenter = false,
-                style = Stroke(
-                    strokeWidth.toPx(),
-                    cap = StrokeCap.Round
-                )
-            )
-        }
-        Text(
-            text = (curPercentage.value * number).toInt().toString(),
-            color = Color.Black,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Bold
-        )
-
-    }
-}

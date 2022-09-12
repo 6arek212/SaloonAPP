@@ -41,6 +41,13 @@
     <string name="active_appointment">Active Appointment</string>
     <string name="login">Login</string>
     <string name="verify">Verify</string>
+    <string name="lets_start">Lets start</string>
+    <string name="the_login_process">The login process</string>
+    <string name="go_back">Go Back</string>
+    <string name="didnt_receive_code">Didn\'t receive code?</string>
+    <string name="requrest_again">Request again</string>
+    <string name="hello_there_lets_login_first">Hello there, Lets login first</string>
+    <string name="login_or_create_account">login or create account</string>
 
 
 </resources>

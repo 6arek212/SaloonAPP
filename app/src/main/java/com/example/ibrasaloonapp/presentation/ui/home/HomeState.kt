@@ -9,6 +9,7 @@ import com.example.ibrasaloonapp.domain.model.User
 data class HomeState(
     val appointment: Appointment? = null,
     val workers: List<User> = listOf(),
+    val showLoginDialog: Boolean = false,
     val refreshing: Boolean = false,
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf())

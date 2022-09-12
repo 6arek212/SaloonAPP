@@ -29,6 +29,7 @@ import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.MenuItem
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
+import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.theme.Gray1
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
@@ -82,53 +83,58 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val user = mainViewModel.state.value.authData?.user
 
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
         scaffoldState = scaffoldState,
         drawerBackgroundColor = Gray2,
-        drawerContent = {
-            DrawerHeader()
-            DrawerBody(items = drawerItems, onClick = { item ->
-                when (item.id) {
-                    Screen.Home.route -> {
-                        navController.navigate(Screen.Home.route) {
-                            launchSingleTop = true
-                            popUpTo(0)
+        drawerContent =
+        user?.let {
+            {
+                DrawerHeader()
+                DrawerBody(items = drawerItems, onClick = { item ->
+                    when (item.id) {
+                        Screen.Home.route -> {
+                            navController.navigate(Screen.Home.route) {
+                                launchSingleTop = true
+                                popUpTo(0)
+                            }
                         }
-                    }
-                    Screen.AppointmentsList.route -> {
-                        navController.navigate(Screen.AppointmentsList.route) {
-                            launchSingleTop = true
-                            popUpTo(0)
+                        Screen.AppointmentsList.route -> {
+                            navController.navigate(Screen.AppointmentsList.route) {
+                                launchSingleTop = true
+                                popUpTo(0)
+                            }
                         }
-                    }
-                    Screen.Profile.route -> {
-                        navController.navigate(Screen.Profile.route) {
-                            launchSingleTop = true
-                            popUpTo(0)
+                        Screen.Profile.route -> {
+                            navController.navigate(Screen.Profile.route) {
+                                launchSingleTop = true
+                                popUpTo(0)
+                            }
                         }
-                    }
 
-                    "logout" -> {
-                        //remove auth data !!!
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                            popUpTo(0)
+                        "logout" -> {
+                            //remove auth data !!!
+                            mainViewModel.onTriggerEvent(MainEvent.Logout)
+                            navController.navigate(Screen.Home.route) {
+                                launchSingleTop = true
+                                popUpTo(0)
+                            }
                         }
                     }
-                }
-                scope.launch {
-                    scaffoldState.drawerState.close()
-                }
-            }, itemTextStyle = MaterialTheme.typography.body2)
+                    scope.launch {
+                        scaffoldState.drawerState.close()
+                    }
+                }, itemTextStyle = MaterialTheme.typography.body2)
+            }
         }
     ) {
 
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.Login.route
+            startDestination = Screen.Home.route
         ) {
             splash(navController = navController)
             login(navController = navController)

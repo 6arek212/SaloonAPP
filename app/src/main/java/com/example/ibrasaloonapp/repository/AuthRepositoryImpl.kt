@@ -13,6 +13,7 @@ import com.example.ibrasaloonapp.network.model.AuthVerificationDto
 import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.network.services.AuthService
 import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
+import com.example.ibrasaloonapp.ui.clearAuthData
 import com.example.ibrasaloonapp.ui.dataStore
 import com.example.ibrasaloonapp.ui.getAuthData
 import com.example.ibrasaloonapp.ui.insertAuthData
@@ -37,7 +38,13 @@ constructor(
 
 
     override suspend fun getLoginStatus(): AuthData? {
-        return application.dataStore.data.first().getAuthData()
+        val authData = application.dataStore.data.first().getAuthData()
+        authData?.let {
+            if (it.token.isEmpty()) {
+                return null
+            }
+        }
+        return authData
     }
 
     override suspend fun sendAuthVerification(phone: String): ApiResult<String> {
@@ -46,7 +53,7 @@ constructor(
         }
     }
 
-    override suspend fun login(loginDataDto: LoginDataDto): ApiResult<String> {
+    override suspend fun login(loginDataDto: LoginDataDto): ApiResult<AuthData> {
         val result = safeApiCall(dispatcher) {
             val res = authService.loginAndVerifyPhone(loginDataDto).authDataDto
             Log.d(TAG, "login: $res")
@@ -59,7 +66,7 @@ constructor(
                 application.dataStore.edit { settings ->
                     settings.insertAuthData(result.value)
                 }
-                ApiResult.Success("Logged in success")
+                ApiResult.Success(result.value)
             }
 
             is ApiResult.GenericError -> {
@@ -73,6 +80,13 @@ constructor(
             is ApiResult.NetworkError -> {
                 ApiResult.NetworkError
             }
+        }
+    }
+
+
+    override suspend fun logout() {
+        application.dataStore.edit { settings ->
+            settings.clearAuthData()
         }
     }
 
