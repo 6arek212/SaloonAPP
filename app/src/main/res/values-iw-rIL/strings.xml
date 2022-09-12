@@ -38,4 +38,6 @@
     <string name="unbook">בטל תור</string>
     <string name="active_appointment">תור פעיל</string>
     <string name="time_for_haircut">" אולי זה הזמן לתספורת"</string>
+    <string name="login">כנס</string>
+    <string name="verify">ודא</string>
 </resources>

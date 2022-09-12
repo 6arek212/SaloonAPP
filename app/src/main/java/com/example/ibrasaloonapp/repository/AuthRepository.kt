@@ -8,11 +8,14 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
 
-    suspend fun getLoginStatus(): AuthData?
+
+    suspend fun sendAuthVerification(phone: String): ApiResult<String>
 
     suspend fun login(loginDataDto: LoginDataDto): ApiResult<String>
 
     suspend fun signup(): ApiResult<String>
+
+    suspend fun getLoginStatus(): AuthData?
 
 
 }

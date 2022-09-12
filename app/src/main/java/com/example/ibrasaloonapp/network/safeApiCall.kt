@@ -32,9 +32,9 @@ suspend fun <T> safeApiCall(
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
             when (throwable) {
-                is Code400Exception -> {
-                    ApiResult.GenericError(throwable.code, throwable.message ?: "")
-                }
+//                is Code400Exception -> {
+//                    ApiResult.GenericError(throwable.code, throwable.message ?: "")
+//                }
 
                 is TimeoutCancellationException -> {
                     val code = 408 // timeout error code
@@ -66,9 +66,9 @@ suspend fun <T> safeApiCall(
 }
 
 
-class Code400Exception(message: String? = "SOME KIND OF ERROR 400-499", val code: Int) :
-    IOException(message) {
-}
+//class Code400Exception(message: String? = "SOME KIND OF ERROR 400-499", val code: Int) :
+//    IOException(message) {
+//}
 
 
 private fun convertErrorBody(throwable: HttpException): String? {

@@ -9,6 +9,7 @@ import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.AuthDataDtoMapper
+import com.example.ibrasaloonapp.network.model.AuthVerificationDto
 import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.network.services.AuthService
 import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
@@ -39,13 +40,18 @@ constructor(
         return application.dataStore.data.first().getAuthData()
     }
 
+    override suspend fun sendAuthVerification(phone: String): ApiResult<String> {
+        return safeApiCall(dispatcher) {
+            authService.sendAuthVerification(AuthVerificationDto(phone = phone)).verifyId
+        }
+    }
+
     override suspend fun login(loginDataDto: LoginDataDto): ApiResult<String> {
         val result = safeApiCall(dispatcher) {
-            val res = authService.login(loginDataDto)
-            Log.d(TAG, "login: ${res}")
+            val res = authService.loginAndVerifyPhone(loginDataDto).authDataDto
+            Log.d(TAG, "login: $res")
             authDataDtoMapper.mapToDomainModel(res)
         }
-
 
         return when (result) {
             is ApiResult.Success -> {

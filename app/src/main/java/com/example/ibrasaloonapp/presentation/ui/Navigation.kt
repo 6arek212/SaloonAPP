@@ -128,7 +128,7 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.Profile.route
+            startDestination = Screen.Login.route
         ) {
             splash(navController = navController)
             login(navController = navController)

@@ -1,23 +1,28 @@
 package com.example.ibrasaloonapp.network.services
 
-import com.example.ibrasaloonapp.network.model.AuthDataDto
+import com.example.ibrasaloonapp.network.model.AuthVerificationDto
 import com.example.ibrasaloonapp.network.model.LoginDataDto
+import com.example.ibrasaloonapp.network.responses.AuthVerificationResponse
+import com.example.ibrasaloonapp.network.responses.LoginResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface AuthService {
 
-    @POST("login")
-    suspend fun login(@Body data: LoginDataDto): AuthDataDto
+    @POST("send-auth-verification")
+    suspend fun sendAuthVerification(@Body data: AuthVerificationDto): AuthVerificationResponse
 
 
-    @POST("signup")
-    suspend fun signup()
+    @POST("login-verify-phone")
+    suspend fun loginAndVerifyPhone(@Body data: LoginDataDto) : LoginResponse
 
 
-    @POST("refresh-token")
-    suspend fun refreshToken(@Query("token") token: String)
+    @POST("signup-verify-phone")
+    suspend fun signupAndVerifyPhone()
+
+
+    @POST("verify-phone")
+    suspend fun verifyPhone()
 
 
 }

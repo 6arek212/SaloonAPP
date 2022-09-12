@@ -39,6 +39,8 @@
     <string name="wax">Wax</string>
     <string name="unbook">Unbook</string>
     <string name="active_appointment">Active Appointment</string>
+    <string name="login">Login</string>
+    <string name="verify">Verify</string>
 
 
 </resources>
