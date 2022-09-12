@@ -102,6 +102,7 @@ fun BookAppointmentView(
             onRemoveHeadFromQueue = { viewModel.onTriggerEvent(BookAppointmentEvent.OnRemoveHeadFromQueue) }) {
 
             BottomSheetScaffold(
+                modifier = Modifier.fillMaxSize(),
                 backgroundColor = Gray2,
                 sheetBackgroundColor = White,
                 sheetGesturesEnabled = false,
@@ -121,8 +122,8 @@ fun BookAppointmentView(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(vertical = 8.dp)
                         .verticalScroll(scrollState)
+                        .padding(top = 8.dp, bottom = BottomSheetScaffoldDefaults.SheetPeekHeight + 16.dp)
                 ) {
 
                     TitleSection(popBackStack = navController::popBackStack)

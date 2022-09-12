@@ -64,7 +64,7 @@ fun AppointmentListView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background)
+                .background(Gray2)
         ) {
 
             Column(

@@ -35,7 +35,7 @@ fun AppointmentCard(
     Card(
         modifier = modifier,
         elevation = 8.dp,
-        backgroundColor = MaterialTheme.colors.surface,
+        backgroundColor = Gray1,
         shape = MaterialTheme.shapes.small
     ) {
 

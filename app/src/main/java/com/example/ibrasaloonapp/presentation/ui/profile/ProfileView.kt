@@ -37,7 +37,9 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.presentation.components.CircularImage
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
+import com.example.ibrasaloonapp.presentation.components.VerticalImageChip
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
 
@@ -74,53 +76,36 @@ fun ProfileView(
                     }
                 )
 
-
-                Box(
+                VerticalImageChip(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 250.dp, max = 300.dp)
-                        .offset(y = -16.dp)
-                ) {
+                        .align(CenterHorizontally)
+                        .offset(y = -80.dp)
+                        .zIndex(1f),
+                    text = "${user.firstName} ${user.lastName}",
+                    onClick = { /*TODO*/ },
+                    isSelected = false,
+                    url = user.image,
+                    imageSize = 200.dp
+                )
 
-                    AsyncImage(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)),
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(if (user.image != null) "https://saloon-ibra-api.herokuapp.com/imgs/${user.image}" else null)
-                            .crossfade(true)
-                            .build(),
-                        placeholder = painterResource(R.drawable.person_place_holder),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        error = painterResource(id = R.drawable.error_image_generic),
-                        fallback = painterResource(id = R.drawable.person_place_holder),
-
-                        )
+//                CircularImage(
+//                    modifier = Modifier
+//                        .align(CenterHorizontally)
+//                        .size(160.dp)
+//                        .offset(y = -80.dp)
+//                        .zIndex(1f),
+//                    url = if (user.image != null) "https://saloon-ibra-api.herokuapp.com/imgs/${user.image}" else null,
+//                    elevation = 8.dp
+//                )
 
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    .2f to Color.Black,
-                                    1f to Black4,
-                                ), alpha = .5f
-                            )
-                    )
-
-                    Text(
-                        modifier = Modifier
-                            .align(BottomStart)
-                            .padding(8.dp),
-                        text = "${user.firstName} ${user.lastName}",
-                        style = MaterialTheme.typography.h4,
-                        color = White
-                    )
-
-                }
+                Text(
+                    modifier = Modifier
+                        .padding(8.dp),
+                    text = "${user.firstName} ${user.lastName}",
+                    style = MaterialTheme.typography.h4,
+                    color = White
+                )
 
 
             }
@@ -135,57 +120,29 @@ fun Top(modifier: Modifier = Modifier, navigateToUpdatePage: () -> Unit) {
 
 
     Surface(
-        modifier = modifier,
-        color = Orange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        color = MaterialTheme.colors.primary,
         shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-        elevation = 8.dp
     ) {
-
         Column {
-
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 150.dp),
-                color = MaterialTheme.colors.primary,
-                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-            ) {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(Alignment.Top)
-                        .padding(8.dp),
-                    verticalAlignment = CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.profile),
-                        color = Gray1,
-                        style = MaterialTheme.typography.h2
-                    )
-                }
-            }
-
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(16.dp),
+                verticalAlignment = CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    modifier = Modifier.align(CenterVertically),
-                    style = MaterialTheme.typography.h4,
-                    text = "Barber",
-                    color = MaterialTheme.colors.onPrimary
+                    text = stringResource(id = R.string.profile),
+                    color = Gray1,
+                    style = MaterialTheme.typography.h2
                 )
 
 
                 IconButton(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .border(1.dp, Gray1, CircleShape)
-                        .align(Alignment.CenterVertically),
+                    modifier = Modifier.clip(CircleShape),
                     onClick = {
                         navigateToUpdatePage()
                     }) {
@@ -196,10 +153,8 @@ fun Top(modifier: Modifier = Modifier, navigateToUpdatePage: () -> Unit) {
                     )
                 }
             }
-
-
         }
-
     }
+
 
 }

@@ -29,6 +29,8 @@ import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.MenuItem
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
+import com.example.ibrasaloonapp.presentation.theme.Gray1
+import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.APPOINTMENT_KEY
@@ -84,7 +86,7 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
         scaffoldState = scaffoldState,
-        drawerBackgroundColor = MaterialTheme.colors.primary,
+        drawerBackgroundColor = Gray2,
         drawerContent = {
             DrawerHeader()
             DrawerBody(items = drawerItems, onClick = { item ->
@@ -119,14 +121,14 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
                 scope.launch {
                     scaffoldState.drawerState.close()
                 }
-            }, itemTextStyle = MaterialTheme.typography.body1)
+            }, itemTextStyle = MaterialTheme.typography.body2)
         }
     ) {
 
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.Home.route
+            startDestination = Screen.Profile.route
         ) {
             splash(navController = navController)
             login(navController = navController)
