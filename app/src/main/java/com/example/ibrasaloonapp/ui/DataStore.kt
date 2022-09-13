@@ -15,6 +15,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 
 
 val TOKEN = stringPreferencesKey("token")
+val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
 val USER_ID = stringPreferencesKey("user_id")
 val USER_FIRST_NAME = stringPreferencesKey("user_first_name")
 val USER_LAST_NAME = stringPreferencesKey("user_last_name")
@@ -24,6 +25,7 @@ val EXPIRES_IN = intPreferencesKey("expiresIn")
 
 fun MutablePreferences.insertAuthData(authData: AuthData) {
     this[TOKEN] = authData.token
+    this[REFRESH_TOKEN] = authData.refreshToken
     this[USER_ID] = authData.user.id
     this[USER_FIRST_NAME] = authData.user.firstName
     this[USER_LAST_NAME] = authData.user.lastName
@@ -34,6 +36,7 @@ fun MutablePreferences.insertAuthData(authData: AuthData) {
 
 fun MutablePreferences.clearAuthData() {
     this[TOKEN] = ""
+    this[REFRESH_TOKEN] = ""
     this[USER_ID] = ""
     this[USER_FIRST_NAME] = ""
     this[USER_LAST_NAME] = ""
@@ -55,6 +58,7 @@ fun Preferences.getAuthData(): AuthData? {
             role = ""
         ),
         token = this[TOKEN] ?: "",
+        refreshToken = this[REFRESH_TOKEN] ?: "",
         expiresIn = this[EXPIRES_IN] ?: 0
     )
 }

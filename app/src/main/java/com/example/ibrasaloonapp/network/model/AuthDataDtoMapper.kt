@@ -12,7 +12,8 @@ constructor(val userDtoMapper: UserDtoMapper) : DomainMapper<AuthDataDto, AuthDa
         return AuthData(
             user = userDtoMapper.mapToDomainModel(model.user),
             token = model.token,
-            expiresIn = model.expiresIn
+            expiresIn = model.expiresIn,
+            refreshToken = model.refreshToken
         )
     }
 
@@ -20,7 +21,8 @@ constructor(val userDtoMapper: UserDtoMapper) : DomainMapper<AuthDataDto, AuthDa
         return AuthDataDto(
             user = userDtoMapper.mapFromDomainModel(domainModel.user),
             token = domainModel.token,
-            expiresIn = domainModel.expiresIn
+            expiresIn = domainModel.expiresIn,
+            refreshToken = domainModel.refreshToken
         )
     }
 }

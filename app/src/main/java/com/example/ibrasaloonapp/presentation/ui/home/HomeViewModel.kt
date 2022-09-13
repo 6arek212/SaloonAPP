@@ -10,6 +10,9 @@ import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.presentation.BaseViewModel
+import com.example.ibrasaloonapp.presentation.MainEvent
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.ui.login.LoginEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
@@ -26,7 +29,7 @@ class HomeViewModel
 constructor(
     private val appointmentsRepository: AppointmentRepository,
     private val workerRepository: WorkerRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _state: MutableState<HomeState> = mutableStateOf(HomeState())
     val state: State<HomeState> = _state
@@ -76,7 +79,7 @@ constructor(
 
 
     private suspend fun getAppointment() {
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
+        loading(true)
 
         val result = appointmentsRepository.getAppointment()
 
@@ -93,6 +96,11 @@ constructor(
                         description = result.errorMessage
                     )
                 )
+
+                if (result.code == 401) {
+                    sendUiEvent(MainUIEvent.Logout)
+                }
+
             }
 
             is ApiResult.NetworkError -> {
@@ -101,13 +109,12 @@ constructor(
         }
 
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
+        loading(false)
     }
 
 
     private suspend fun getWorkers() {
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
+        loading(true)
 
         val result = workerRepository.getWorkers()
 
@@ -132,26 +139,8 @@ constructor(
         }
 
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+        loading(false)
     }
 
-
-    private fun appendToMessageQueue(uiComponent: UIComponent) {
-        val queue = state.value.errorQueue
-        queue.add(uiComponent)
-        _state.value = _state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
-        _state.value = _state.value.copy(errorQueue = queue)
-    }
-
-    private fun removeHeadMessage() {
-        try {
-            val queue = _state.value.errorQueue
-            queue.remove() // can throw exception if empty
-            _state.value = _state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
-            _state.value = _state.value.copy(errorQueue = queue)
-        } catch (e: Exception) {
-            Log.d(TAG, "removeHeadMessage: Nothing to remove from DialogQueue")
-        }
-    }
 
 }

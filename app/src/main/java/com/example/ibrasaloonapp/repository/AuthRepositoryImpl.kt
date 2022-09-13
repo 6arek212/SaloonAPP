@@ -11,12 +11,10 @@ import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.AuthDataDtoMapper
 import com.example.ibrasaloonapp.network.model.AuthVerificationDto
 import com.example.ibrasaloonapp.network.model.LoginDataDto
+import com.example.ibrasaloonapp.network.model.RefreshTokenDto
 import com.example.ibrasaloonapp.network.services.AuthService
 import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
-import com.example.ibrasaloonapp.ui.clearAuthData
-import com.example.ibrasaloonapp.ui.dataStore
-import com.example.ibrasaloonapp.ui.getAuthData
-import com.example.ibrasaloonapp.ui.insertAuthData
+import com.example.ibrasaloonapp.ui.*
 import com.example.trainingapp.util.safeApiCall
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -92,5 +90,44 @@ constructor(
 
     override suspend fun signup(): ApiResult<String> {
         TODO("Not yet implemented")
+    }
+
+
+    override suspend fun refreshToken(): String? {
+        val authData = application.dataStore.data.first().getAuthData()
+
+        Log.d(TAG, "refreshToken: ${authData}")
+
+        if (authData != null && !authData.refreshToken.isEmpty()) {
+
+            val result = safeApiCall(dispatcher = dispatcher) {
+                authService.refreshToken(RefreshTokenDto(refreshToken = authData.refreshToken)).token
+            }
+
+            return when (result) {
+                is ApiResult.Success -> {
+                    application.dataStore.edit { settings ->
+                        settings[TOKEN] = result.value
+                    }
+                    result.value
+                }
+
+                is ApiResult.GenericError -> {
+                    null
+                }
+
+                is ApiResult.NetworkError -> {
+                    null
+                }
+            }
+        }
+
+        return null
+    }
+
+    override suspend fun removeCurrentToken() {
+        application.dataStore.edit { settings ->
+            settings[TOKEN] = ""
+        }
     }
 }

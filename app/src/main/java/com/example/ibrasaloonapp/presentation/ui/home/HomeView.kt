@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -33,13 +34,16 @@ import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentEvent
 import com.example.ibrasaloonapp.presentation.ui.login.LoginView
+import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -55,42 +59,58 @@ fun HomeView(
     val refreshing = viewModel.state.value.refreshing
     val user = mainViewModel.state.value.authData?.user
     val showLoginDialog = viewModel.state.value.showLoginDialog
+    val events = viewModel.uiEvents
+
+    LaunchedEffect(Unit) {
+        launch {
+            events.collect { event ->
+                when (event) {
+                    is MainUIEvent.Logout -> {
+                        mainViewModel.onTriggerEvent(MainEvent.Logout)
+                    }
+                }
+            }
+        }
+    }
+
 
     DefaultScreenUI(onRemoveHeadFromQueue = { viewModel.onTriggerEvent(HomeEvent.OnRemoveHeadFromQueue) }) {
-        BackdropScaffold(
-            scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
-            frontLayerScrimColor = Color.Unspecified,
-            appBar = {
-                HomeAppBar()
-            },
-            backLayerContent = {
-                BackLayer(user)
-            },
-            frontLayerContent = {
-                FrontLayer(
-                    appointment = appointment,
-                    workers = workers,
-                    isRefreshing = refreshing,
-                    onTriggerEvent = viewModel::onTriggerEvent,
-                    navController = navController,
-                    navigateToBookAppointment = { navController.navigate(Screen.BookAppointment.route) },
-                    showLoginDialog = showLoginDialog,
-                    onDismissLoginDialog = { viewModel.onTriggerEvent(HomeEvent.DismissLoginDialog) },
-                    onShowLoginDialog = { viewModel.onTriggerEvent(HomeEvent.ShowLoginDialog) },
-                    user = user,
-                    onLogin = { authData ->
-                        mainViewModel.onTriggerEvent(
-                            MainEvent.Login(
-                                authData
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(refreshing),
+            onRefresh = { viewModel.onTriggerEvent(HomeEvent.Refresh) }) {
+            BackdropScaffold(
+                scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
+                frontLayerScrimColor = Color.Unspecified,
+                appBar = {
+                    HomeAppBar()
+                },
+                backLayerContent = {
+                    BackLayer(user)
+                },
+                frontLayerContent = {
+                    FrontLayer(
+                        appointment = appointment,
+                        workers = workers,
+                        navController = navController,
+                        navigateToBookAppointment = { navController.navigate(Screen.BookAppointment.route) },
+                        showLoginDialog = showLoginDialog,
+                        onDismissLoginDialog = { viewModel.onTriggerEvent(HomeEvent.DismissLoginDialog) },
+                        onShowLoginDialog = { viewModel.onTriggerEvent(HomeEvent.ShowLoginDialog) },
+                        user = user,
+                        onLogin = { authData ->
+                            mainViewModel.onTriggerEvent(
+                                MainEvent.Login(
+                                    authData
+                                )
                             )
-                        )
-                        viewModel.onTriggerEvent(HomeEvent.Refresh)
-                    }
-                )
-            },
-            frontLayerElevation = 10.dp,
-            frontLayerBackgroundColor = Gray1
-        )
+                            viewModel.onTriggerEvent(HomeEvent.Refresh)
+                        }
+                    )
+                },
+                frontLayerElevation = 10.dp,
+                frontLayerBackgroundColor = Gray1
+            )
+        }
     }
 
 }
@@ -99,14 +119,14 @@ fun HomeView(
 @Composable
 fun BackLayer(user: User?) {
 
-    user?.let {
+    if (user != null && !user.firstName.isEmpty() && !user.lastName.isEmpty()) {
         Column {
             ImageName(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, top = 24.dp),
-                firstName = it.firstName,
-                lastName = it.lastName
+                firstName = user.firstName,
+                lastName = user.lastName
             )
             Spacer(modifier = Modifier.padding(16.dp))
         }
@@ -118,8 +138,6 @@ fun BackLayer(user: User?) {
 fun FrontLayer(
     appointment: Appointment?,
     workers: List<User>,
-    isRefreshing: Boolean,
-    onTriggerEvent: (HomeEvent) -> Unit,
     navigateToBookAppointment: () -> Unit,
     navController: NavController,
     showLoginDialog: Boolean,
@@ -130,39 +148,36 @@ fun FrontLayer(
 ) {
     val scrollState = rememberScrollState()
 
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing),
-        onRefresh = { onTriggerEvent(HomeEvent.Refresh) }) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-        ) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+    ) {
 
 
-            Header(
-                appointment = appointment,
-                navigateToBookAppointment = navigateToBookAppointment,
-                navController = navController,
-                showLoginDialog = showLoginDialog,
-                onDismissLoginDialog = onDismissLoginDialog,
-                onShowLoginDialog = onShowLoginDialog,
-                user = user,
-                onLogin = onLogin
-            )
+        Header(
+            appointment = appointment,
+            navigateToBookAppointment = navigateToBookAppointment,
+            navController = navController,
+            showLoginDialog = showLoginDialog,
+            onDismissLoginDialog = onDismissLoginDialog,
+            onShowLoginDialog = onShowLoginDialog,
+            user = user,
+            onLogin = onLogin
+        )
 
 
 
-            OurStaff(workers = workers)
+        OurStaff(workers = workers)
 
-            Spacer(modifier = Modifier.padding(16.dp))
+        Spacer(modifier = Modifier.padding(16.dp))
 
-            Stories()
+        Stories()
 
-            Spacer(modifier = Modifier.padding(16.dp))
+        Spacer(modifier = Modifier.padding(16.dp))
 
-            AboutUs()
-        }
+        AboutUs()
     }
 }
 

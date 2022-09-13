@@ -19,4 +19,8 @@ interface AuthRepository {
 
     suspend fun logout()
 
+    suspend fun refreshToken(): String?
+
+    suspend fun removeCurrentToken()
+
 }

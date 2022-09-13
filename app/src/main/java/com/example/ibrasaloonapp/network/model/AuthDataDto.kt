@@ -9,6 +9,9 @@ data class AuthDataDto(
     @SerializedName("token")
     val token: String,
 
+    @SerializedName("refresh_token")
+    val refreshToken: String,
+
     @SerializedName("expiresIn")
     val expiresIn: Int
 ) {

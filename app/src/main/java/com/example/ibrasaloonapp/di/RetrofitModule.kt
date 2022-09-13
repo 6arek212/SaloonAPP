@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.di
 
+import com.example.ibrasaloonapp.network.utils.TokenAuthenticator
 import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.trainingapp.util.AuthInterceptor
 import com.google.gson.GsonBuilder
@@ -28,11 +29,13 @@ object RetrofitModule {
     @Singleton
     @Provides
     fun provideRetrofit(
-        authInterceptor: AuthInterceptor
+        authInterceptor: AuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator
     ): Retrofit {
 
 
         val client = OkHttpClient.Builder()
+            .authenticator(tokenAuthenticator)
             .addInterceptor(authInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
