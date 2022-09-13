@@ -10,6 +10,8 @@ import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,14 +24,12 @@ class MainActivityViewModel
 @Inject
 constructor(
     val authRepository: AuthRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     //TODO: NETWORK STATUS !!!!
     private val _state: MutableState<AuthState> = mutableStateOf(AuthState())
     val state: State<AuthState> = _state
 
-    private val _events = Channel<UIEvent>()
-    val events = _events.receiveAsFlow()
 
     init {
         onTriggerEvent(MainEvent.GetAuthData)
@@ -40,7 +40,7 @@ constructor(
         viewModelScope.launch {
             when (event) {
                 is MainEvent.Login -> {
-                    _state.value = _state.value.copy(authData = event.authData)
+                    _state.value = _state.value.copy(authData = event.authData, isLoggedIn = true)
                 }
 
                 is MainEvent.GetAuthData -> {
@@ -60,10 +60,10 @@ constructor(
 
         if (authData != null) {
             _state.value = state.value.copy(isLoggedIn = true, authData = authData)
-            _events.send(UIEvent.NavigateNow(Screen.AppointmentsList.route))
+            sendUiEvent(MainUIEvent.AuthDataReady(true))
         } else {
-            _state.value = AuthState(isLoggedIn = false)
-            _events.send(UIEvent.NavigateNow(Screen.Login.route))
+            _state.value = AuthState(isLoggedIn = false, authData = null)
+            sendUiEvent(MainUIEvent.AuthDataReady(false))
         }
 
         Log.d(TAG, "checkAuth: ${authData}")
@@ -72,11 +72,8 @@ constructor(
 
     private suspend fun logout() {
         authRepository.logout()
-        _state.value = _state.value.copy(authData = null)
-    }
-
-    sealed class UIEvent {
-        class NavigateNow(val route: String) : UIEvent()
+        _state.value = _state.value.copy(authData = null, isLoggedIn = false)
+        sendUiEvent(MainUIEvent.Logout)
     }
 
 

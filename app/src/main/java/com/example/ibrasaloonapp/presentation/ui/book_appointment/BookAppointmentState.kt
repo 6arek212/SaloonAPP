@@ -18,11 +18,7 @@ data class BookAppointmentState(
     val selectedWorker: User? = null,
     val selectedWorkingDate: WorkingDate? = null,
     val selectedService: String = "",
-    val selectedAppointment: Appointment? = null,
-
-    val progressBarState: ProgressBarState = ProgressBarState.Idle,
-    val errorQueue: Queue<UIComponent> = Queue(mutableListOf())
-
+    val selectedAppointment: Appointment? = null
 ) {
 }
 

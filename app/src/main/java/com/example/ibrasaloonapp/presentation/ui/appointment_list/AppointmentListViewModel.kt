@@ -1,15 +1,19 @@
 package com.example.ibrasaloonapp.presentation.ui.appointment_list
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.presentation.BaseViewModel
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -22,8 +26,9 @@ private const val TAG = "AppointmentsListVM"
 class AppointmentsListViewModel
 @Inject
 constructor(
+    private val context: Application,
     private val repository: AppointmentRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _state: MutableState<AppointmentListState> = mutableStateOf(AppointmentListState())
     val state: State<AppointmentListState> = _state
@@ -55,8 +60,7 @@ constructor(
     }
 
     private suspend fun getAppointments() {
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
+        loading(true)
         val result = repository.getAppointments()
 
         when (result) {
@@ -65,20 +69,32 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Error",
+                        description = result.errorMessage
+                    )
+                )
+                if (result.code == 401) {
+                    sendUiEvent(MainUIEvent.Logout)
+                }
             }
 
             is ApiResult.NetworkError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
+                    )
+                )
             }
         }
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+        loading(false)
     }
 
 
     suspend fun unbook(id: String, index: Int) {
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
+        loading(true)
         val result = repository.unbookAppointment(id)
 
         when (result) {
@@ -95,34 +111,28 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = "Error",
+                        description = result.errorMessage
+                    )
+                )
+                if (result.code == 401) {
+                    sendUiEvent(MainUIEvent.Logout)
+                }
             }
 
             is ApiResult.NetworkError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
+                    )
+                )
             }
         }
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
-    }
-
-
-    private fun appendToMessageQueue(uiComponent: UIComponent) {
-        val queue = state.value.errorQueue
-        queue.add(uiComponent)
-        _state.value = _state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
-        _state.value = _state.value.copy(errorQueue = queue)
-    }
-
-    private fun removeHeadMessage() {
-        try {
-            val queue = _state.value.errorQueue
-            queue.remove() // can throw exception if empty
-            _state.value = state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
-            _state.value = state.value.copy(errorQueue = queue)
-        } catch (e: Exception) {
-            Log.d(TAG, "removeHeadMessage: Nothing to remove from DialogQueue")
-        }
+        loading(false)
     }
 
 }

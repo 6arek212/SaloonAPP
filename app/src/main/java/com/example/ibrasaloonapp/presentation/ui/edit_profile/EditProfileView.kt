@@ -19,6 +19,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.User
+import com.example.ibrasaloonapp.presentation.MainActivityViewModel
+import com.example.ibrasaloonapp.presentation.MainEvent
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.Screen
@@ -37,9 +40,25 @@ const val USER_KEY = "user_key"
 fun EditProfileView(
     navController: NavController,
     profileViewModel: ProfileViewModel?,
+    mainViewModel: MainActivityViewModel,
     viewModel: EditProfileViewModel = hiltViewModel(),
     popBackStack: (user: User) -> Unit
 ) {
+
+    val uiEvents = viewModel.uiEvents
+
+    LaunchedEffect(Unit) {
+        launch {
+            uiEvents.collect { event ->
+                when (event) {
+                    is MainUIEvent.Logout -> {
+                        mainViewModel.onTriggerEvent(MainEvent.Logout)
+                    }
+                }
+            }
+        }
+    }
+
     profileViewModel?.let {
         Log.d(TAG, "EditProfileView: ${profileViewModel}")
         val firstName = viewModel.state.value.firstName
@@ -54,7 +73,6 @@ fun EditProfileView(
                 events.collect { event ->
                     when (event) {
                         is EditProfileViewModel.UIEvent.UpdateUser -> {
-//                            profileViewModel.onTriggerEvent(ProfileEvent.UpdateUser(event.user))
                             popBackStack(event.user)
                         }
                     }

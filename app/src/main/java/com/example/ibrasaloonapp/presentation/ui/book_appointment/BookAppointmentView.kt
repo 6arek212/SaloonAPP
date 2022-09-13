@@ -29,6 +29,9 @@ import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.domain.model.WorkingDate
+import com.example.ibrasaloonapp.presentation.MainActivityViewModel
+import com.example.ibrasaloonapp.presentation.MainEvent
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import kotlinx.coroutines.launch
@@ -40,6 +43,7 @@ const val APPOINTMENT_KEY = "APPOINTMENT_KEY"
 @Composable
 fun BookAppointmentView(
     navController: NavController,
+    mainViewModel: MainActivityViewModel,
     viewModel: BookAppointmentViewModel = hiltViewModel(),
     popBackStack: (appointment: Appointment) -> Unit
 ) {
@@ -54,18 +58,30 @@ fun BookAppointmentView(
     val selectedAppointment = viewModel.state.value.selectedAppointment
     val selectedService = viewModel.state.value.selectedService
 
-    val progressBar = viewModel.state.value.progressBarState
-    val queue = viewModel.state.value.errorQueue
+    val progressBar = viewModel.uiState.value.progressBarState
+    val queue = viewModel.uiState.value.errorQueue
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
+    val uiEvents = viewModel.uiEvents
     val events = viewModel.events
 
 
     val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
 
+    LaunchedEffect(Unit) {
+        launch {
+            uiEvents.collect { event ->
+                when (event) {
+                    is MainUIEvent.Logout -> {
+                        mainViewModel.onTriggerEvent(MainEvent.Logout)
+                    }
+                }
+            }
+        }
+    }
 
 
     LaunchedEffect(Unit) {
@@ -123,7 +139,10 @@ fun BookAppointmentView(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
-                        .padding(top = 8.dp, bottom = BottomSheetScaffoldDefaults.SheetPeekHeight + 16.dp)
+                        .padding(
+                            top = 8.dp,
+                            bottom = BottomSheetScaffoldDefaults.SheetPeekHeight + 16.dp
+                        )
                 ) {
 
                     TitleSection(popBackStack = navController::popBackStack)

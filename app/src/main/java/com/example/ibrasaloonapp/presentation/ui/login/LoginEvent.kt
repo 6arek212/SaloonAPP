@@ -12,6 +12,5 @@ sealed class LoginEvent {
     class OnCodeDigitChanged(val codePlace: CodeDigitPlace, val value: String) : LoginEvent()
     object SendAuthVerification : LoginEvent()
     object Login : LoginEvent()
-    object LoggedInStatus : LoginEvent()
 
 }

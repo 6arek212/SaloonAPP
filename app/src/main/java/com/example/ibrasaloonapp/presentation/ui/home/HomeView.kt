@@ -1,13 +1,15 @@
 package com.example.ibrasaloonapp.presentation.ui.home
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -28,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.TimePatterns
+import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.AuthData
@@ -44,7 +47,9 @@ import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
+private const val TAG = "HomeView"
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -54,12 +59,30 @@ fun HomeView(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
+    val isLoggedIn = mainViewModel.state.value.isLoggedIn
     val appointment = viewModel.state.value.appointment
     val workers = viewModel.state.value.workers
     val refreshing = viewModel.state.value.refreshing
     val user = mainViewModel.state.value.authData?.user
     val showLoginDialog = viewModel.state.value.showLoginDialog
+    val queue = viewModel.uiState.value.errorQueue
+    val progress = viewModel.uiState.value.progressBarState
     val events = viewModel.uiEvents
+
+    LaunchedEffect(key1 = isLoggedIn) {
+        Log.d(TAG, "HomeView: isLoggedIn ${isLoggedIn}  ${user}")
+        if (isLoggedIn) {
+            viewModel.onTriggerEvent(HomeEvent.GetData(isLoggedIn))
+        }
+    }
+
+
+    LaunchedEffect(key1 = isLoggedIn) {
+        if (!isLoggedIn) {
+            viewModel.onTriggerEvent(HomeEvent.Rest)
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         launch {
@@ -74,10 +97,13 @@ fun HomeView(
     }
 
 
-    DefaultScreenUI(onRemoveHeadFromQueue = { viewModel.onTriggerEvent(HomeEvent.OnRemoveHeadFromQueue) }) {
+    DefaultScreenUI(
+        queue = queue,
+        progressBarState = progress,
+        onRemoveHeadFromQueue = { viewModel.onTriggerEvent(HomeEvent.OnRemoveHeadFromQueue) }) {
         SwipeRefresh(
             state = rememberSwipeRefreshState(refreshing),
-            onRefresh = { viewModel.onTriggerEvent(HomeEvent.Refresh) }) {
+            onRefresh = { viewModel.onTriggerEvent(HomeEvent.Refresh(isAuthed = user != null)) }) {
             BackdropScaffold(
                 scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
                 frontLayerScrimColor = Color.Unspecified,
@@ -103,8 +129,8 @@ fun HomeView(
                                     authData
                                 )
                             )
-                            viewModel.onTriggerEvent(HomeEvent.Refresh)
-                        }
+                        },
+                        isLoading = progress == ProgressBarState.Loading
                     )
                 },
                 frontLayerElevation = 10.dp,
@@ -119,7 +145,7 @@ fun HomeView(
 @Composable
 fun BackLayer(user: User?) {
 
-    if (user != null && !user.firstName.isEmpty() && !user.lastName.isEmpty()) {
+    if (user != null && user.firstName.isNotEmpty() && user.lastName.isNotEmpty()) {
         Column {
             ImageName(
                 modifier = Modifier
@@ -131,6 +157,7 @@ fun BackLayer(user: User?) {
             Spacer(modifier = Modifier.padding(16.dp))
         }
     }
+
 
 }
 
@@ -145,6 +172,8 @@ fun FrontLayer(
     onShowLoginDialog: () -> Unit,
     user: User?,
     onLogin: (AuthData) -> Unit,
+    isLoading: Boolean
+
 ) {
     val scrollState = rememberScrollState()
 
@@ -164,12 +193,14 @@ fun FrontLayer(
             onDismissLoginDialog = onDismissLoginDialog,
             onShowLoginDialog = onShowLoginDialog,
             user = user,
-            onLogin = onLogin
+            onLogin = onLogin,
+            isLoading = isLoading
         )
 
 
-
-        OurStaff(workers = workers)
+        AnimatedVisibility(visible = workers.isNotEmpty()) {
+            OurStaff(workers = workers)
+        }
 
         Spacer(modifier = Modifier.padding(16.dp))
 
@@ -193,7 +224,11 @@ fun Header(
     onShowLoginDialog: () -> Unit,
     user: User?,
     onLogin: (AuthData) -> Unit,
+    isLoading: Boolean
 ) {
+
+    Log.d(TAG, "Header: $appointment  $user   $isLoading")
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -212,12 +247,62 @@ fun Header(
     ) {
 
 
+        AnimatedVisibility(visible = user != null) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+
+                Button(
+                    modifier = Modifier,
+                    contentPadding = PaddingValues(horizontal = 28.dp, vertical = 8.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+                    border = BorderStroke(1.dp, Gray1),
+                    shape = MaterialTheme.shapes.large,
+                    onClick = { navigateToBookAppointment() }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.book),
+                        style = MaterialTheme.typography.h4,
+                        color = Gray1,
+                    )
+                }
+
+                Spacer(modifier = Modifier.padding(16.dp))
+            }
+        }
+
+
+
+
         if (user != null) {
-            Appointment(
-                appointment = appointment,
-                navigateToBookAppointment = navigateToBookAppointment
-            )
-        } else {
+
+            AnimatedVisibility(visible = appointment != null && !isLoading) {
+                Appointment(
+                    appointment = appointment,
+                    navigateToBookAppointment = navigateToBookAppointment
+                )
+            }
+
+            AnimatedVisibility(visible = appointment == null && !isLoading) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        modifier = Modifier,
+                        textAlign = TextAlign.Center,
+                        text = stringResource(id = R.string.you_dont_have_appointment),
+                        color = Color.White,
+                        style = MaterialTheme.typography.h3,
+                        lineHeight = 30.sp
+                    )
+                }
+
+            }
+        }
+
+        AnimatedVisibility(visible = user == null && !isLoading) {
             NotLoggedIn(
                 navController = navController,
                 showLoginDialog = showLoginDialog,
@@ -226,7 +311,6 @@ fun Header(
                 onLogin = onLogin
             )
         }
-
 
     }
 }
@@ -314,76 +398,49 @@ fun Appointment(
         verticalArrangement = Arrangement.Center
     ) {
 
-        Button(
-            modifier = Modifier,
-            contentPadding = PaddingValues(horizontal = 28.dp, vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-            border = BorderStroke(1.dp, Gray1),
-            shape = MaterialTheme.shapes.large,
-            onClick = { navigateToBookAppointment() }
-        ) {
-            Text(
-                text = stringResource(id = R.string.book),
-                style = MaterialTheme.typography.h4,
-                color = Gray1,
-            )
-        }
 
-        Spacer(modifier = Modifier.padding(16.dp))
+        if (appointment != null) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(id = R.string.you_have_appointment),
+                    color = Color.White,
+                    style = MaterialTheme.typography.h3
+                )
 
+                Spacer(modifier = Modifier.padding(4.dp))
 
-
-
-        appointment?.let {
-
-            Text(
-                text = stringResource(id = R.string.you_have_appointment),
-                color = Color.White,
-                style = MaterialTheme.typography.h3
-            )
-
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            Text(
-                text = "${
-                    stringDateFormat(
-                        appointment.startTime,
-                        TimePatterns.EEEE_MM_DD,
-                        LocalContext.current
-                    )
-                } " +
-                        "${stringResource(id = R.string.at)} " +
+                Text(
+                    text = "${
                         stringDateFormat(
                             appointment.startTime,
-                            TimePatterns.TIME_ONLY,
+                            TimePatterns.EEEE_MM_DD,
                             LocalContext.current
-                        ),
-                color = Color.White,
-                style = MaterialTheme.typography.body1
-            )
+                        )
+                    } " +
+                            "${stringResource(id = R.string.at)} " +
+                            stringDateFormat(
+                                appointment.startTime,
+                                TimePatterns.TIME_ONLY,
+                                LocalContext.current
+                            ),
+                    color = Color.White,
+                    style = MaterialTheme.typography.body1
+                )
 
-            Spacer(modifier = Modifier.padding(4.dp))
+                Spacer(modifier = Modifier.padding(4.dp))
 
 
-            ImageChip(
-                modifier = Modifier.fillMaxWidth(),
-                text = "${appointment.worker.firstName} ${appointment.worker.lastName}",
-                onClick = { },
-                isSelected = false,
-                url = appointment.worker.image
-            )
-        }
-
-        if (appointment == null) {
-
-            Text(
-                modifier = Modifier,
-                textAlign = TextAlign.Center,
-                text = stringResource(id = R.string.you_dont_have_appointment),
-                color = Color.White,
-                style = MaterialTheme.typography.h3,
-                lineHeight = 30.sp
-            )
+                ImageChip(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "${appointment.worker.firstName} ${appointment.worker.lastName}",
+                    onClick = { },
+                    isSelected = false,
+                    url = appointment.worker.image
+                )
+            }
         }
 
     }

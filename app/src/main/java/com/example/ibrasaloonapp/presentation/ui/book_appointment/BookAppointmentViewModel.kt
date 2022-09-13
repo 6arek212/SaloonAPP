@@ -16,6 +16,8 @@ import com.example.ibrasaloonapp.core.getDateAsString
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.BookAppointmentDto
+import com.example.ibrasaloonapp.presentation.BaseViewModel
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,11 +32,12 @@ private const val TAG = "BookAppointmentViewMode"
 class BookAppointmentViewModel
 @Inject
 constructor(
+    private val context: Application,
     private val repository: AppointmentRepository,
     private val workerRepository: WorkerRepository,
     private val validateRequired: ValidateRequired,
     private val application: Application
-) : ViewModel() {
+) : BaseViewModel() {
 
 
     private val _state: MutableState<BookAppointmentState> = mutableStateOf(BookAppointmentState())
@@ -124,8 +127,7 @@ constructor(
         if (workerId == null)
             return
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
+        loading(true)
 
         val result = workerRepository.getWorkingDates(workerId = workerId.id, fromDate = fromDate)
 
@@ -136,27 +138,35 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
+                Log.d(TAG, "GenericError: ${result.errorMessage}")
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
+                        title = context.getString(R.string.error),
                         description = result.errorMessage
                     )
                 )
+                if (result.code == 401) {
+                    sendUiEvent(MainUIEvent.Logout)
+                }
             }
 
             is ApiResult.NetworkError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
+                    )
+                )
             }
         }
 
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+        loading(false)
     }
 
 
     private suspend fun getWorkers() {
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
+        loading(true)
 
         val result = workerRepository.getWorkers()
 
@@ -167,21 +177,30 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
+                Log.d(TAG, "GenericError: ${result.errorMessage}")
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
+                        title = context.getString(R.string.error),
                         description = result.errorMessage
                     )
                 )
+                if (result.code == 401) {
+                    sendUiEvent(MainUIEvent.Logout)
+                }
             }
 
             is ApiResult.NetworkError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
+                    )
+                )
             }
         }
 
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+        loading(false)
     }
 
 
@@ -192,8 +211,7 @@ constructor(
         if (workerId == null || workingDate == null)
             return
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
+        loading(true)
 
         val result = repository.getAvailableAppointments(
             workingDate.id,
@@ -207,38 +225,45 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
+                Log.d(TAG, "GenericError: ${result.errorMessage}")
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
+                        title = context.getString(R.string.error),
                         description = result.errorMessage
                     )
                 )
+                if (result.code == 401) {
+                    sendUiEvent(MainUIEvent.Logout)
+                }
             }
 
             is ApiResult.NetworkError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
+                    )
+                )
             }
         }
 
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+        loading(false)
     }
-
 
 
     private suspend fun getServices() {
         val workerId = _state.value.selectedWorker?.id ?: return
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
+        loading(true)
         val list = listOf(
-            ServiceType.HairCut("Hair Cut",application.getString(R.string.hair_cut)),
-            ServiceType.HairCut("Wax",application.getString(R.string.wax)),
+            ServiceType.HairCut("Hair Cut", application.getString(R.string.hair_cut)),
+            ServiceType.HairCut("Wax", application.getString(R.string.wax)),
         )
 
         _state.value = _state.value.copy(services = list)
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+        loading(false)
     }
 
 
@@ -250,8 +275,7 @@ constructor(
         if (appointment == null || worker == null || service.isBlank())
             return
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Loading)
-
+        loading(true)
 
         val appointmentDTO =
             BookAppointmentDto(
@@ -282,39 +306,30 @@ constructor(
                 _events.send(BookAppointmentUIEvent.OnBookAppointment(result.value))
             }
             is ApiResult.GenericError -> {
-                Log.d(TAG, "submitData: ${result.errorMessage}")
+                Log.d(TAG, "GenericError: ${result.errorMessage}")
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
+                        title = context.getString(R.string.error),
                         description = result.errorMessage
                     )
                 )
+                if (result.code == 401) {
+                    sendUiEvent(MainUIEvent.Logout)
+                }
             }
 
             is ApiResult.NetworkError -> {
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
+                    )
+                )
             }
         }
 
-        _state.value = _state.value.copy(progressBarState = ProgressBarState.Idle)
+        loading(false)
     }
 
-
-    private fun appendToMessageQueue(uiComponent: UIComponent) {
-        val queue = state.value.errorQueue
-        queue.add(uiComponent)
-        _state.value = _state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
-        _state.value = _state.value.copy(errorQueue = queue)
-    }
-
-    private fun removeHeadMessage() {
-        try {
-            val queue = _state.value.errorQueue
-            queue.remove() // can throw exception if empty
-            _state.value = _state.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
-            _state.value = _state.value.copy(errorQueue = queue)
-        } catch (e: Exception) {
-            Log.d(TAG, "removeHeadMessage: Nothing to remove from DialogQueue")
-        }
-    }
 
 }

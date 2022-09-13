@@ -29,12 +29,15 @@ import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
+import com.example.ibrasaloonapp.presentation.MainEvent
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.presentation.ui.home.HomeEvent
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -42,17 +45,26 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 fun AppointmentListView(
     navController: NavController,
     viewModel: AppointmentsListViewModel = hiltViewModel(),
-    authViewModel: MainActivityViewModel = hiltViewModel()
+    mainViewModel: MainActivityViewModel
 ) {
-//    LaunchedEffect(Unit) {
-//        viewModel.onTriggerEvent(AppointmentListEvent.GetAppointments)
-//    }
 
-    val queue = viewModel.state.value.errorQueue
+    val queue = viewModel.uiState.value.errorQueue
     val isRefreshing = viewModel.state.value.isRefreshing
-    val progressBar = viewModel.state.value.progressBarState
+    val progressBar = viewModel.uiState.value.progressBarState
     val appointments = viewModel.state.value.appointments
+    val events = viewModel.uiEvents
 
+    LaunchedEffect(Unit) {
+        launch {
+            events.collect { event ->
+                when (event) {
+                    is MainUIEvent.Logout -> {
+                        mainViewModel.onTriggerEvent(MainEvent.Logout)
+                    }
+                }
+            }
+        }
+    }
 
     DefaultScreenUI(
         onRemoveHeadFromQueue = { viewModel.onTriggerEvent(AppointmentListEvent.OnRemoveHeadFromQueue) },

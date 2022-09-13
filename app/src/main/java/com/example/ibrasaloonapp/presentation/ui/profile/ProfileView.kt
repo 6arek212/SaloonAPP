@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BorderColor
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
@@ -37,11 +38,15 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.presentation.MainActivityViewModel
+import com.example.ibrasaloonapp.presentation.MainEvent
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.CircularImage
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.VerticalImageChip
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
+import kotlinx.coroutines.launch
 
 
 private const val TAG = "ProfileView"
@@ -50,10 +55,23 @@ private const val TAG = "ProfileView"
 fun ProfileView(
     navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel(),
+    mainViewModel: MainActivityViewModel
 ) {
     val user = viewModel.state.value.user
     val progress = viewModel.uiState.value.progressBarState
+    val events = viewModel.uiEvents
 
+    LaunchedEffect(Unit) {
+        launch {
+            events.collect { event ->
+                when (event) {
+                    is MainUIEvent.Logout -> {
+                        mainViewModel.onTriggerEvent(MainEvent.Logout)
+                    }
+                }
+            }
+        }
+    }
     user?.let {
 
         DefaultScreenUI(
@@ -87,16 +105,6 @@ fun ProfileView(
                     url = user.image,
                     imageSize = 200.dp
                 )
-
-//                CircularImage(
-//                    modifier = Modifier
-//                        .align(CenterHorizontally)
-//                        .size(160.dp)
-//                        .offset(y = -80.dp)
-//                        .zIndex(1f),
-//                    url = if (user.image != null) "https://saloon-ibra-api.herokuapp.com/imgs/${user.image}" else null,
-//                    elevation = 8.dp
-//                )
 
 
                 Text(

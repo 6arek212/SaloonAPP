@@ -33,6 +33,9 @@ import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
+import com.example.ibrasaloonapp.presentation.MainEvent
+import com.example.ibrasaloonapp.presentation.MainUIEvent
+import com.example.ibrasaloonapp.presentation.components.CommonOtp
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.SubTitle
 import com.example.ibrasaloonapp.presentation.components.TimeCircularProgressBar
@@ -45,7 +48,7 @@ import kotlinx.coroutines.launch
 fun LoginView(
     onLoggedIn: (AuthData) -> Unit = {},
     navController: NavController,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
 
     val phone = viewModel.state.value.phone
@@ -61,14 +64,12 @@ fun LoginView(
 
     val interactionSource = remember { MutableInteractionSource() }
 
+
     LaunchedEffect(Unit) {
         launch {
             events.collect { event ->
                 when (event) {
                     is LoginViewModel.UIEvent.LoggedIn -> {
-//                        navController.navigate(Screen.Home.route) {
-//                            popUpTo(Screen.Home.route) { inclusive = true }
-//                        }
                         onLoggedIn(event.authData)
                     }
                 }
@@ -99,16 +100,31 @@ fun LoginView(
 
             Spacer(modifier = Modifier.padding(12.dp))
 
-            Text(text = stringResource(id = R.string.lets_start), style = MaterialTheme.typography.h2)
-            Text(text = stringResource(id = R.string.the_login_process), style = MaterialTheme.typography.h3)
+            Text(
+                text = stringResource(id = R.string.lets_start),
+                style = MaterialTheme.typography.h2
+            )
+            Text(
+                text = stringResource(id = R.string.the_login_process),
+                style = MaterialTheme.typography.h3
+            )
 
             Spacer(modifier = Modifier.padding(2.dp))
 
             AnimatedVisibility(visible = showCode) {
-                CodeSection(
-                    onTriggerEvent = viewModel::onTriggerEvent,
+                CommonOtp(
+                    onChangeFocus = { place, str ->
+                        viewModel.onTriggerEvent(
+                            LoginEvent.OnCodeDigitChanged(
+                                place,
+                                str
+                            )
+                        )
+                    },
                     code = code,
-                    moveFocus = focusManager::moveFocus
+                    moveFocus = focusManager::moveFocus,
+                    onRest = { viewModel.onTriggerEvent(LoginEvent.Reset) }
+
                 )
             }
 
@@ -269,140 +285,6 @@ private fun Bottom(
 
 }
 
-@Composable
-fun CodeSection(
-    moveFocus: (focusDirection: FocusDirection) -> Unit,
-    onTriggerEvent: (LoginEvent) -> Unit,
-    code: OPT4Digits
-) {
-
-    LaunchedEffect(
-        key1 = code.one,
-    ) {
-        if (code.one.isNotEmpty() || code.isEmpty()) {
-            moveFocus(FocusDirection.Next)
-        }
-    }
-
-    LaunchedEffect(
-        key1 = code.two,
-    ) {
-        if (code.two.isNotEmpty()) {
-            moveFocus(FocusDirection.Next)
-        }
-    }
-
-    LaunchedEffect(
-        key1 = code.three,
-    ) {
-        if (code.three.isNotEmpty()) {
-            moveFocus(FocusDirection.Next)
-        }
-    }
-
-    Column(
-        horizontalAlignment = CenterHorizontally
-    ) {
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { onTriggerEvent(LoginEvent.Reset) }) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "back arrow")
-            }
-
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            Text(text = stringResource(id = R.string.go_back) , style = MaterialTheme.typography.body1)
-        }
-
-        Spacer(modifier = Modifier.padding(4.dp))
-
-        TimeCircularProgressBar(
-            animationDuration = 1000 * 60,
-            percentage = 1f,
-            number = 60,
-            color = Red,
-            animDelay = 500,
-            radius = 26.dp
-        )
-
-
-        Spacer(modifier = Modifier.padding(4.dp))
-
-
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 15.dp, start = 15.dp, end = 15.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                CommonOtpTextField(
-                    value = code.one,
-                    onTriggerEvent = onTriggerEvent,
-                    place = CodeDigitPlace.ONE
-                )
-                CommonOtpTextField(
-                    value = code.two,
-                    onTriggerEvent = onTriggerEvent,
-                    place = CodeDigitPlace.TWO
-                )
-                CommonOtpTextField(
-                    value = code.three,
-                    onTriggerEvent = onTriggerEvent,
-                    place = CodeDigitPlace.THREE
-                )
-                CommonOtpTextField(
-                    value = code.four,
-                    onTriggerEvent = onTriggerEvent,
-                    place = CodeDigitPlace.FOUR
-                )
-            }
-
-            Spacer(modifier = Modifier.padding(4.dp))
-
-            Row {
-                Text(text = stringResource(id = R.string.didnt_receive_code), style = MaterialTheme.typography.caption)
-                Spacer(modifier = Modifier.padding(4.dp))
-                Text(text = stringResource(id = R.string.requrest_again), color = Blue, style = MaterialTheme.typography.caption)
-            }
-        }
-    }
-}
-
-
-@Composable
-fun CommonOtpTextField(value: String, onTriggerEvent: (LoginEvent) -> Unit, place: CodeDigitPlace) {
-    val max = 1
-    OutlinedTextField(
-        value = value,
-        singleLine = true,
-        onValueChange = {
-            if (it.length <= max) onTriggerEvent(
-                LoginEvent.OnCodeDigitChanged(
-                    place,
-                    it
-                )
-            )
-        },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.NumberPassword,
-            imeAction = if (place == CodeDigitPlace.FOUR) ImeAction.Done else ImeAction.Next
-        ),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .width(60.dp)
-            .height(60.dp),
-        maxLines = 1,
-        textStyle = LocalTextStyle.current.copy(
-            textAlign = TextAlign.Center
-        )
-    )
-}
 
 
 

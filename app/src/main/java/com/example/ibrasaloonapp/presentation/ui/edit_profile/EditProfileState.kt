@@ -8,6 +8,5 @@ data class EditProfileState(
     val firstName: String = "",
     val lastName: String = "",
     val phone: String = "",
-    val progressBarState: ProgressBarState = ProgressBarState.Idle,
 ) {
 }

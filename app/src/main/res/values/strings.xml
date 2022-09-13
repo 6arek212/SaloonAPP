@@ -48,6 +48,9 @@
     <string name="requrest_again">Request again</string>
     <string name="hello_there_lets_login_first">Hello there, Lets login first</string>
     <string name="login_or_create_account">login or create account</string>
+    <string name="error">Error</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="birth_date">Birth Date</string>
 
 
 </resources>

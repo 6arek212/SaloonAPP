@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.presentation.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,6 +32,7 @@ import com.example.ibrasaloonapp.domain.model.MenuItem
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.theme.Gray1
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
@@ -47,10 +50,43 @@ import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
+private const val TAG = "Navigation"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(mainViewModel: MainActivityViewModel) {
+
+    val navController = rememberNavController()
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    val user = mainViewModel.state.value.authData?.user
+
+
+    val events = mainViewModel.uiEvents
+
+    LaunchedEffect(Unit) {
+        launch {
+            events.collect { event ->
+                when (event) {
+                    is MainUIEvent.Logout -> {
+
+                        val currentRout = navController.currentDestination?.route
+                        Log.d(TAG, "Navigation: ${currentRout}")
+                        currentRout?.let {
+                            if (currentRout != Screen.Home.route && currentRout != Screen.Signup.route) {
+                                navController.navigate(Screen.Home.route) {
+                                    launchSingleTop = true
+                                    popUpTo(0)
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
 
     val drawerItems = listOf(
         MenuItem(
@@ -79,11 +115,6 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
         )
     )
 
-
-    val navController = rememberNavController()
-    val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
-    val user = mainViewModel.state.value.authData?.user
 
 
 
@@ -120,10 +151,6 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
                         //remove auth data !!!
                         scope.launch { scaffoldState.drawerState.close() }
                         mainViewModel.onTriggerEvent(MainEvent.Logout)
-                        navController.navigate(Screen.Home.route) {
-                            launchSingleTop = true
-                            popUpTo(0)
-                        }
                     }
                 }
                 scope.launch {
@@ -136,16 +163,16 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.Home.route
+            startDestination = Screen.Signup.route
         ) {
             splash(navController = navController)
             login(navController = navController)
-            signup(navController = navController)
+            signup(navController = navController, mainViewModel = mainViewModel)
             home(navController = navController, mainViewModel = mainViewModel)
-            appointmentList(navController = navController)
-            bookAppointment(navController = navController)
-            profile(navController = navController)
-            editProfile(navController = navController)
+            appointmentList(navController = navController, mainViewModel = mainViewModel)
+            bookAppointment(navController = navController, mainViewModel = mainViewModel)
+            profile(navController = navController, mainViewModel = mainViewModel)
+            editProfile(navController = navController, mainViewModel = mainViewModel)
         }
     }
 }
@@ -175,12 +202,13 @@ fun NavGraphBuilder.login(
 
 fun NavGraphBuilder.signup(
     navController: NavController,
+    mainViewModel: MainActivityViewModel
 ) {
     composable(
         route = Screen.Signup.route,
         arguments = emptyList()
     ) {
-        SignupView(navController = navController)
+        SignupView(navController = navController, mainViewModel = mainViewModel)
     }
 }
 
@@ -194,12 +222,13 @@ fun NavGraphBuilder.home(
         arguments = emptyList()
     ) { backStackEntry ->
 
+        val viewModel: HomeViewModel = hiltViewModel()
+
         val appointment = backStackEntry
             .savedStateHandle
             .getLiveData<Appointment>(APPOINTMENT_KEY)
             .observeAsState().value
 
-        val viewModel: HomeViewModel = hiltViewModel()
 
         appointment?.let {
             viewModel.onTriggerEvent(HomeEvent.UpdateAppointment(appointment))
@@ -216,34 +245,40 @@ fun NavGraphBuilder.home(
 
 fun NavGraphBuilder.appointmentList(
     navController: NavController,
+    mainViewModel: MainActivityViewModel
 ) {
     composable(
         route = Screen.AppointmentsList.route,
         arguments = emptyList()
     ) {
-        AppointmentListView(navController = navController)
+        AppointmentListView(navController = navController, mainViewModel = mainViewModel)
     }
 }
 
 
 fun NavGraphBuilder.bookAppointment(
     navController: NavController,
+    mainViewModel: MainActivityViewModel
 ) {
     composable(
         route = Screen.BookAppointment.route,
         arguments = emptyList()
     ) {
-        BookAppointmentView(navController = navController, popBackStack = { appointment ->
-            navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.set(APPOINTMENT_KEY, appointment)
-        })
+        BookAppointmentView(
+            navController = navController,
+            popBackStack = { appointment ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(APPOINTMENT_KEY, appointment)
+            }, mainViewModel = mainViewModel
+        )
     }
 }
 
 
 fun NavGraphBuilder.profile(
     navController: NavController,
+    mainViewModel: MainActivityViewModel
 ) {
     composable(
         route = Screen.Profile.route,
@@ -261,12 +296,17 @@ fun NavGraphBuilder.profile(
             viewModel.onTriggerEvent(ProfileEvent.UpdateUser(user))
         }
 
-        ProfileView(navController = navController, viewModel = viewModel)
+        ProfileView(
+            navController = navController,
+            viewModel = viewModel,
+            mainViewModel = mainViewModel
+        )
     }
 }
 
 fun NavGraphBuilder.editProfile(
     navController: NavController,
+    mainViewModel: MainActivityViewModel
 ) {
     composable(
         route = Screen.EditProfile.route + "/{userId}/{firstName}/{lastName}/{phone}",
@@ -284,7 +324,8 @@ fun NavGraphBuilder.editProfile(
                 navController.previousBackStackEntry
                     ?.savedStateHandle
                     ?.set(USER_KEY, user)
-            })
+            }, mainViewModel = mainViewModel
+        )
     }
 }
 

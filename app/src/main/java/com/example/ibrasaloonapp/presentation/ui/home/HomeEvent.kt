@@ -6,10 +6,12 @@ import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileEvent
 sealed class HomeEvent {
     object GetAppointment : HomeEvent()
     object GetWorkers : HomeEvent()
-    object Refresh : HomeEvent()
+    class GetData(val isAuthed: Boolean) : HomeEvent()
+    class Refresh(val isAuthed: Boolean) : HomeEvent()
     object DismissLoginDialog : HomeEvent()
     object ShowLoginDialog : HomeEvent()
     class UpdateAppointment(val appointment: Appointment) : HomeEvent()
     object OnRemoveHeadFromQueue : HomeEvent()
+    object Rest : HomeEvent()
 
 }

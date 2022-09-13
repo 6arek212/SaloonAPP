@@ -3,9 +3,11 @@ package com.example.ibrasaloonapp.network.services
 import com.example.ibrasaloonapp.network.model.AuthVerificationDto
 import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.network.model.RefreshTokenDto
+import com.example.ibrasaloonapp.network.model.SignupDataDto
 import com.example.ibrasaloonapp.network.responses.AuthVerificationResponse
 import com.example.ibrasaloonapp.network.responses.LoginResponse
 import com.example.ibrasaloonapp.network.responses.RefreshTokenResponse
+import com.example.ibrasaloonapp.network.responses.SignupResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -20,7 +22,7 @@ interface AuthService {
 
 
     @POST("signup-verify-phone")
-    suspend fun signupAndVerifyPhone()
+    suspend fun signupAndVerifyPhone(@Body data: SignupDataDto): SignupResponse
 
 
     @POST("verify-phone")

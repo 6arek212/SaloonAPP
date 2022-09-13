@@ -7,6 +7,10 @@ data class OPT4Digits(
     val four: String
 ) {
 
+    constructor(value: String) : this(value,value,value,value)
+
+
+
     fun getCode(): String {
         return "${one}${two}${three}${four}"
     }

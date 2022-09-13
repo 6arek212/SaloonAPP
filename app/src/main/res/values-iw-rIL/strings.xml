@@ -47,4 +47,7 @@
     <string name="requrest_again">שלח שוב</string>
     <string name="login_or_create_account">כנס או צור חשבון חדש</string>
     <string name="hello_there_lets_login_first">שלום אורח , כנס למערכת תחילה</string>
+    <string name="error">שגיאה</string>
+    <string name="something_went_wrong">מהשו לא תקין התרחש</string>
+    <string name="birth_date">תאריך לידה</string>
 </resources>

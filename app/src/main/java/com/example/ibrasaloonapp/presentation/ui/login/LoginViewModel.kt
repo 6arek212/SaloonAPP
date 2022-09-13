@@ -1,11 +1,13 @@
 package com.example.ibrasaloonapp.presentation.ui.login
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
@@ -18,6 +20,7 @@ import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
+import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentEvent
 import com.example.ibrasaloonapp.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +37,7 @@ private const val TAG = "LoginViewModel"
 class LoginViewModel
 @Inject
 constructor(
+    private val context: Application,
     private val authRepository: AuthRepository,
     private val validatePhoneNumber: ValidatePhoneNumber,
     private val required: ValidateRequired
@@ -47,10 +51,6 @@ constructor(
 
     private var verifyId: String? = null
 
-
-    init {
-//        onTriggerEvent(LoginEvent.LoggedInStatus)
-    }
 
 
     fun onTriggerEvent(event: LoginEvent) {
@@ -123,9 +123,6 @@ constructor(
                     removeHeadMessage()
                 }
 
-                is LoginEvent.LoggedInStatus -> {
-                    checkLoginStatus()
-                }
 
                 is LoginEvent.Login -> {
                     login()
@@ -134,14 +131,6 @@ constructor(
         }
     }
 
-
-    private suspend fun checkLoginStatus() {
-//        authRepository.getLoginStatus().collect() {
-//            if (!it.token.isBlank()) {
-//                _events.send(UIEvent.LoggedIn)
-//            }
-//        }
-    }
 
 
     private suspend fun sendAuthVerification() {
@@ -171,10 +160,9 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-                Log.d(TAG, "sendAuthVerification: ")
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
+                        title = context.getString(R.string.error),
                         description = result.errorMessage
                     )
                 )
@@ -185,8 +173,8 @@ constructor(
             is ApiResult.NetworkError -> {
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
-                        description = "Something went wrong"
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
                     )
                 )
                 _state.value = _state.value.copy(verifyCode = OPT4Digits("", "", "", ""))
@@ -240,21 +228,21 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-                Log.d(TAG, "login: logged in fail ${result.code}")
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
+                        title = context.getString(R.string.error),
                         description = result.errorMessage
                     )
                 )
+
                 _state.value = _state.value.copy(verifyCode = OPT4Digits("", "", "", ""))
             }
 
             is ApiResult.NetworkError -> {
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
-                        description = "Something went wrong"
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
                     )
                 )
                 _state.value = _state.value.copy(verifyCode = OPT4Digits("", "", "", ""))
@@ -263,6 +251,8 @@ constructor(
 
         loading(false)
     }
+
+
 
 
     private fun rest() {

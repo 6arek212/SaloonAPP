@@ -8,10 +8,7 @@ import androidx.datastore.preferences.core.edit
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.network.ApiResult
-import com.example.ibrasaloonapp.network.model.AuthDataDtoMapper
-import com.example.ibrasaloonapp.network.model.AuthVerificationDto
-import com.example.ibrasaloonapp.network.model.LoginDataDto
-import com.example.ibrasaloonapp.network.model.RefreshTokenDto
+import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.services.AuthService
 import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.example.ibrasaloonapp.ui.*
@@ -88,10 +85,35 @@ constructor(
         }
     }
 
-    override suspend fun signup(): ApiResult<String> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun signup(signupDataDto: SignupDataDto): ApiResult<AuthData> {
+        val result = safeApiCall(dispatcher) {
+            val res = authService.signupAndVerifyPhone(signupDataDto).authDataDto
+            Log.d(TAG, "login: $res")
+            authDataDtoMapper.mapToDomainModel(res)
+        }
 
+        return when (result) {
+            is ApiResult.Success -> {
+                Log.d(TAG, "login: logged in success ${result.value}")
+                application.dataStore.edit { settings ->
+                    settings.insertAuthData(result.value)
+                }
+                ApiResult.Success(result.value)
+            }
+
+            is ApiResult.GenericError -> {
+                Log.d(TAG, "login: logged in fail")
+                ApiResult.GenericError(
+                    code = result.code,
+                    errorMessage = result.errorMessage
+                )
+            }
+
+            is ApiResult.NetworkError -> {
+                ApiResult.NetworkError
+            }
+        }
+    }
 
     override suspend fun refreshToken(): String? {
         val authData = application.dataStore.data.first().getAuthData()

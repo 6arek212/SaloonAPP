@@ -3,6 +3,7 @@ package com.example.ibrasaloonapp.repository
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.LoginDataDto
+import com.example.ibrasaloonapp.network.model.SignupDataDto
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 
@@ -13,7 +14,7 @@ interface AuthRepository {
 
     suspend fun login(loginDataDto: LoginDataDto): ApiResult<AuthData>
 
-    suspend fun signup(): ApiResult<String>
+    suspend fun signup(signupDataDto: SignupDataDto): ApiResult<AuthData>
 
     suspend fun getLoginStatus(): AuthData?
 

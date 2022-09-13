@@ -1,11 +1,13 @@
 package com.example.ibrasaloonapp.presentation.ui.home
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
@@ -27,6 +29,7 @@ private const val TAG = "HomeViewModel"
 class HomeViewModel
 @Inject
 constructor(
+    private val context: Application,
     private val appointmentsRepository: AppointmentRepository,
     private val workerRepository: WorkerRepository
 ) : BaseViewModel() {
@@ -34,14 +37,28 @@ constructor(
     private val _state: MutableState<HomeState> = mutableStateOf(HomeState())
     val state: State<HomeState> = _state
 
-    init {
-        onTriggerEvent(HomeEvent.GetAppointment)
-        onTriggerEvent(HomeEvent.GetWorkers)
-    }
 
     fun onTriggerEvent(event: HomeEvent) {
         viewModelScope.launch {
             when (event) {
+                is HomeEvent.GetData -> {
+                    loading(true)
+                    if (event.isAuthed) {
+                        getAppointment()
+                    }
+                    getWorkers()
+                    loading(false)
+                }
+
+                is HomeEvent.Rest -> {
+                    _state.value = _state.value.copy(
+                        appointment = null,
+                        showLoginDialog = false,
+                        refreshing = false
+                    )
+                }
+
+
                 is HomeEvent.DismissLoginDialog -> {
                     _state.value = _state.value.copy(showLoginDialog = false)
                 }
@@ -68,7 +85,9 @@ constructor(
 
                 is HomeEvent.Refresh -> {
                     _state.value = _state.value.copy(refreshing = true)
-                    getAppointment()
+                    if (event.isAuthed) {
+                        getAppointment()
+                    }
                     getWorkers()
                     _state.value = _state.value.copy(refreshing = false)
                 }
@@ -79,7 +98,6 @@ constructor(
 
 
     private suspend fun getAppointment() {
-        loading(true)
 
         val result = appointmentsRepository.getAppointment()
 
@@ -92,7 +110,7 @@ constructor(
             is ApiResult.GenericError -> {
                 appendToMessageQueue(
                     UIComponent.Dialog(
-                        title = "Error",
+                        title = context.getString(R.string.error),
                         description = result.errorMessage
                     )
                 )
@@ -100,21 +118,23 @@ constructor(
                 if (result.code == 401) {
                     sendUiEvent(MainUIEvent.Logout)
                 }
-
             }
 
             is ApiResult.NetworkError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
+                    )
+                )
             }
         }
 
 
-        loading(false)
     }
 
 
     private suspend fun getWorkers() {
-        loading(true)
 
         val result = workerRepository.getWorkers()
 
@@ -131,15 +151,22 @@ constructor(
                         description = result.errorMessage
                     )
                 )
+                if (result.code == 401) {
+                    sendUiEvent(MainUIEvent.Logout)
+                }
             }
 
             is ApiResult.NetworkError -> {
-
+                appendToMessageQueue(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.something_went_wrong)
+                    )
+                )
             }
         }
 
 
-        loading(false)
     }
 
 
