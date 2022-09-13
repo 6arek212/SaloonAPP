@@ -138,6 +138,32 @@ fun LoginView(
                 )
             }
 
+            if (!showCode) {
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    Text(
+                        text = stringResource(id = R.string.dont_have_an_account),
+                        style = MaterialTheme.typography.caption,
+                        color = MaterialTheme.colors.onBackground
+                    )
+
+                    Spacer(modifier = Modifier.padding(4.dp))
+
+                    Text(
+                        modifier = Modifier.clickable { navController.navigate(Screen.Signup.route) },
+                        text = stringResource(id = R.string.create_account),
+                        style = MaterialTheme.typography.caption,
+                        color = Blue
+                    )
+
+                }
+            }
+
         }
 
     }

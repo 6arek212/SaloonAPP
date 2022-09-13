@@ -129,19 +129,19 @@ fun CommonOtp(
             }
 
             Spacer(modifier = Modifier.padding(4.dp))
+        }
 
-            Row {
-                Text(
-                    text = stringResource(id = R.string.didnt_receive_code),
-                    style = MaterialTheme.typography.caption
-                )
-                Spacer(modifier = Modifier.padding(4.dp))
-                Text(
-                    text = stringResource(id = R.string.requrest_again),
-                    color = Blue,
-                    style = MaterialTheme.typography.caption
-                )
-            }
+        Row {
+            Text(
+                text = stringResource(id = R.string.didnt_receive_code),
+                style = MaterialTheme.typography.caption
+            )
+            Spacer(modifier = Modifier.padding(4.dp))
+            Text(
+                text = stringResource(id = R.string.requrest_again),
+                color = Blue,
+                style = MaterialTheme.typography.caption
+            )
         }
     }
 }

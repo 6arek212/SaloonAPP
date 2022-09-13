@@ -24,6 +24,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.CalendarConstraints.DateValidator
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.lang.String.format
@@ -39,7 +40,7 @@ private fun showDatePicker(
 ) {
     val builder = MaterialDatePicker.Builder.datePicker()
 
-    val dateValidator: DateValidator = DateValidatorPointForward.now()
+    val dateValidator: DateValidator = DateValidatorPointBackward.now()
 
     val constraintsBuilder = CalendarConstraints.Builder().setValidator(dateValidator)
 

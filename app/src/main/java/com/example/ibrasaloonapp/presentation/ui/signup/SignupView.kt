@@ -2,13 +2,11 @@ package com.example.ibrasaloonapp.presentation.ui.signup
 
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -165,11 +163,16 @@ fun Signup(
 
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
+    val interactionSource = remember { MutableInteractionSource() }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { focusManager.clearFocus() }
             .background(MaterialTheme.colors.background)
             .padding(8.dp),
     ) {
@@ -308,7 +311,7 @@ fun InformationPage(
     Column(modifier = modifier) {
         Text(text = stringResource(id = R.string.lets_start), style = MaterialTheme.typography.h2)
         Text(
-            text = "The signup process",
+            text = stringResource(id = R.string.the_signup_process),
             style = MaterialTheme.typography.h3
         )
 
@@ -398,7 +401,7 @@ fun PhonePage(
 
         Text(
             textAlign = TextAlign.Center,
-            text = "Phone number",
+            text = stringResource(id = R.string.phone_number),
             style = MaterialTheme.typography.h3,
             color = MaterialTheme.colors.onBackground
         )
@@ -466,7 +469,7 @@ fun DonePage(modifier: Modifier = Modifier) {
     ) {
         Text(
             textAlign = TextAlign.Center,
-            text = "Welcome",
+            text = stringResource(id = R.string.welcome),
             style = MaterialTheme.typography.h1,
             color = MaterialTheme.colors.onBackground,
             fontSize = 50.sp
@@ -474,14 +477,14 @@ fun DonePage(modifier: Modifier = Modifier) {
 
         Text(
             textAlign = TextAlign.Center,
-            text = "to Ibraa Saloon",
+            text = stringResource(id = R.string.to_ibraa_saloon),
             style = MaterialTheme.typography.h1,
             color = MaterialTheme.colors.onBackground
         )
 
         Text(
             textAlign = TextAlign.Center,
-            text = "We are ready to go",
+            text = stringResource(id = R.string.we_are_ready_to_go),
             style = MaterialTheme.typography.h3,
             color = MaterialTheme.colors.onBackground
         )

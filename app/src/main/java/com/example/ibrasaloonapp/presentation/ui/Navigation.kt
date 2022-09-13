@@ -54,7 +54,7 @@ private const val TAG = "Navigation"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Navigation(mainViewModel: MainActivityViewModel) {
+fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewModel) {
 
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
@@ -163,7 +163,7 @@ fun Navigation(mainViewModel: MainActivityViewModel) {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navController,
-            startDestination = Screen.Signup.route
+            startDestination = Screen.Splash.route
         ) {
             splash(navController = navController)
             login(navController = navController)

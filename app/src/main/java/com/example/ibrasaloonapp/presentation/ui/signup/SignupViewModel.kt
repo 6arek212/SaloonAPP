@@ -252,7 +252,7 @@ constructor(
         when (result) {
             is ApiResult.Success -> {
                 Log.d(TAG, "signup: signup in success")
-//                sendUiEvent(MainUIEvent.LoggedIn(result.value))
+                sendUiEvent(MainUIEvent.LoggedIn(result.value))
                 nextPage()
             }
 

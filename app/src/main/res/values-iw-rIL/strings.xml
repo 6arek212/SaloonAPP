@@ -50,4 +50,11 @@
     <string name="error">שגיאה</string>
     <string name="something_went_wrong">מהשו לא תקין התרחש</string>
     <string name="birth_date">תאריך לידה</string>
+    <string name="dont_have_an_account">אין לך חשבון?</string>
+    <string name="create_account">צור חשבון</string>
+    <string name="welcome">ברוכים הבאים</string>
+    <string name="to_ibraa_saloon">למספרת אברהים</string>
+    <string name="we_are_ready_to_go">אנחנו מוכנים</string>
+    <string name="the_signup_process">תהליך ההרשמה</string>
+    <string name="phone_number">"מספר טלפון "</string>
 </resources>
