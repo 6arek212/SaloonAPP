@@ -1,27 +1,16 @@
 package com.example.ibrasaloonapp.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.BookOnline
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
-import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
-import com.example.ibrasaloonapp.domain.model.MenuItem
-import com.example.ibrasaloonapp.presentation.ui.Screen
-import com.example.ibrasaloonapp.presentation.ui.home.DrawerBody
-import com.example.ibrasaloonapp.presentation.ui.home.DrawerHeader
 
 
 /**
@@ -31,8 +20,8 @@ import com.example.ibrasaloonapp.presentation.ui.home.DrawerHeader
 @Composable
 fun DefaultScreenUI(
     modifier: Modifier = Modifier,
-    queue: Queue<UIComponent> = Queue(mutableListOf()),
-    onRemoveHeadFromQueue: () -> Unit,
+    uiComponent: UIComponent? = null,
+    onRemoveUIComponent: () -> Unit,
     progressBarState: ProgressBarState = ProgressBarState.Idle,
     dialogOnConfirm: () -> Unit = {},
     content: @Composable () -> Unit,
@@ -53,21 +42,23 @@ fun DefaultScreenUI(
         ) {
             content()
             //process the queue
-            if (!queue.isEmpty()) {
-                queue.peek()?.let { uiComponent ->
-                    if (uiComponent is UIComponent.Dialog) {
-                        GenericDialog(
-                            modifier = Modifier
-                                .fillMaxWidth(0.9f),
-                            title = uiComponent.title,
-                            description = uiComponent.description,
-                            onRemoveHeadFromQueue = onRemoveHeadFromQueue,
-                            onConfirm = dialogOnConfirm,
-                            confirmButton = uiComponent.confirmButton
-                        )
-                    }
+
+
+            when (uiComponent) {
+                is UIComponent.Dialog -> {
+                    QuestionDialog(
+                        title = uiComponent.title,
+                        description = uiComponent.description,
+                        onConfirm = {
+                            dialogOnConfirm()
+                            onRemoveUIComponent()
+                        },
+                        onDismiss = onRemoveUIComponent,
+                        actionButtons = uiComponent.actionButtons
+                    )
                 }
             }
+
 
             if (progressBarState is ProgressBarState.Loading) {
                 CircularIndeterminateProgressBar()

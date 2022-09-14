@@ -6,19 +6,15 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,13 +37,10 @@ import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
-import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentEvent
 import com.example.ibrasaloonapp.presentation.ui.login.LoginView
-import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 private const val TAG = "HomeView"
 
@@ -65,7 +58,7 @@ fun HomeView(
     val refreshing = viewModel.state.value.refreshing
     val user = mainViewModel.state.value.authData?.user
     val showLoginDialog = viewModel.state.value.showLoginDialog
-    val queue = viewModel.uiState.value.errorQueue
+    val uiMessage = viewModel.uiState.value.uiMessage
     val progress = viewModel.uiState.value.progressBarState
     val events = viewModel.uiEvents
 
@@ -80,6 +73,7 @@ fun HomeView(
     LaunchedEffect(key1 = isLoggedIn) {
         if (!isLoggedIn) {
             viewModel.onTriggerEvent(HomeEvent.Rest)
+            viewModel.onTriggerEvent(HomeEvent.GetWorkers)
         }
     }
 
@@ -98,9 +92,9 @@ fun HomeView(
 
 
     DefaultScreenUI(
-        queue = queue,
+        uiComponent = uiMessage,
         progressBarState = progress,
-        onRemoveHeadFromQueue = { viewModel.onTriggerEvent(HomeEvent.OnRemoveHeadFromQueue) }) {
+        onRemoveUIComponent = { viewModel.onTriggerEvent(HomeEvent.OnRemoveHeadFromQueue) }) {
         SwipeRefresh(
             state = rememberSwipeRefreshState(refreshing),
             onRefresh = { viewModel.onTriggerEvent(HomeEvent.Refresh(isAuthed = user != null)) }) {
@@ -118,7 +112,15 @@ fun HomeView(
                         appointment = appointment,
                         workers = workers,
                         navController = navController,
-                        navigateToBookAppointment = { navController.navigate(Screen.BookAppointment.route) },
+                        navigateToBookAppointment = {
+                            navController.navigate(Screen.BookAppointment.route) {
+                                popUpTo(Screen.Home.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
                         showLoginDialog = showLoginDialog,
                         onDismissLoginDialog = { viewModel.onTriggerEvent(HomeEvent.DismissLoginDialog) },
                         onShowLoginDialog = { viewModel.onTriggerEvent(HomeEvent.ShowLoginDialog) },
@@ -252,14 +254,13 @@ fun Header(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-
-                Button(
+                OutlinedButton(
                     modifier = Modifier,
                     contentPadding = PaddingValues(horizontal = 28.dp, vertical = 8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
                     border = BorderStroke(1.dp, Gray1),
                     shape = MaterialTheme.shapes.large,
-                    onClick = { navigateToBookAppointment() }
+                    onClick = { navigateToBookAppointment() },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent)
                 ) {
                     Text(
                         text = stringResource(id = R.string.book),
@@ -332,16 +333,18 @@ fun NotLoggedIn(
         verticalArrangement = Arrangement.Center
     ) {
 
-        Button(
+        OutlinedButton(
             modifier = Modifier,
             contentPadding = PaddingValues(horizontal = 28.dp, vertical = 8.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
             border = BorderStroke(1.dp, Gray1),
             shape = MaterialTheme.shapes.large,
-            onClick = { onShowLoginDialog() }
+            onClick = { onShowLoginDialog() },
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent)
         ) {
+
+            //stringResource(id = R.string.login_or_create_account)
             Text(
-                text = stringResource(id = R.string.login_or_create_account),
+                text = "Login Or Signup",
                 style = MaterialTheme.typography.h4,
                 color = Gray1,
             )

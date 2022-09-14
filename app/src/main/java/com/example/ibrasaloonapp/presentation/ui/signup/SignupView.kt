@@ -60,7 +60,7 @@ fun SignupView(
 //            durationMillis = duration
 //        )
 //    )
-    val queue = viewModel.uiState.value.errorQueue
+    val uiMessage = viewModel.uiState.value.uiMessage
     val progress = viewModel.uiState.value.progressBarState
 
     val showCode = viewModel.state.value.showCode
@@ -95,9 +95,9 @@ fun SignupView(
     }
 
     DefaultScreenUI(
-        queue = queue,
+        uiComponent = uiMessage,
         progressBarState = progress,
-        onRemoveHeadFromQueue = { viewModel.onTriggerEvent(SignupEvent.OnRemoveHeadFromQueue) }) {
+        onRemoveUIComponent = { viewModel.onTriggerEvent(SignupEvent.OnRemoveHeadFromQueue) }) {
         Signup(
             pagesNumber = pagesNumber,
             showCode = showCode,

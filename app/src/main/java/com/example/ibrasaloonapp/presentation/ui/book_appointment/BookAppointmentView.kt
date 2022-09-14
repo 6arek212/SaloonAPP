@@ -59,7 +59,7 @@ fun BookAppointmentView(
     val selectedService = viewModel.state.value.selectedService
 
     val progressBar = viewModel.uiState.value.progressBarState
-    val queue = viewModel.uiState.value.errorQueue
+    val uiMessage = viewModel.uiState.value.uiMessage
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
@@ -113,9 +113,9 @@ fun BookAppointmentView(
 
         DefaultScreenUI(
             modifier = Modifier.padding(it),
-            queue = queue,
+            uiComponent = uiMessage,
             progressBarState = progressBar,
-            onRemoveHeadFromQueue = { viewModel.onTriggerEvent(BookAppointmentEvent.OnRemoveHeadFromQueue) }) {
+            onRemoveUIComponent = { viewModel.onTriggerEvent(BookAppointmentEvent.OnRemoveHeadFromQueue) }) {
 
             BottomSheetScaffold(
                 modifier = Modifier.fillMaxSize(),

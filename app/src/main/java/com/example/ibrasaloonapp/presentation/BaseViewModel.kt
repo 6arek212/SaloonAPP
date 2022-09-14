@@ -10,7 +10,6 @@ import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.presentation.ui.UIState
-import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -33,28 +32,32 @@ open class BaseViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(progressBarState = ProgressBarState.Idle)
     }
 
-    protected fun sendUiEvent(uiEvent: MainUIEvent){
+    protected fun sendUiEvent(uiEvent: MainUIEvent) {
         viewModelScope.launch {
             _uiEvents.send(uiEvent)
         }
     }
 
     protected fun appendToMessageQueue(uiComponent: UIComponent) {
-        val queue = _uiState.value.errorQueue
-        queue.add(uiComponent)
-        _uiState.value = _uiState.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
-        _uiState.value = _uiState.value.copy(errorQueue = queue)
+//        val queue = _uiState.value.errorMessage
+//        queue.add(uiComponent)
+//        _uiState.value = _uiState.value.copy(errorMessage = Queue(mutableListOf())) // force recompose
+//        _uiState.value = _uiState.value.copy(errorMessage = queue)
+
+        _uiState.value = _uiState.value.copy(uiMessage = uiComponent)
     }
 
     protected fun removeHeadMessage() {
-        try {
-            val queue = _uiState.value.errorQueue
-            queue.remove() // can throw exception if empty
-            _uiState.value =
-                _uiState.value.copy(errorQueue = Queue(mutableListOf())) // force recompose
-            _uiState.value = _uiState.value.copy(errorQueue = queue)
-        } catch (e: Exception) {
-            Log.d(TAG, "removeHeadMessage: Nothing to remove from DialogQueue")
-        }
+//        try {
+//            val queue = _uiState.value.errorMessage
+//            queue.remove() // can throw exception if empty
+//            _uiState.value =
+//                _uiState.value.copy(errorMessage = Queue(mutableListOf())) // force recompose
+//            _uiState.value = _uiState.value.copy(errorMessage = queue)
+//        } catch (e: Exception) {
+//            Log.d(TAG, "removeHeadMessage: Nothing to remove from DialogQueue")
+//        }
+        _uiState.value = _uiState.value.copy(uiMessage = null)
+
     }
 }

@@ -24,9 +24,6 @@ import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
-import com.example.ibrasaloonapp.presentation.ui.Screen
-import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
-import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileViewModel
 import kotlinx.coroutines.launch
 
@@ -65,7 +62,7 @@ fun EditProfileView(
         val lastName = viewModel.state.value.lastName
         val phone = viewModel.state.value.phone
         val progress = viewModel.uiState.value.progressBarState
-        val queue = viewModel.uiState.value.errorQueue
+        val uiMessage = viewModel.uiState.value.uiMessage
         val events = viewModel.events
 
         LaunchedEffect(Unit) {
@@ -82,9 +79,9 @@ fun EditProfileView(
 
 
         DefaultScreenUI(
-            queue = queue,
+            uiComponent = uiMessage,
             progressBarState = progress,
-            onRemoveHeadFromQueue = { viewModel.onTriggerEvent(EditProfileEvent.OnRemoveHeadFromQueue) }) {
+            onRemoveUIComponent = { viewModel.onTriggerEvent(EditProfileEvent.OnRemoveHeadFromQueue) }) {
 
             Column(
                 modifier = Modifier

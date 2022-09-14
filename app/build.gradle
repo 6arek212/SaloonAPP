@@ -26,6 +26,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
@@ -78,8 +79,8 @@ dependencies {
 
     def material = "1.6.1"
     implementation "com.google.android.material:material:$material"
-    implementation('androidx.compose.material3:material3-window-size-class:1.0.0-beta02')
-    implementation('androidx.compose.material3:material3:1.0.0-beta02')
+//    implementation('androidx.compose.material3:material3-window-size-class:1.0.0-beta02')
+//    implementation('androidx.compose.material3:material3:1.0.0-beta02')
 
 
     def retrofit_ver = "2.9.0"

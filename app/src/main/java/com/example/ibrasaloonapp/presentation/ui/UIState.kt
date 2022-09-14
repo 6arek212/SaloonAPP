@@ -4,8 +4,8 @@ import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 
-data class UIState (
+data class UIState(
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
-    val errorQueue: Queue<UIComponent> = Queue(mutableListOf())
-        ){
+    val uiMessage: UIComponent? = null
+) {
 }

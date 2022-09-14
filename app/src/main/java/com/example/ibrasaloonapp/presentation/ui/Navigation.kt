@@ -1,7 +1,6 @@
 package com.example.ibrasaloonapp.presentation.ui
 
 import android.util.Log
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
@@ -12,11 +11,9 @@ import androidx.compose.material.icons.filled.BookOnline
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,6 +30,7 @@ import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
+import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray1
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
@@ -52,7 +50,6 @@ import java.lang.Exception
 
 private const val TAG = "Navigation"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewModel) {
 
@@ -60,6 +57,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val user = mainViewModel.state.value.authData?.user
+    val uiMessage = mainViewModel.uiState.value.uiMessage
 
 
     val events = mainViewModel.uiEvents
@@ -69,14 +67,17 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
             events.collect { event ->
                 when (event) {
                     is MainUIEvent.Logout -> {
-
+                        scope.launch { scaffoldState.drawerState.close() }
                         val currentRout = navController.currentDestination?.route
                         Log.d(TAG, "Navigation: ${currentRout}")
                         currentRout?.let {
                             if (currentRout != Screen.Home.route && currentRout != Screen.Signup.route) {
                                 navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Home.route) {
+                                        saveState = true
+                                    }
                                     launchSingleTop = true
-                                    popUpTo(0)
+                                    restoreState = true
                                 }
                             }
                         }
@@ -118,61 +119,60 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
 
 
 
-    Scaffold(
-        modifier = Modifier.statusBarsPadding(),
-        scaffoldState = scaffoldState,
-        drawerBackgroundColor = Gray2,
-        drawerGesturesEnabled = user != null,
-        drawerContent =
-        {
-            DrawerHeader()
-            DrawerBody(items = drawerItems, onClick = { item ->
-                when (item.id) {
-                    Screen.Home.route -> {
-                        navController.navigate(Screen.Home.route) {
-                            launchSingleTop = true
-                            popUpTo(0)
-                        }
-                    }
-                    Screen.AppointmentsList.route -> {
-                        navController.navigate(Screen.AppointmentsList.route) {
-                            launchSingleTop = true
-                            popUpTo(0)
-                        }
-                    }
-                    Screen.Profile.route -> {
-                        navController.navigate(Screen.Profile.route) {
-                            launchSingleTop = true
-                            popUpTo(0)
-                        }
-                    }
-
-                    "logout" -> {
-                        //remove auth data !!!
-                        scope.launch { scaffoldState.drawerState.close() }
-                        mainViewModel.onTriggerEvent(MainEvent.Logout)
-                    }
-                }
-                scope.launch {
-                    scaffoldState.drawerState.close()
-                }
-            }, itemTextStyle = MaterialTheme.typography.body2)
+    DefaultScreenUI(
+        onRemoveUIComponent = { mainViewModel.onTriggerEvent(MainEvent.RemoveMessage) },
+        uiComponent = uiMessage,
+        dialogOnConfirm = {
+            mainViewModel.onTriggerEvent(MainEvent.Logout)
         }
     ) {
 
-        NavHost(
-            modifier = Modifier.padding(it),
-            navController = navController,
-            startDestination = Screen.Splash.route
+        Scaffold(
+            modifier = Modifier.statusBarsPadding(),
+            scaffoldState = scaffoldState,
+            drawerBackgroundColor = Gray2,
+            drawerGesturesEnabled = user != null,
+            drawerContent =
+            {
+                DrawerHeader()
+                DrawerBody(items = drawerItems, onClick = { item ->
+                    if (item.id != "logout") {
+                        navController.navigate(item.id) {
+                            //navController.graph.findStartDestination().id
+                            popUpTo(Screen.Home.route) {
+                                saveState = true
+//                            inclusive = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+
+
+                        scope.launch {
+                            scaffoldState.drawerState.close()
+                        }
+
+                    } else {
+                        mainViewModel.onTriggerEvent(MainEvent.ShowLogoutDialog)
+                    }
+                }, itemTextStyle = MaterialTheme.typography.body2)
+            }
         ) {
-            splash(navController = navController)
-            login(navController = navController)
-            signup(navController = navController, mainViewModel = mainViewModel)
-            home(navController = navController, mainViewModel = mainViewModel)
-            appointmentList(navController = navController, mainViewModel = mainViewModel)
-            bookAppointment(navController = navController, mainViewModel = mainViewModel)
-            profile(navController = navController, mainViewModel = mainViewModel)
-            editProfile(navController = navController, mainViewModel = mainViewModel)
+
+            NavHost(
+                modifier = Modifier.padding(it),
+                navController = navController,
+                startDestination = Screen.Splash.route
+            ) {
+                splash(navController = navController)
+                login(navController = navController)
+                signup(navController = navController, mainViewModel = mainViewModel)
+                home(navController = navController, mainViewModel = mainViewModel)
+                appointmentList(navController = navController, mainViewModel = mainViewModel)
+                bookAppointment(navController = navController, mainViewModel = mainViewModel)
+                profile(navController = navController, mainViewModel = mainViewModel)
+                editProfile(navController = navController, mainViewModel = mainViewModel)
+            }
         }
     }
 }

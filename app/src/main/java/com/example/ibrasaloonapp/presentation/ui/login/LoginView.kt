@@ -6,25 +6,18 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,15 +25,10 @@ import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.domain.model.AuthData
-import com.example.ibrasaloonapp.domain.model.OPT4Digits
-import com.example.ibrasaloonapp.presentation.MainEvent
-import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.CommonOtp
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.SubTitle
-import com.example.ibrasaloonapp.presentation.components.TimeCircularProgressBar
 import com.example.ibrasaloonapp.presentation.theme.Blue
-import com.example.ibrasaloonapp.presentation.theme.Red
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import kotlinx.coroutines.launch
 
@@ -55,7 +43,7 @@ fun LoginView(
     val phoneError = viewModel.state.value.phoneError
     val code = viewModel.state.value.verifyCode
     val progress = viewModel.uiState.value.progressBarState
-    val queue = viewModel.uiState.value.errorQueue
+    val uiMessage = viewModel.uiState.value.uiMessage
     val showCode = viewModel.state.value.showCode
     val events = viewModel.events
 
@@ -81,8 +69,8 @@ fun LoginView(
 
 
     DefaultScreenUI(
-        onRemoveHeadFromQueue = { viewModel.onTriggerEvent(LoginEvent.OnRemoveHeadFromQueue) },
-        queue = queue
+        onRemoveUIComponent = { viewModel.onTriggerEvent(LoginEvent.OnRemoveHeadFromQueue) },
+        uiComponent = uiMessage
     ) {
         Column(
             modifier = Modifier

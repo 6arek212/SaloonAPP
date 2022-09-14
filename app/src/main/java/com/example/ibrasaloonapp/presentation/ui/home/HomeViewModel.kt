@@ -72,11 +72,15 @@ constructor(
                 }
 
                 is HomeEvent.GetAppointment -> {
+                    loading(true)
                     getAppointment()
+                    loading(false)
                 }
 
                 is HomeEvent.GetWorkers -> {
+                    loading(true)
                     getWorkers()
+                    loading(false)
                 }
 
                 is HomeEvent.UpdateAppointment -> {

@@ -5,7 +5,7 @@ sealed class UIComponent {
     data class Dialog(
         val title: String,
         val description: String,
-        val confirmButton: Boolean = false
+        val actionButtons: Boolean = false
     ) : UIComponent()
 
     data class None(

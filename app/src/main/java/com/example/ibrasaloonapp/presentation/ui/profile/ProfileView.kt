@@ -1,47 +1,27 @@
 package com.example.ibrasaloonapp.presentation.ui.profile
 
-import android.util.Log
-import androidx.annotation.Px
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BorderColor
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Bottom
-import androidx.compose.ui.Alignment.Companion.BottomCenter
-import androidx.compose.ui.Alignment.Companion.BottomStart
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius.Companion.Zero
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
-import com.example.ibrasaloonapp.presentation.components.CircularImage
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.VerticalImageChip
 import com.example.ibrasaloonapp.presentation.theme.*
@@ -60,6 +40,7 @@ fun ProfileView(
     val user = viewModel.state.value.user
     val progress = viewModel.uiState.value.progressBarState
     val events = viewModel.uiEvents
+    val uiMessage = viewModel.uiState.value.uiMessage
 
     LaunchedEffect(Unit) {
         launch {
@@ -76,7 +57,9 @@ fun ProfileView(
 
         DefaultScreenUI(
             progressBarState = progress,
-            onRemoveHeadFromQueue = { }) {
+            onRemoveUIComponent = { },
+            uiComponent = uiMessage
+        ) {
 
             Column(
                 modifier = Modifier

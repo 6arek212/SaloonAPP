@@ -6,6 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,6 +51,21 @@ constructor(
                 is MainEvent.Logout -> {
                     logout()
                 }
+
+                is MainEvent.ShowLogoutDialog -> {
+                    appendToMessageQueue(
+                        UIComponent.Dialog(
+                            title = "Logout",
+                            "Are you sure you want to logout?",
+                            actionButtons = true
+                        )
+                    )
+                }
+
+                is MainEvent.RemoveMessage -> {
+                    removeHeadMessage()
+                }
+
             }
         }
     }
