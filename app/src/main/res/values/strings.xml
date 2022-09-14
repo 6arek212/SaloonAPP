@@ -58,6 +58,8 @@
     <string name="we_are_ready_to_go">We are ready to go</string>
     <string name="the_signup_process">The signup process</string>
     <string name="phone_number">Phone nubmer</string>
+    <string name="network_not_available">Network Not Available</string>
+    <string name="network_available">Network Available ,  Try to reload</string>
 
 
 </resources>

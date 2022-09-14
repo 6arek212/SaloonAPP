@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.Appointment
@@ -58,7 +60,9 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
     val scope = rememberCoroutineScope()
     val user = mainViewModel.state.value.authData?.user
     val uiMessage = mainViewModel.uiState.value.uiMessage
-
+    val networkStatus = mainViewModel.uiState.value.network
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination?.route
 
     val events = mainViewModel.uiEvents
 
@@ -124,7 +128,10 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
         uiComponent = uiMessage,
         dialogOnConfirm = {
             mainViewModel.onTriggerEvent(MainEvent.Logout)
-        }
+        },
+        networkStatus = networkStatus,
+        onDismissNetworkMessage = { mainViewModel.onTriggerEvent(MainEvent.DismissNetworkMessage) },
+        isSplashRoute = currentDestination == Screen.Splash.route
     ) {
 
         Scaffold(

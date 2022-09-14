@@ -4,8 +4,8 @@
     <style name="Theme.IbraSaloonAPP" parent="Theme.MaterialComponents.DayNight">
         <item name="android:statusBarColor">@color/purple_500</item>
 <!--        <item name="android:windowDisablePreview">true</item>-->
-<!--        <item name="android:windowBackground">@color/purple_500</item>-->
-        <item name="android:windowBackground">@xml/startup_screen</item>
+        <item name="android:windowBackground">@color/purple_500</item>
+<!--        <item name="android:windowBackground">@xml/startup_screen</item>-->
 
 
 

@@ -24,6 +24,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
@@ -95,52 +96,86 @@ fun HomeView(
         uiComponent = uiMessage,
         progressBarState = progress,
         onRemoveUIComponent = { viewModel.onTriggerEvent(HomeEvent.OnRemoveHeadFromQueue) }) {
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(refreshing),
-            onRefresh = { viewModel.onTriggerEvent(HomeEvent.Refresh(isAuthed = user != null)) }) {
-            BackdropScaffold(
-                scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
-                frontLayerScrimColor = Color.Unspecified,
-                appBar = {
-                    HomeAppBar()
-                },
-                backLayerContent = {
-                    BackLayer(user)
-                },
-                frontLayerContent = {
-                    FrontLayer(
-                        appointment = appointment,
-                        workers = workers,
-                        navController = navController,
-                        navigateToBookAppointment = {
-                            navController.navigate(Screen.BookAppointment.route) {
-                                popUpTo(Screen.Home.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        showLoginDialog = showLoginDialog,
-                        onDismissLoginDialog = { viewModel.onTriggerEvent(HomeEvent.DismissLoginDialog) },
-                        onShowLoginDialog = { viewModel.onTriggerEvent(HomeEvent.ShowLoginDialog) },
-                        user = user,
-                        onLogin = { authData ->
-                            mainViewModel.onTriggerEvent(
-                                MainEvent.Login(
-                                    authData
-                                )
-                            )
-                        },
-                        isLoading = progress == ProgressBarState.Loading
+        Home(
+            progress = progress == ProgressBarState.Loading,
+            onRefresh = { viewModel.onTriggerEvent(HomeEvent.Refresh(isAuthed = user != null)) },
+            onDismissLoginDialog = { viewModel.onTriggerEvent(HomeEvent.DismissLoginDialog) },
+            onShowLoginDialog = { viewModel.onTriggerEvent(HomeEvent.ShowLoginDialog) },
+            navController = navController,
+            navigateToBookAppointment = {
+                navController.navigate(Screen.BookAppointment.route) {
+                    popUpTo(Screen.Home.route) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            onLogin = { authData ->
+                mainViewModel.onTriggerEvent(
+                    MainEvent.Login(
+                        authData
                     )
-                },
-                frontLayerElevation = 10.dp,
-                frontLayerBackgroundColor = Gray1
-            )
-        }
+                )
+            },
+            user = user,
+            appointment = appointment,
+            workers = workers,
+            refreshing = refreshing,
+            showLoginDialog = showLoginDialog
+        )
     }
 
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun Home(
+    user: User?,
+    appointment: Appointment?,
+    workers: List<User>,
+    refreshing: Boolean,
+    showLoginDialog: Boolean,
+    progress: Boolean,
+    onRefresh: () -> Unit,
+    navigateToBookAppointment: () -> Unit,
+    onDismissLoginDialog: () -> Unit,
+    onShowLoginDialog: () -> Unit,
+    onLogin: (AuthData) -> Unit,
+    navController: NavController
+) {
+
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(refreshing),
+        onRefresh = { onRefresh() }) {
+        BackdropScaffold(
+            scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
+            frontLayerScrimColor = Color.Unspecified,
+            appBar = {
+                HomeAppBar()
+            },
+            backLayerContent = {
+                BackLayer(user)
+            },
+            frontLayerContent = {
+                FrontLayer(
+                    appointment = appointment,
+                    workers = workers,
+                    navController = navController,
+                    navigateToBookAppointment = navigateToBookAppointment,
+                    showLoginDialog = showLoginDialog,
+                    onDismissLoginDialog = onDismissLoginDialog,
+                    onShowLoginDialog = onShowLoginDialog,
+                    user = user,
+                    onLogin = onLogin,
+                    isLoading = progress
+                )
+            },
+            frontLayerElevation = 10.dp,
+            frontLayerBackgroundColor = Gray1
+        )
+    }
 }
 
 
@@ -560,5 +595,22 @@ fun AboutUs() {
 @Preview(showBackground = false)
 @Composable
 fun HomePreview() {
-//    HomeView()
+    AppTheme() {
+
+        Home(
+            user = User("", "tarik", "husin", "", ""),
+            appointment = null,
+            workers = listOf(),
+            refreshing = false,
+            showLoginDialog = false,
+            progress = false,
+            onRefresh = { /*TODO*/ },
+            navigateToBookAppointment = { /*TODO*/ },
+            onDismissLoginDialog = { /*TODO*/ },
+            onShowLoginDialog = { /*TODO*/ },
+            onLogin = {},
+            navController = rememberNavController()
+        )
+    }
+
 }

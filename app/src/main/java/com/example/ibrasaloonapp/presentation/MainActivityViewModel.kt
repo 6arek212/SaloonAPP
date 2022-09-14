@@ -7,12 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.network.utils.ConnectivityObserver
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,16 +26,17 @@ private const val TAG = "MainActivityViewModel"
 class MainActivityViewModel
 @Inject
 constructor(
-    val authRepository: AuthRepository
+    private val networkConnectivityObserver: ConnectivityObserver,
+    private val authRepository: AuthRepository
 ) : BaseViewModel() {
 
-    //TODO: NETWORK STATUS !!!!
     private val _state: MutableState<AuthState> = mutableStateOf(AuthState())
     val state: State<AuthState> = _state
 
 
     init {
         onTriggerEvent(MainEvent.GetAuthData)
+        observeNetwork()
     }
 
 
@@ -42,6 +45,10 @@ constructor(
             when (event) {
                 is MainEvent.Login -> {
                     _state.value = _state.value.copy(authData = event.authData, isLoggedIn = true)
+                }
+
+                is MainEvent.DismissNetworkMessage -> {
+                    setNetworkStatus(null)
                 }
 
                 is MainEvent.GetAuthData -> {
@@ -90,6 +97,43 @@ constructor(
         authRepository.logout()
         _state.value = _state.value.copy(authData = null, isLoggedIn = false)
         sendUiEvent(MainUIEvent.Logout)
+    }
+
+
+    private fun observeNetwork() {
+        viewModelScope.launch {
+            networkConnectivityObserver.observe().collect() {
+                when (it) {
+
+                    ConnectivityObserver.Status.Available -> {
+                        Log.d(TAG, "observeNetwork: 1")
+                        val hasNetwork = uiState.value.network
+
+                        if (hasNetwork != null && !hasNetwork)
+                            setNetworkStatus(true)
+                    }
+
+                    ConnectivityObserver.Status.Lost -> {
+                        Log.d(TAG, "observeNetwork: 2")
+
+                        setNetworkStatus(false)
+                    }
+
+                    ConnectivityObserver.Status.Unavailable -> {
+                        Log.d(TAG, "observeNetwork: 3")
+
+                        setNetworkStatus(false)
+                    }
+
+                    ConnectivityObserver.Status.Losing -> {
+                        Log.d(TAG, "observeNetwork: 4")
+
+                        setNetworkStatus(false)
+                    }
+                }
+
+            }
+        }
     }
 
 

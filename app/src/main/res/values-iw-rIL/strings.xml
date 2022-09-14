@@ -57,4 +57,6 @@
     <string name="we_are_ready_to_go">אנחנו מוכנים</string>
     <string name="the_signup_process">תהליך ההרשמה</string>
     <string name="phone_number">"מספר טלפון "</string>
+    <string name="network_available">רשת זמינה , נסה לרענן עכשיו</string>
+    <string name="network_not_available">אין חיבור לרשת</string>
 </resources>

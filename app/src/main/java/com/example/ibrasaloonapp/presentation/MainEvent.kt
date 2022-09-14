@@ -9,4 +9,5 @@ sealed class MainEvent {
     object GetAuthData : MainEvent()
     object RemoveMessage : MainEvent()
     object ShowLogoutDialog : MainEvent()
+    object DismissNetworkMessage : MainEvent()
 }

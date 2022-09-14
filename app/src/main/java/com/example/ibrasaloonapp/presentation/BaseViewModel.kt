@@ -32,6 +32,12 @@ open class BaseViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(progressBarState = ProgressBarState.Idle)
     }
 
+    protected fun setNetworkStatus(state: Boolean?) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(network = state)
+        }
+    }
+
     protected fun sendUiEvent(uiEvent: MainUIEvent) {
         viewModelScope.launch {
             _uiEvents.send(uiEvent)
