@@ -8,6 +8,7 @@ data class SignupState(
     val lastName: String = "",
     val birthDate: String = "",
     val verifyCode: OPT4Digits = OPT4Digits(""),
+    val image: String? = null,
 
     val phoneError: String? = null,
     val firstNameError: String? = null,

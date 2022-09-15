@@ -2,12 +2,14 @@ package com.example.ibrasaloonapp.di
 
 import android.content.Context
 import com.example.ibrasaloonapp.core.Logger
+import com.example.ibrasaloonapp.presentation.AuthState
 import com.example.ibrasaloonapp.presentation.BaseApplication
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.flow
 import javax.inject.Singleton
 
 
@@ -32,5 +34,9 @@ object AppModule {
         )
     }
 
+
+    @Provides
+    @Singleton
+    fun provideAuthState() = flow<AuthState> {}
 
 }

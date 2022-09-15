@@ -104,11 +104,9 @@ fun HomeView(
             navController = navController,
             navigateToBookAppointment = {
                 navController.navigate(Screen.BookAppointment.route) {
-                    popUpTo(Screen.Home.route) {
-                        saveState = true
-                    }
+                    popUpTo(Screen.Home.route)
                     launchSingleTop = true
-                    restoreState = true
+
                 }
             },
             onLogin = { authData ->
@@ -546,16 +544,16 @@ fun Stories() {
 
         Spacer(modifier = Modifier.padding(8.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(scrollState)
-        ) {
-            StoryCard(image = R.drawable.story1)
-            StoryCard(image = R.drawable.story2)
-            StoryCard(image = R.drawable.story3)
-            StoryCard(image = R.drawable.story4)
-        }
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .horizontalScroll(scrollState)
+//        ) {
+//            StoryCard(image = R.drawable.story1)
+//            StoryCard(image = R.drawable.story2)
+//            StoryCard(image = R.drawable.story3)
+//            StoryCard(image = R.drawable.story4)
+//        }
 
     }
 }

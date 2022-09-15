@@ -73,7 +73,10 @@ fun ProfileView(
                         .fillMaxWidth()
                         .zIndex(1f),
                     navigateToUpdatePage = {
-                        navController.navigate(Screen.EditProfile.route + "/${user.id}/${user.firstName}/${user.lastName}/${user.phone}")
+                        navController.navigate(Screen.EditProfile.route + "/${user.id}/${user.firstName}/${user.lastName}/${user.phone}"){
+                            popUpTo(Screen.Profile.route)
+                            launchSingleTop = true
+                        }
                     }
                 )
 
@@ -83,10 +86,15 @@ fun ProfileView(
                         .offset(y = -80.dp)
                         .zIndex(1f),
                     text = "${user.firstName} ${user.lastName}",
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        navController.navigate(Screen.UploadImage.route) {
+                            popUpTo(Screen.Profile.route)
+                            launchSingleTop = true
+                        }
+                    },
                     isSelected = false,
                     url = user.image,
-                    imageSize = 200.dp
+                    imageSize = 200.dp,
                 )
 
 

@@ -4,6 +4,9 @@ import com.google.gson.annotations.SerializedName
 
 data class AuthVerificationDto(
     @SerializedName("phone")
-    val phone: String
+    val phone: String,
+
+    @SerializedName("isLogin")
+    val isLogin: Boolean? = null
 ) {
 }

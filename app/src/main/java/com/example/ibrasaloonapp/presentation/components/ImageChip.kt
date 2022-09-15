@@ -48,6 +48,7 @@ fun ImageChip(
                 .offset(x = 15.dp),
             elevation = 8.dp,
             url = if (url != null) "https://saloon-ibra-api.herokuapp.com/imgs/${url}" else null,
+            onClick = {}
         )
 
         CustomChip(

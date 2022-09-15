@@ -1,82 +1,88 @@
-package com.example.ibrasaloonapp.presentation.ui.profile
-
+package com.example.ibrasaloonapp.presentation.ui.upload
 
 import android.app.Application
-import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
-import com.example.ibrasaloonapp.presentation.ui.upload.UploadImageState
 import com.example.ibrasaloonapp.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.InputStream
 import javax.inject.Inject
-import kotlin.math.log
 
-
-private const val TAG = "ProfileViewModel"
 
 @HiltViewModel
-class ProfileViewModel
+class UploadImageViewModel
 @Inject
 constructor(
     private val context: Application,
-    private val savedState: SavedStateHandle,
     private val userRepository: UserRepository
 ) : BaseViewModel() {
 
+    private var stream: InputStream? = null
 
-    private val _state: MutableState<ProfileState> = mutableStateOf(ProfileState())
-    val state: State<ProfileState> = _state
+    private val _uploadState: MutableState<UploadImageState> = mutableStateOf(UploadImageState())
+    val uploadState: State<UploadImageState> = _uploadState
+
+    private val _events = Channel<UploadUIEvent>()
+    val events = _events.receiveAsFlow()
 
 
-    init {
-        Log.d(TAG, " ProfileViewModel ")
-        onTriggerEvent(ProfileEvent.GetUser)
-    }
-
-    fun onTriggerEvent(event: ProfileEvent) {
+    fun onTriggerEvent(event: UploadImageEvent) {
         viewModelScope.launch {
             when (event) {
-                is ProfileEvent.OnRemoveUIComponent -> {
+                is UploadImageEvent.OnRemoveUIComponent -> {
                     removeHeadMessage()
                 }
-                is ProfileEvent.UpdateImage -> {
-                    val user = _state.value.user?.copy(image = event.imagePath)
-                    _state.value = _state.value.copy(user = user)
+
+                is UploadImageEvent.OnSelectedImage -> {
+                    _uploadState.value =
+                        _uploadState.value.copy(imageUri = event.imageUri, buttonVisible = true)
+                    stream = event.imageStream
                 }
 
-                is ProfileEvent.GetUser -> {
-                    getUser()
-                }
-                is ProfileEvent.UpdateUser -> {
-                    _state.value = _state.value.copy(user = event.user)
+                is UploadImageEvent.Upload -> {
+                    uploadImage()
                 }
             }
         }
     }
 
 
-    private suspend fun getUser() {
-        Log.d(TAG, "getUser: ")
+    private suspend fun uploadImage() {
+        val st = stream
+        val uri = _uploadState.value.imageUri
+
+        if (st == null || uri == null) {
+            appendToMessageQueue(
+                UIComponent.Dialog(
+                    title = "You did not pick an image !",
+                    description = "you have to click the image above and select a new image"
+                )
+            )
+            return
+        }
+
+        val cR = context.contentResolver
+        val mime = MimeTypeMap.getSingleton()
+        val type = mime.getExtensionFromMimeType(cR.getType(uri)) ?: return
+
         loading(true)
-        val result = userRepository.getUser()
+        val result = userRepository.uploadImage(st, type)
 
         when (result) {
             is ApiResult.Success -> {
-                _state.value = _state.value.copy(user = result.value)
+//                _uploadState.value = _uploadState.value.copy(imageUri = null)
+                _events.send(UploadUIEvent.ImageUploaded(result.value))
             }
             is ApiResult.GenericError -> {
                 appendToMessageQueue(
@@ -99,6 +105,8 @@ constructor(
                 )
             }
         }
+
+
         loading(false)
     }
 

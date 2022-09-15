@@ -59,4 +59,8 @@
     <string name="phone_number">"מספר טלפון "</string>
     <string name="network_available">רשת זמינה , נסה לרענן עכשיו</string>
     <string name="network_not_available">אין חיבור לרשת</string>
+    <string name="user_with_number_was_not_found">לא  נמצא לקוח עם מספר זה</string>
+    <string name="bad_request">מהשן השתבש נסה שוב</string>
+    <string name="verification_timeout_try_again">הקוד פג תוקף , נסה שוב</string>
+    <string name="code_not_match">הקוד לא נכון</string>
 </resources>

@@ -23,6 +23,9 @@ import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentEvent
 import com.example.ibrasaloonapp.repository.AuthRepository
+import com.example.trainingapp.network.NetworkErrors.ERROR_400
+import com.example.trainingapp.network.NetworkErrors.ERROR_403
+import com.example.trainingapp.network.NetworkErrors.ERROR_404
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
@@ -50,7 +53,6 @@ constructor(
     val events = _events.receiveAsFlow()
 
     private var verifyId: String? = null
-
 
 
     fun onTriggerEvent(event: LoginEvent) {
@@ -132,7 +134,6 @@ constructor(
     }
 
 
-
     private suspend fun sendAuthVerification() {
         val phone = _state.value.phone
         val phoneValidate = validatePhoneNumber.execute(phone)
@@ -151,7 +152,7 @@ constructor(
 
         loading(true)
 
-        val result = authRepository.sendAuthVerification(phone = phone)
+        val result = authRepository.sendAuthVerification(phone = phone, isLogin = true)
 
         when (result) {
             is ApiResult.Success -> {
@@ -160,14 +161,31 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
+
+                _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
+
+                val message = when (result.code) {
+
+                    ERROR_404 -> {
+                        context.getString(R.string.user_with_number_was_not_found)
+                    }
+
+                    ERROR_400 -> {
+                        context.getString(R.string.bad_request)
+                    }
+
+                    else -> {
+                        context.getString(R.string.something_went_wrong)
+                    }
+                }
+
+
                 appendToMessageQueue(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = message
                     )
                 )
-
-                _state.value = _state.value.copy(verifyCode = OPT4Digits("", "", "", ""))
             }
 
             is ApiResult.NetworkError -> {
@@ -177,7 +195,7 @@ constructor(
                         description = context.getString(R.string.something_went_wrong)
                     )
                 )
-                _state.value = _state.value.copy(verifyCode = OPT4Digits("", "", "", ""))
+                _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
             }
         }
 
@@ -228,10 +246,26 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
+
+                val message = when (result.code) {
+
+                    ERROR_404 -> {
+                        context.getString(R.string.verification_timeout_try_again)
+                    }
+
+                    ERROR_403 -> {
+                        context.getString(R.string.code_not_match)
+                    }
+
+                    else -> {
+                        context.getString(R.string.something_went_wrong)
+                    }
+                }
+
                 appendToMessageQueue(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = message
                     )
                 )
 
@@ -251,8 +285,6 @@ constructor(
 
         loading(false)
     }
-
-
 
 
     private fun rest() {

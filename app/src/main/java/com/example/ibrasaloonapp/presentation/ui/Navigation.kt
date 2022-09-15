@@ -33,11 +33,10 @@ import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
-import com.example.ibrasaloonapp.presentation.theme.Gray1
 import com.example.ibrasaloonapp.presentation.theme.Gray2
-import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.APPOINTMENT_KEY
+import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.USER_KEY
 import com.example.ibrasaloonapp.presentation.ui.home.*
@@ -45,10 +44,13 @@ import com.example.ibrasaloonapp.presentation.ui.login.LoginView
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileView
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileViewModel
+import com.example.ibrasaloonapp.presentation.ui.signup.SignupEvent
 import com.example.ibrasaloonapp.presentation.ui.signup.SignupView
+import com.example.ibrasaloonapp.presentation.ui.signup.SignupViewModel
 import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
+import com.example.ibrasaloonapp.presentation.ui.upload.IMAGE_KEY
+import com.example.ibrasaloonapp.presentation.ui.upload.UploadImageView
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 private const val TAG = "Navigation"
 
@@ -63,6 +65,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
     val networkStatus = mainViewModel.uiState.value.network
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
+    Log.d(TAG, "Navigation: ${currentDestination}")
 
     val events = mainViewModel.uiEvents
 
@@ -73,7 +76,6 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                     is MainUIEvent.Logout -> {
                         scope.launch { scaffoldState.drawerState.close() }
                         val currentRout = navController.currentDestination?.route
-                        Log.d(TAG, "Navigation: ${currentRout}")
                         currentRout?.let {
                             if (currentRout != Screen.Home.route && currentRout != Screen.Signup.route) {
                                 navController.navigate(Screen.Home.route) {
@@ -144,11 +146,10 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 DrawerHeader()
                 DrawerBody(items = drawerItems, onClick = { item ->
                     if (item.id != "logout") {
+                        Log.d(TAG, "Navigation: ${item.id}")
                         navController.navigate(item.id) {
-                            //navController.graph.findStartDestination().id
                             popUpTo(Screen.Home.route) {
                                 saveState = true
-//                            inclusive = true
                             }
                             launchSingleTop = true
                             restoreState = true
@@ -169,7 +170,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
             NavHost(
                 modifier = Modifier.padding(it),
                 navController = navController,
-                startDestination = Screen.Splash.route
+                startDestination = Screen.Home.route
             ) {
                 splash(navController = navController)
                 login(navController = navController)
@@ -179,6 +180,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 bookAppointment(navController = navController, mainViewModel = mainViewModel)
                 profile(navController = navController, mainViewModel = mainViewModel)
                 editProfile(navController = navController, mainViewModel = mainViewModel)
+                uploadImage(navController = navController, mainViewModel = mainViewModel)
             }
         }
     }
@@ -214,7 +216,18 @@ fun NavGraphBuilder.signup(
     composable(
         route = Screen.Signup.route,
         arguments = emptyList()
-    ) {
+    ) { backStackEntry ->
+
+        val updatedImagePath = backStackEntry
+            .savedStateHandle
+            .getLiveData<String>(IMAGE_KEY)
+            .observeAsState().value
+
+        val viewModel: SignupViewModel = hiltViewModel()
+        updatedImagePath?.let {
+            viewModel.onTriggerEvent(SignupEvent.UpdateImage(updatedImagePath))
+        }
+
         SignupView(navController = navController, mainViewModel = mainViewModel)
     }
 }
@@ -297,10 +310,19 @@ fun NavGraphBuilder.profile(
             .getLiveData<User>(USER_KEY)
             .observeAsState().value
 
+        val updatedImagePath = backStackEntry
+            .savedStateHandle
+            .getLiveData<String>(IMAGE_KEY)
+            .observeAsState().value
+
         val viewModel: ProfileViewModel = hiltViewModel()
 
         user?.let {
             viewModel.onTriggerEvent(ProfileEvent.UpdateUser(user))
+        }
+
+        updatedImagePath?.let {
+            viewModel.onTriggerEvent(ProfileEvent.UpdateImage(updatedImagePath))
         }
 
         ProfileView(
@@ -335,6 +357,33 @@ fun NavGraphBuilder.editProfile(
         )
     }
 }
+
+
+fun NavGraphBuilder.uploadImage(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel
+) {
+    composable(
+        route = Screen.UploadImage.route,
+        arguments = Screen.UploadImage.arguments
+    ) {
+        val previousViewModel: ProfileViewModel? = navController
+            .previousBackStackEntry?.let {
+                hiltViewModel(it)
+            }
+
+        UploadImageView(
+            navController = navController,
+            profileViewModel = previousViewModel,
+            popBackStack = { imagePath ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(IMAGE_KEY, imagePath)
+                navController.popBackStack()
+            })
+    }
+}
+
 
 
 

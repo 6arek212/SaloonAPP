@@ -48,6 +48,7 @@ fun VerticalImageChip(
                 .offset(y = 15.dp),
             elevation = 8.dp,
             url = if (url != null) "https://saloon-ibra-api.herokuapp.com/imgs/${url}" else null,
+            onClick = onClick
         )
 
         CustomChip(
@@ -61,7 +62,7 @@ fun VerticalImageChip(
                 bottom = 6.dp
             ),
             text = text,
-            onClick = onClick,
+            onClick = {},
             isSelected = isSelected
         )
 

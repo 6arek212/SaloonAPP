@@ -10,6 +10,7 @@ import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.services.AuthService
+import com.example.ibrasaloonapp.presentation.AuthState
 import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.example.ibrasaloonapp.ui.*
 import com.example.trainingapp.util.safeApiCall
@@ -28,6 +29,7 @@ constructor(
     private val application: Context,
     private val authService: AuthService,
     private val authDataDtoMapper: AuthDataDtoMapper,
+    private val authState: AuthState,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AuthRepository {
 
@@ -42,9 +44,14 @@ constructor(
         return authData
     }
 
-    override suspend fun sendAuthVerification(phone: String): ApiResult<String> {
+    override suspend fun sendAuthVerification(phone: String, isLogin: Boolean?): ApiResult<String> {
         return safeApiCall(dispatcher) {
-            authService.sendAuthVerification(AuthVerificationDto(phone = phone)).verifyId
+            authService.sendAuthVerification(
+                AuthVerificationDto(
+                    phone = phone,
+                    isLogin = isLogin
+                )
+            ).verifyId
         }
     }
 

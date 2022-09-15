@@ -60,6 +60,10 @@
     <string name="phone_number">Phone nubmer</string>
     <string name="network_not_available">Network Not Available</string>
     <string name="network_available">Network Available ,  Try to reload</string>
+    <string name="user_with_number_was_not_found">A user with number was not found</string>
+    <string name="bad_request">Bad requst , try again</string>
+    <string name="verification_timeout_try_again">Verification timeout try again</string>
+    <string name="code_not_match">Code not match</string>
 
 
 </resources>

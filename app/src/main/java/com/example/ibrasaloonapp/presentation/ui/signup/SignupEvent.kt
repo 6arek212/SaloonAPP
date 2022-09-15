@@ -1,14 +1,13 @@
 package com.example.ibrasaloonapp.presentation.ui.signup
 
-import com.example.ibrasaloonapp.presentation.ui.home.HomeEvent
 import com.example.ibrasaloonapp.presentation.ui.login.CodeDigitPlace
-import com.example.ibrasaloonapp.presentation.ui.login.LoginEvent
 
 
 sealed class SignupEvent {
     object PrevPage :SignupEvent()
     object NextPage :SignupEvent()
     object Signup :SignupEvent()
+    class UpdateImage(val imagePath: String) : SignupEvent()
 
     object SendAuthVerification : SignupEvent()
 

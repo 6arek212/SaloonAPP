@@ -9,6 +9,7 @@ import com.example.ibrasaloonapp.network.services.AppointmentService
 import com.example.ibrasaloonapp.network.services.AuthService
 import com.example.ibrasaloonapp.network.services.UserService
 import com.example.ibrasaloonapp.network.services.WorkerService
+import com.example.ibrasaloonapp.presentation.AuthState
 import com.example.ibrasaloonapp.repository.*
 import dagger.Module
 import dagger.Provides
@@ -67,13 +68,15 @@ object RepositoryModule {
     fun provideAuthRepository(
         service: AuthService,
         mapper: AuthDataDtoMapper,
+        authState: AuthState,
         @ApplicationContext
         application: Context
     ): AuthRepository {
         return AuthRepositoryImpl(
             authService = service,
             authDataDtoMapper = mapper,
-            application = application
+            application = application,
+            authState = authState
         )
     }
 

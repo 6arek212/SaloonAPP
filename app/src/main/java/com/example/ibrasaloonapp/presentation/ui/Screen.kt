@@ -41,6 +41,11 @@ sealed class Screen(val route: String, val arguments: List<NamedNavArgument>) {
         arguments = emptyList()
     )
 
+    object UploadImage : Screen(
+        route = "UploadImage",
+        arguments = emptyList()
+    )
+
     object EditProfile : Screen(
         route = "EditProfile",
         arguments = listOf(

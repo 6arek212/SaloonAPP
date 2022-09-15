@@ -38,12 +38,16 @@ constructor(
     private val _state: MutableState<SignupState> = mutableStateOf(SignupState())
     val state: State<SignupState> = _state
 
-    val pagesNumber: Int = 3
+    val pagesNumber: Int = 4
     private var verifyId: String? = null
 
     fun onTriggerEvent(event: SignupEvent) {
         viewModelScope.launch {
             when (event) {
+
+                is SignupEvent.UpdateImage -> {
+                    _state.value = _state.value.copy(image = event.imagePath)
+                }
 
                 is SignupEvent.OnPhoneChanged -> {
                     _state.value = _state.value.copy(phone = event.phone)

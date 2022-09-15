@@ -1,9 +1,11 @@
 package com.example.ibrasaloonapp.presentation.components
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -29,12 +32,18 @@ import com.example.ibrasaloonapp.presentation.theme.White
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CircularImage(modifier: Modifier = Modifier, elevation: Dp = 2.dp, url: String?) {
+fun CircularImage(
+    modifier: Modifier = Modifier,
+    elevation: Dp = 2.dp,
+    url: String? = null,
+    uri: Uri? = null,
+    onClick: () -> Unit
+) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
 
     LaunchedEffect(Unit) {
 //        val imageLoader = ImageLoader.Builder(context)
@@ -77,13 +86,12 @@ fun CircularImage(modifier: Modifier = Modifier, elevation: Dp = 2.dp, url: Stri
 //    )
 
 
-
-
     Surface(
         modifier = modifier,
         color = Color.Transparent,
         elevation = elevation,
-        shape = CircleShape
+        shape = CircleShape,
+        onClick = onClick
     ) {
 //        Image(
 //            modifier = Modifier.fillMaxSize(),
@@ -99,10 +107,7 @@ fun CircularImage(modifier: Modifier = Modifier, elevation: Dp = 2.dp, url: Stri
                 .border(2.dp, White, CircleShape),
 
             model = ImageRequest.Builder(LocalContext.current)
-                .placeholderMemoryCacheKey("123")
-                .size(size = 100)
-                .scale(Scale.FILL)
-                .data(url)
+                .data(uri ?: url)
                 .crossfade(true)
                 .build(),
             placeholder = painterResource(R.drawable.person_place_holder),
@@ -110,8 +115,7 @@ fun CircularImage(modifier: Modifier = Modifier, elevation: Dp = 2.dp, url: Stri
             contentScale = ContentScale.Crop,
             error = painterResource(id = R.drawable.error_image_generic),
             fallback = painterResource(id = R.drawable.person_place_holder),
-
-            )
+        )
     }
 
 }

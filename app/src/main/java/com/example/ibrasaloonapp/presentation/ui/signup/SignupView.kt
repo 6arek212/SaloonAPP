@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,10 +34,8 @@ import com.example.ibrasaloonapp.domain.model.OPT4Digits
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
-import com.example.ibrasaloonapp.presentation.components.CommonOtp
-import com.example.ibrasaloonapp.presentation.components.DatePicker
-import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
-import com.example.ibrasaloonapp.presentation.components.SubTitle
+import com.example.ibrasaloonapp.presentation.components.*
+import com.example.ibrasaloonapp.presentation.theme.AppTheme
 import com.example.ibrasaloonapp.presentation.theme.Gray1
 import com.example.ibrasaloonapp.presentation.theme.Green
 import com.example.ibrasaloonapp.presentation.ui.Screen
@@ -63,6 +62,7 @@ fun SignupView(
     val uiMessage = viewModel.uiState.value.uiMessage
     val progress = viewModel.uiState.value.progressBarState
 
+    val image = viewModel.state.value.image
     val showCode = viewModel.state.value.showCode
     val verifyCode = viewModel.state.value.verifyCode
     val pagesNumber = viewModel.pagesNumber
@@ -105,6 +105,7 @@ fun SignupView(
             firstName = firstName,
             lastName = lastName,
             phone = phone,
+            imageUrl = image,
             verifyCode = verifyCode,
             birthDate = birthDate,
             firstNameError = firstNameError,
@@ -129,6 +130,13 @@ fun SignupView(
             onDone = {
                 navController.navigate(Screen.Home.route) {
                     popUpTo(Screen.Signup.route) { inclusive = true }
+                    launchSingleTop = true
+                }
+            },
+            navigateToUploadImage = {
+                navController.navigate(Screen.UploadImage.route) {
+                    launchSingleTop = true
+                    restoreState = true
                 }
             }
         )
@@ -158,7 +166,9 @@ fun Signup(
     onNextPage: () -> Unit,
     onPrevPage: () -> Unit,
     sendAuthVerification: () -> Unit,
-    onDone: () -> Unit
+    onDone: () -> Unit,
+    navigateToUploadImage: () -> Unit,
+    imageUrl: String?
 ) {
 
     val scrollState = rememberScrollState()
@@ -208,7 +218,6 @@ fun Signup(
             )
         }
 
-//        AnimatedVisibility(modifier = Modifier.weight(1f), visible = page == 2) {
 
         if (page == 2)
             PhonePage(
@@ -224,9 +233,16 @@ fun Signup(
                 verifyCode = verifyCode
             )
 
-//        }
 
-        AnimatedVisibility(modifier = Modifier.weight(1f), visible = page == 3) {
+        if (page == 3) {
+            UploadImage(
+                modifier = Modifier.weight(1f),
+                navigateToUploadImage = navigateToUploadImage,
+                imageUrl = imageUrl
+            )
+        }
+
+        AnimatedVisibility(modifier = Modifier.weight(1f), visible = page == 4) {
             DonePage(modifier = Modifier)
         }
 
@@ -245,11 +261,12 @@ fun Signup(
         Spacer(modifier = Modifier.padding(4.dp))
 
         Button(
+            contentPadding = PaddingValues(4.dp),
             modifier = Modifier.fillMaxWidth(),
             onClick = { if (page == pagesNumber) onDone() else onNextPage() }) {
             Text(
                 text = if (page < pagesNumber) "Next" else "Done",
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.body1
             )
         }
 
@@ -408,38 +425,39 @@ fun PhonePage(
 
         Spacer(modifier = Modifier.padding(8.dp))
         AnimatedVisibility(visible = !showCode) {
-            Row {
 
-                Column {
-                    OutlinedTextField(
-                        label = {
-                            Text(text = stringResource(id = R.string.phone))
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        ),
-                        onValueChange = { s ->
-                            onPhoneChange(s)
-                        },
-                        value = phone,
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(Icons.Filled.Phone, "phone")
-                        },
-                        textStyle = MaterialTheme.typography.h4
-                    )
+            Column {
+                OutlinedTextField(
+                    label = {
+                        Text(text = stringResource(id = R.string.phone))
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    onValueChange = { s ->
+                        onPhoneChange(s)
+                    },
+                    value = phone,
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(Icons.Filled.Phone, "phone")
+                    },
+                    textStyle = MaterialTheme.typography.h4
+                )
 
-                    Text(
-                        modifier = Modifier.padding(top = 2.dp),
-                        text = phoneError ?: "",
-                        color = MaterialTheme.colors.error,
-                        style = MaterialTheme.typography.body2
-                    )
-                }
+                Text(
+                    modifier = Modifier.padding(top = 2.dp),
+                    text = phoneError ?: "",
+                    color = MaterialTheme.colors.error,
+                    style = MaterialTheme.typography.body2
+                )
+
+                Spacer(modifier = Modifier.padding(4.dp))
 
                 Button(onClick = { sendAuthVerification() }) {
                     Text(text = "Verify")
+
                 }
             }
         }
@@ -501,26 +519,45 @@ fun DonePage(modifier: Modifier = Modifier) {
 }
 
 
-//@Composable
-//@Preview
-//fun SignupPreview() {
-//    AppTheme {
-//        Signup(
-//            firstName = "tarik",
-//            lastName = "husin",
-//            phone = "0525145565",
-//            birthDate = "10/06/1998",
-//            firstNameError = null,
-//            lastNameError = null,
-//            birthDateError = null,
-//            phoneError = null,
-//            onFirstNameChange = {},
-//            onLastNameChange = {},
-//            onBirthDateChange = {},
-//            onPhoneChange = {},
-//            onNextPage = {},
-//            page = 1
-//        )
-//    }
-//}
+@Composable
+fun UploadImage(
+    modifier: Modifier = Modifier,
+    imageUrl: String?,
+    navigateToUploadImage: () -> Unit,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularImage(url = imageUrl, modifier = Modifier.size(200.dp), onClick = {})
+
+        Spacer(modifier = Modifier.padding(16.dp))
+
+        Text(
+            textAlign = TextAlign.Center,
+            text = "Lets add a profile image",
+            style = MaterialTheme.typography.h2,
+            color = MaterialTheme.colors.onBackground,
+        )
+
+        Spacer(modifier = Modifier.padding(16.dp))
+
+        Button(
+            onClick = navigateToUploadImage,
+            colors = ButtonDefaults.buttonColors(backgroundColor = Gray1)
+        ) {
+            Text(text = "Click here", color = MaterialTheme.colors.onBackground)
+        }
+    }
+}
+
+
+@Composable
+@Preview
+fun SignupPreview() {
+    AppTheme {
+        UploadImage(imageUrl = null) {}
+    }
+}
 
