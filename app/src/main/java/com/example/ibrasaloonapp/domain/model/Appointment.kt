@@ -12,7 +12,7 @@ data class Appointment(
     val startTime: String,
     val endTime: String,
     val isActive: Boolean,
-    val customer: String? = null,
+    val customer: User? = null,
     val worker: User
 ) : Parcelable {
 }

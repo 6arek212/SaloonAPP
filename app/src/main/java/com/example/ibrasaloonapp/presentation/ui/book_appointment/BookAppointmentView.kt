@@ -286,9 +286,9 @@ fun PickService(
                         text = ser.value,
                         onClick = {
                             onTriggerEvent(
-                                BookAppointmentEvent.OnSelectedService(ser.value)
+                                BookAppointmentEvent.OnSelectedService(ser.key)
                             )
-                        }, isSelected = ser.value == selectedService
+                        }, isSelected = ser.key == selectedService
                     )
                 }
             }

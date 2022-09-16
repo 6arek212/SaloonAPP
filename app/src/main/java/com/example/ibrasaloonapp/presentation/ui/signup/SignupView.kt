@@ -194,7 +194,7 @@ fun Signup(
                 }
                 Spacer(modifier = Modifier.padding(4.dp))
             }
-            SubTitle(text = "Signup")
+            SubTitle(text = stringResource(R.string.signup))
         }
 
 

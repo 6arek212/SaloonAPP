@@ -9,10 +9,10 @@ data class AppointmentDto(
     val id: String,
 
     @SerializedName("customer")
-    val customer: String? = null,
+    val customer: UserDto? = null,
 
     @SerializedName("worker")
-    val worker: User,
+    val worker: UserDto,
 
     @SerializedName("service")
     val service: String? = null,

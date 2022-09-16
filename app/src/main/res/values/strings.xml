@@ -76,6 +76,7 @@
     <string name="click_image_above_and_pick_an_image">Click the image above and pick an image</string>
     <string name="upload">Upload</string>
     <string name="booked">Booked</string>
+    <string name="signup">Signup</string>
 
 
 </resources>

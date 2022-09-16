@@ -37,24 +37,24 @@ constructor(
 
         return Appointment(
             id = model.id ?: "",
-            customer = model.customer,
+            customer = model.customer?.let { customerMapper.mapToDomainModel(it) },
             isActive = model.isActive,
             service = service,
             startTime = model.startTime,
             endTime = model.endTime,
-            worker = model.worker
+            worker = customerMapper.mapToDomainModel(model.worker)
         )
     }
 
     override fun mapFromDomainModel(domainModel: Appointment): AppointmentDto {
         return AppointmentDto(
             id = domainModel.id,
-            customer = domainModel.customer,
+            customer = domainModel.customer?.let { customerMapper.mapFromDomainModel(it) },
             isActive = domainModel.isActive,
             service = domainModel.service?.value,
             startTime = domainModel.startTime,
             endTime = domainModel.endTime,
-            worker = domainModel.worker
+            worker = customerMapper.mapFromDomainModel(domainModel.worker)
         )
     }
 

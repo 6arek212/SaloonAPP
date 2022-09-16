@@ -15,7 +15,6 @@ import com.example.ibrasaloonapp.network.model.BookAppointmentDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
-import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
 import com.example.ibrasaloonapp.ui.CustomString
 import com.example.trainingapp.network.NetworkErrors

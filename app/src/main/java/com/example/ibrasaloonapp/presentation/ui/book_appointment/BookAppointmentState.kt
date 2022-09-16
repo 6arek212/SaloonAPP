@@ -4,7 +4,6 @@ import android.os.Parcelable
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.User
 import kotlinx.parcelize.Parcelize
-import java.util.*
 
 data class BookAppointmentState(
     val workers: List<User> = listOf(),
@@ -20,7 +19,7 @@ data class BookAppointmentState(
 }
 
 @Parcelize
-sealed class ServiceType(val name: String, val value: String) : Parcelable {
-    class HairCut(val n: String, val v: String) : ServiceType(name = n, value = v)
+sealed class ServiceType(val key: String, val value: String) : Parcelable {
+    class HairCut(val n: String, val v: String) : ServiceType(key = n, value = v)
 }
 

@@ -28,6 +28,7 @@ constructor(
 
 
     override suspend fun getUserId(): String? {
+        Log.d(TAG, "getUserId: ${userId.value}")
         return userId.value
     }
 
