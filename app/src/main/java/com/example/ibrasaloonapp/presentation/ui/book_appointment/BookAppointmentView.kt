@@ -28,7 +28,6 @@ import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.User
-import com.example.ibrasaloonapp.domain.model.WorkingDate
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
@@ -52,6 +51,7 @@ fun BookAppointmentView(
     val workingDates = viewModel.state.value.workingDates
     val services = viewModel.state.value.services
     val availableAppointments = viewModel.state.value.availableAppointments
+    val userId = mainViewModel.state.value.authData?.user?.id
 
     val selectedWorker = viewModel.state.value.selectedWorker
     val selectedWorkingDate = viewModel.state.value.selectedWorkingDate
@@ -262,7 +262,7 @@ fun PickAppointment(
 
 @Composable
 fun PickService(
-    selectedWorkingDate: WorkingDate?,
+    selectedWorkingDate: String?,
     services: List<ServiceType>,
     onTriggerEvent: (BookAppointmentEvent) -> Unit,
     selectedService: String
@@ -283,12 +283,12 @@ fun PickService(
             ) {
                 items(items = services) { ser ->
                     CustomChip(
-                        text = ser.t,
+                        text = ser.value,
                         onClick = {
                             onTriggerEvent(
-                                BookAppointmentEvent.OnSelectedService(ser.t)
+                                BookAppointmentEvent.OnSelectedService(ser.value)
                             )
-                        }, isSelected = ser.t == selectedService
+                        }, isSelected = ser.value == selectedService
                     )
                 }
             }
@@ -299,9 +299,9 @@ fun PickService(
 @Composable
 fun PickDay(
     selectedWorker: User?,
-    workingDates: List<WorkingDate>,
+    workingDates: List<String>,
     onTriggerEvent: (BookAppointmentEvent) -> Unit,
-    selectedWorkingDate: WorkingDate?
+    selectedWorkingDate: String?
 ) {
 
     AnimatedVisibility(visible = selectedWorker != null) {
@@ -320,7 +320,7 @@ fun PickDay(
                 items(items = workingDates) { workingDate ->
                     CustomChip(
                         text = stringDateFormat(
-                            workingDate.date,
+                            workingDate,
                             TimePatterns.DATE_MM_DD,
                             LocalContext.current
                         ),
@@ -458,7 +458,7 @@ fun BookAppointmentConfirmation(
 
         Button(
             modifier = Modifier,
-            onClick = { onBook() },
+            onClick = onBook,
             shape = MaterialTheme.shapes.small,
             contentPadding = PaddingValues(vertical = 8.dp, horizontal = 34.dp)
         ) {

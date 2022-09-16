@@ -1,20 +1,45 @@
 package com.example.ibrasaloonapp.network.model
 
+import android.app.Application
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.util.DomainMapper
+import com.example.ibrasaloonapp.presentation.ui.book_appointment.ServiceType
 import javax.inject.Inject
+
+
+const val HAIR_CUT = "Hair cut"
+const val Wax = "Wax"
+
 
 class AppointmentDtoMapper
 @Inject
 constructor(
+    private val context: Application,
     private val customerMapper: UserDtoMapper
 ) : DomainMapper<AppointmentDto, Appointment> {
     override fun mapToDomainModel(model: AppointmentDto): Appointment {
+
+        val service = model.service?.let {
+            when (it) {
+                HAIR_CUT -> {
+                    ServiceType.HairCut(model.service, context.getString(R.string.hair_cut))
+                }
+
+                Wax -> {
+                    ServiceType.HairCut(model.service, context.getString(R.string.wax))
+                }
+                else -> {
+                    ServiceType.HairCut(it, it)
+                }
+            }
+        }
+
         return Appointment(
             id = model.id ?: "",
             customer = model.customer,
             isActive = model.isActive,
-            service = model.service,
+            service = service,
             startTime = model.startTime,
             endTime = model.endTime,
             worker = model.worker
@@ -26,7 +51,7 @@ constructor(
             id = domainModel.id,
             customer = domainModel.customer,
             isActive = domainModel.isActive,
-            service = domainModel.service,
+            service = domainModel.service?.value,
             startTime = domainModel.startTime,
             endTime = domainModel.endTime,
             worker = domainModel.worker

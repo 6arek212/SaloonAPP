@@ -5,19 +5,16 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.core.domain.ProgressBarState
-import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.presentation.BaseViewModel
-import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
-import com.example.ibrasaloonapp.presentation.ui.login.LoginEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
+import com.example.ibrasaloonapp.ui.defaultErrorMessage
+import com.example.trainingapp.network.NetworkErrors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,7 +35,6 @@ constructor(
     val state: State<HomeState> = _state
 
 
-
     fun onTriggerEvent(event: HomeEvent) {
         viewModelScope.launch {
             when (event) {
@@ -46,17 +42,15 @@ constructor(
                     loading(true)
                     if (event.isAuthed) {
                         getAppointment()
+                    } else {
+                        _state.value = _state.value.copy(
+                            appointment = null,
+                            showLoginDialog = false,
+                            refreshing = false
+                        )
                     }
                     getWorkers()
                     loading(false)
-                }
-
-                is HomeEvent.Rest -> {
-                    _state.value = _state.value.copy(
-                        appointment = null,
-                        showLoginDialog = false,
-                        refreshing = false
-                    )
                 }
 
 
@@ -69,7 +63,7 @@ constructor(
                 }
 
                 is HomeEvent.OnRemoveHeadFromQueue -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
 
                 is HomeEvent.GetAppointment -> {
@@ -113,10 +107,10 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
 
@@ -126,7 +120,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)
@@ -150,19 +144,20 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
-                        title = "Error",
-                        description = result.errorMessage
+                        title = context.getString(R.string.error),
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
+
                 if (result.code == 401) {
                     sendUiEvent(MainUIEvent.Logout)
                 }
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)

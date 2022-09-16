@@ -14,7 +14,7 @@ interface AppointmentRepository {
     suspend fun unbookAppointment(id: String): ApiResult<String>
 
     suspend fun getAvailableAppointments(
-        workingDateId: String,
+        workingDate: String,
         workerId: String
     ): ApiResult<List<Appointment>>
 

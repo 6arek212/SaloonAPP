@@ -1,24 +1,17 @@
 package com.example.ibrasaloonapp.repository
 
-import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.datastore.preferences.core.edit
-import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.services.AuthService
-import com.example.ibrasaloonapp.presentation.AuthState
-import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import com.example.ibrasaloonapp.ui.*
 import com.example.trainingapp.util.safeApiCall
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 private const val TAG = "AuthRepositoryImpl"
@@ -29,10 +22,14 @@ constructor(
     private val application: Context,
     private val authService: AuthService,
     private val authDataDtoMapper: AuthDataDtoMapper,
-    private val authState: AuthState,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val userId: CustomString
 ) : AuthRepository {
 
+
+    override suspend fun getUserId(): String? {
+        return userId.value
+    }
 
     override suspend fun getLoginStatus(): AuthData? {
         val authData = application.dataStore.data.first().getAuthData()
@@ -40,6 +37,7 @@ constructor(
             if (it.token.isEmpty()) {
                 return null
             }
+            userId.value = it.user.id
         }
         return authData
     }
@@ -68,6 +66,7 @@ constructor(
                 application.dataStore.edit { settings ->
                     settings.insertAuthData(result.value)
                 }
+                userId.value = result.value.user.id
                 ApiResult.Success(result.value)
             }
 
@@ -87,6 +86,7 @@ constructor(
 
 
     override suspend fun logout() {
+        userId.value = null
         application.dataStore.edit { settings ->
             settings.clearAuthData()
         }
@@ -105,6 +105,7 @@ constructor(
                 application.dataStore.edit { settings ->
                     settings.insertAuthData(result.value)
                 }
+                userId.value = result.value.user.id
                 ApiResult.Success(result.value)
             }
 

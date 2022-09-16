@@ -60,7 +60,19 @@
     <string name="network_available">רשת זמינה , נסה לרענן עכשיו</string>
     <string name="network_not_available">אין חיבור לרשת</string>
     <string name="user_with_number_was_not_found">לא  נמצא לקוח עם מספר זה</string>
-    <string name="bad_request">מהשן השתבש נסה שוב</string>
+    <string name="bad_request">מהשו השתבש נסה שוב</string>
     <string name="verification_timeout_try_again">הקוד פג תוקף , נסה שוב</string>
     <string name="code_not_match">הקוד לא נכון</string>
+    <string name="not_authorized">אין לך הרשאה , נסה לכנס שוב</string>
+    <string name="the_appointment_has_been_booked">התור הוזמן</string>
+    <string name="you_already_have_an_appointment">יש לך תור פעיל</string>
+    <string name="appointment_has_already_been_booked">התור נקבע ע\"י מישהו אחר</string>
+    <string name="not_found">לא נמצא</string>
+    <string name="your_appointment_has_been_unbooked">התור בוטל</string>
+    <string name="you_have_to_click_the_image_above_and_select_a_new_image">לחץ על התמונה למעלה ובחר תמונה חדשה</string>
+    <string name="you_did_not_pick_an_image">לא בחרת תמונה</string>
+    <string name="upload_image">העלה תמונה</string>
+    <string name="click_image_above_and_pick_an_image">לחץ על התמונה למעלה ובחר תמונה חדשה</string>
+    <string name="upload">העלה</string>
+    <string name="booked">" הוזמן"</string>
 </resources>

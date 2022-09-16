@@ -12,6 +12,8 @@ import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.UserRepository
+import com.example.ibrasaloonapp.ui.defaultErrorMessage
+import com.example.trainingapp.network.NetworkErrors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -41,7 +43,7 @@ constructor(
         viewModelScope.launch {
             when (event) {
                 is UploadImageEvent.OnRemoveUIComponent -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
 
                 is UploadImageEvent.OnSelectedImage -> {
@@ -63,10 +65,10 @@ constructor(
         val uri = _uploadState.value.imageUri
 
         if (st == null || uri == null) {
-            appendToMessageQueue(
+            sendMessage(
                 UIComponent.Dialog(
-                    title = "You did not pick an image !",
-                    description = "you have to click the image above and select a new image"
+                    title = context.getString(R.string.you_did_not_pick_an_image),
+                    description = context.getString(R.string.you_have_to_click_the_image_above_and_select_a_new_image)
                 )
             )
             return
@@ -85,10 +87,11 @@ constructor(
                 _events.send(UploadUIEvent.ImageUploaded(result.value))
             }
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+
+                sendMessage(
                     UIComponent.Dialog(
-                        title = "Error",
-                        description = result.errorMessage
+                        title = context.getString(R.string.error),
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
                 if (result.code == 401) {
@@ -97,7 +100,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)

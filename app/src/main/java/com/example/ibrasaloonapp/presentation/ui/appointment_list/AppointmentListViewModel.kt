@@ -1,20 +1,18 @@
 package com.example.ibrasaloonapp.presentation.ui.appointment_list
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.core.domain.ProgressBarState
-import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
+import com.example.ibrasaloonapp.ui.defaultErrorMessage
+import com.example.trainingapp.network.NetworkErrors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,7 +48,7 @@ constructor(
                     getAppointments()
                 }
                 is AppointmentListEvent.OnRemoveHeadFromQueue -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
                 is AppointmentListEvent.UnBookAppointment -> {
                     unbook(id = event.id, index = event.index)
@@ -69,10 +67,11 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+
+                sendMessage(
                     UIComponent.Dialog(
-                        title = "Error",
-                        description = result.errorMessage
+                        title = context.getString(R.string.error),
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
                 if (result.code == 401) {
@@ -81,7 +80,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)
@@ -102,19 +101,20 @@ constructor(
                 val list = ArrayList(_state.value.appointments)
                 list.removeAt(index)
                 _state.value = _state.value.copy(appointments = list)
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
-                        title = "Unbooked",
-                        description = "You'r appointment has been unbooked"
+                        title = context.getString(R.string.unbook),
+                        description = context.getString(R.string.your_appointment_has_been_unbooked)
+
                     )
                 )
             }
 
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
-                        title = "Error",
-                        description = result.errorMessage
+                        title = context.getString(R.string.error),
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
                 if (result.code == 401) {
@@ -123,7 +123,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)

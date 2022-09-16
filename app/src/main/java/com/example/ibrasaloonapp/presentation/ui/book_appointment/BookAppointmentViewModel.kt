@@ -5,13 +5,9 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.core.domain.ProgressBarState
-import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
-import com.example.ibrasaloonapp.core.getCurrentDateAsString
 import com.example.ibrasaloonapp.core.getDateAsString
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
@@ -19,7 +15,10 @@ import com.example.ibrasaloonapp.network.model.BookAppointmentDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
+import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
+import com.example.ibrasaloonapp.ui.CustomString
+import com.example.trainingapp.network.NetworkErrors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -36,6 +35,7 @@ constructor(
     private val repository: AppointmentRepository,
     private val workerRepository: WorkerRepository,
     private val validateRequired: ValidateRequired,
+    private val userId: CustomString,
     private val application: Application
 ) : BaseViewModel() {
 
@@ -113,7 +113,7 @@ constructor(
                 }
 
                 is BookAppointmentEvent.OnRemoveHeadFromQueue -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
             }
         }
@@ -139,10 +139,26 @@ constructor(
 
             is ApiResult.GenericError -> {
                 Log.d(TAG, "GenericError: ${result.errorMessage}")
-                appendToMessageQueue(
+
+                val message = when (result.code) {
+
+                    NetworkErrors.ERROR_400 -> {
+                        context.getString(R.string.bad_request)
+                    }
+
+                    NetworkErrors.ERROR_401 -> {
+                        context.getString(R.string.not_authorized)
+                    }
+
+                    else -> {
+                        context.getString(R.string.something_went_wrong)
+                    }
+                }
+
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = message
                     )
                 )
                 if (result.code == 401) {
@@ -151,7 +167,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)
@@ -178,10 +194,26 @@ constructor(
 
             is ApiResult.GenericError -> {
                 Log.d(TAG, "GenericError: ${result.errorMessage}")
-                appendToMessageQueue(
+
+                val message = when (result.code) {
+
+                    NetworkErrors.ERROR_400 -> {
+                        context.getString(R.string.bad_request)
+                    }
+
+                    NetworkErrors.ERROR_401 -> {
+                        context.getString(R.string.not_authorized)
+                    }
+
+                    else -> {
+                        context.getString(R.string.something_went_wrong)
+                    }
+                }
+
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = message
                     )
                 )
                 if (result.code == 401) {
@@ -190,7 +222,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)
@@ -214,7 +246,7 @@ constructor(
         loading(true)
 
         val result = repository.getAvailableAppointments(
-            workingDate.id,
+            workingDate,
             workerId
         )
 
@@ -226,10 +258,27 @@ constructor(
 
             is ApiResult.GenericError -> {
                 Log.d(TAG, "GenericError: ${result.errorMessage}")
-                appendToMessageQueue(
+
+                val message = when (result.code) {
+
+                    NetworkErrors.ERROR_400 -> {
+                        context.getString(R.string.bad_request)
+                    }
+
+                    NetworkErrors.ERROR_401 -> {
+                        context.getString(R.string.not_authorized)
+                    }
+
+                    else -> {
+                        context.getString(R.string.something_went_wrong)
+                    }
+                }
+
+
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = message
                     )
                 )
                 if (result.code == 401) {
@@ -238,7 +287,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)
@@ -268,20 +317,20 @@ constructor(
 
 
     private suspend fun book() {
-        val worker = _state.value.selectedWorker
         val service = _state.value.selectedService
         val appointment = _state.value.selectedAppointment
+        val userId = userId.value ?: return
 
-        if (appointment == null || worker == null || service.isBlank())
+        if (appointment == null  || service.isBlank())
             return
 
         loading(true)
 
         val appointmentDTO =
             BookAppointmentDto(
-                workerId = worker.id,
                 service = service,
-                appointmentId = appointment.id
+                appointmentId = appointment.id,
+                userId = userId
             )
 
         val result = repository.bookAppointment(appointmentDTO)
@@ -297,20 +346,39 @@ constructor(
                     services = listOf(),
                     availableAppointments = listOf(),
                 )
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
-                        title = "Booked",
-                        description = "the appointment has been booked"
+                        title = context.getString(R.string.booked),
+                        description = context.getString(R.string.the_appointment_has_been_booked)
                     )
                 )
                 _events.send(BookAppointmentUIEvent.OnBookAppointment(result.value))
             }
             is ApiResult.GenericError -> {
                 Log.d(TAG, "GenericError: ${result.errorMessage}")
-                appendToMessageQueue(
+                val message = when (result.code) {
+
+                    NetworkErrors.ERROR_400 -> {
+                        when (result.genericCode) {
+                            1 -> context.getString(R.string.you_already_have_an_appointment)
+                            2 -> context.getString(R.string.appointment_has_already_been_booked)
+                            else -> context.getString(R.string.bad_request)
+                        }
+                    }
+
+                    NetworkErrors.ERROR_401 -> {
+                        context.getString(R.string.not_authorized)
+                    }
+
+                    else -> {
+                        context.getString(R.string.something_went_wrong)
+                    }
+                }
+
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = message
                     )
                 )
                 if (result.code == 401) {
@@ -319,7 +387,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)

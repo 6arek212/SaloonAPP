@@ -18,6 +18,8 @@ interface AuthRepository {
 
     suspend fun getLoginStatus(): AuthData?
 
+    suspend fun getUserId(): String?
+
     suspend fun logout()
 
     suspend fun refreshToken(): String?

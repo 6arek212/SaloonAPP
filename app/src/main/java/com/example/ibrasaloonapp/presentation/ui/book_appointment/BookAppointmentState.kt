@@ -1,27 +1,26 @@
 package com.example.ibrasaloonapp.presentation.ui.book_appointment
 
-import com.example.ibrasaloonapp.core.getCurrentDateAsString
-import com.example.ibrasaloonapp.core.domain.ProgressBarState
-import com.example.ibrasaloonapp.core.domain.Queue
-import com.example.ibrasaloonapp.core.domain.UIComponent
+import android.os.Parcelable
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.User
-import com.example.ibrasaloonapp.domain.model.WorkingDate
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
 data class BookAppointmentState(
     val workers: List<User> = listOf(),
-    val workingDates: List<WorkingDate> = listOf(),
+    val workingDates: List<String> = listOf(),
     val services: List<ServiceType> = listOf(),
     val availableAppointments: List<Appointment> = listOf(),
 
     val selectedWorker: User? = null,
-    val selectedWorkingDate: WorkingDate? = null,
+    val selectedWorkingDate: String? = null,
     val selectedService: String = "",
     val selectedAppointment: Appointment? = null
 ) {
 }
 
-sealed class ServiceType(val v: String, val t: String) {
-    class HairCut(val name: String, val value: String) : ServiceType(v = name, t = value)
+@Parcelize
+sealed class ServiceType(val name: String, val value: String) : Parcelable {
+    class HairCut(val n: String, val v: String) : ServiceType(name = n, value = v)
 }
+

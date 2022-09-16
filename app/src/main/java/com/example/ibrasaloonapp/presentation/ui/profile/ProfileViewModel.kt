@@ -3,7 +3,6 @@ package com.example.ibrasaloonapp.presentation.ui.profile
 
 import android.app.Application
 import android.util.Log
-import android.webkit.MimeTypeMap
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -14,16 +13,11 @@ import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
-import com.example.ibrasaloonapp.presentation.ui.upload.UploadImageState
 import com.example.ibrasaloonapp.repository.UserRepository
+import com.example.ibrasaloonapp.ui.defaultErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.io.InputStream
 import javax.inject.Inject
-import kotlin.math.log
 
 
 private const val TAG = "ProfileViewModel"
@@ -51,7 +45,7 @@ constructor(
         viewModelScope.launch {
             when (event) {
                 is ProfileEvent.OnRemoveUIComponent -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
                 is ProfileEvent.UpdateImage -> {
                     val user = _state.value.user?.copy(image = event.imagePath)
@@ -79,10 +73,10 @@ constructor(
                 _state.value = _state.value.copy(user = result.value)
             }
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = "Error",
-                        description = result.errorMessage
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
                 if (result.code == 401) {
@@ -91,7 +85,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)

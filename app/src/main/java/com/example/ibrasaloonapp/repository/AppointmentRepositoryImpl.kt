@@ -6,6 +6,7 @@ import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.services.AppointmentService
+import com.example.ibrasaloonapp.ui.CustomString
 import com.example.trainingapp.util.safeApiCall
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,11 @@ constructor(
         appointment: BookAppointmentDto
     ): ApiResult<Appointment> {
         return safeApiCall(dispatcher = dispatcher) {
-            mapper.mapToDomainModel(service.bookAppointment(appointment).appointment)
+            mapper.mapToDomainModel(
+                service.bookAppointment(
+                    data = appointment
+                ).appointment
+            )
         }
     }
 
@@ -52,13 +57,13 @@ constructor(
 
 
     override suspend fun getAvailableAppointments(
-        workingDateId: String,
+        workingDate: String,
         workerId: String
     ): ApiResult<List<Appointment>> {
         return safeApiCall(dispatcher = dispatcher) {
             mapper.toDomainList(
                 service.getAvailableAppointments(
-                    workingDateId = workingDateId,
+                    workingDate = workingDate,
                     workerId = workerId
                 ).availableAppointments
             )

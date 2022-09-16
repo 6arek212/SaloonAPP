@@ -4,18 +4,11 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.utils.ConnectivityObserver
-import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -60,7 +53,7 @@ constructor(
                 }
 
                 is MainEvent.ShowLogoutDialog -> {
-                    appendToMessageQueue(
+                    sendMessage(
                         UIComponent.Dialog(
                             title = "Logout",
                             "Are you sure you want to logout?",
@@ -70,7 +63,7 @@ constructor(
                 }
 
                 is MainEvent.RemoveMessage -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
 
             }

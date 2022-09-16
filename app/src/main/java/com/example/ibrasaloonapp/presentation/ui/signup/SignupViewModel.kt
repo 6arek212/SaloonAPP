@@ -12,13 +12,12 @@ import com.example.ibrasaloonapp.domain.model.OPT4Digits
 import com.example.ibrasaloonapp.domain.use_case.ValidatePhoneNumber
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
-import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.network.model.SignupDataDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.ui.login.CodeDigitPlace
-import com.example.ibrasaloonapp.presentation.ui.login.LoginEvent
 import com.example.ibrasaloonapp.repository.AuthRepository
+import com.example.ibrasaloonapp.ui.defaultErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -129,7 +128,7 @@ constructor(
                 }
 
                 is SignupEvent.OnRemoveHeadFromQueue -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
             }
 
@@ -178,10 +177,10 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
 
@@ -189,7 +188,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)
@@ -261,24 +260,24 @@ constructor(
             }
 
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
-                        description = result.errorMessage
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
 
-                _state.value = _state.value.copy(verifyCode = OPT4Digits("", "", "", ""))
+                _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)
                     )
                 )
-                _state.value = _state.value.copy(verifyCode = OPT4Digits("", "", "", ""))
+                _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
             }
         }
 

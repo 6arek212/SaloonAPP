@@ -64,6 +64,18 @@
     <string name="bad_request">Bad requst , try again</string>
     <string name="verification_timeout_try_again">Verification timeout try again</string>
     <string name="code_not_match">Code not match</string>
+    <string name="not_authorized">Your not authorized try to login again</string>
+    <string name="the_appointment_has_been_booked">the appointment has been booked</string>
+    <string name="you_already_have_an_appointment">You already have an appointment</string>
+    <string name="appointment_has_already_been_booked">Appointment has already been booked</string>
+    <string name="not_found">Not found</string>
+    <string name="your_appointment_has_been_unbooked">You\'r appointment has been unbooked</string>
+    <string name="you_have_to_click_the_image_above_and_select_a_new_image">you have to click the image above and select a new image</string>
+    <string name="you_did_not_pick_an_image">You did not pick an image !</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="click_image_above_and_pick_an_image">Click the image above and pick an image</string>
+    <string name="upload">Upload</string>
+    <string name="booked">Booked</string>
 
 
 </resources>

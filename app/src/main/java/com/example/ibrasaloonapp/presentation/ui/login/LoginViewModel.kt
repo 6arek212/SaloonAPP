@@ -5,30 +5,22 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.core.domain.ProgressBarState
-import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
-import com.example.ibrasaloonapp.core.getCurrentDateAsString
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
-import com.example.ibrasaloonapp.domain.use_case.ValidatePassword
 import com.example.ibrasaloonapp.domain.use_case.ValidatePhoneNumber
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
-import com.example.ibrasaloonapp.presentation.MainUIEvent
-import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentEvent
 import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.trainingapp.network.NetworkErrors.ERROR_400
 import com.example.trainingapp.network.NetworkErrors.ERROR_403
 import com.example.trainingapp.network.NetworkErrors.ERROR_404
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -122,7 +114,7 @@ constructor(
                 }
 
                 is LoginEvent.OnRemoveHeadFromQueue -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
 
 
@@ -180,7 +172,7 @@ constructor(
                 }
 
 
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = message
@@ -189,7 +181,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)
@@ -262,7 +254,7 @@ constructor(
                     }
                 }
 
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = message
@@ -273,7 +265,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)

@@ -6,6 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
@@ -38,31 +39,18 @@ open class BaseViewModel : ViewModel() {
         }
     }
 
+
     protected fun sendUiEvent(uiEvent: MainUIEvent) {
         viewModelScope.launch {
             _uiEvents.send(uiEvent)
         }
     }
 
-    protected fun appendToMessageQueue(uiComponent: UIComponent) {
-//        val queue = _uiState.value.errorMessage
-//        queue.add(uiComponent)
-//        _uiState.value = _uiState.value.copy(errorMessage = Queue(mutableListOf())) // force recompose
-//        _uiState.value = _uiState.value.copy(errorMessage = queue)
-
+    protected fun sendMessage(uiComponent: UIComponent) {
         _uiState.value = _uiState.value.copy(uiMessage = uiComponent)
     }
 
-    protected fun removeHeadMessage() {
-//        try {
-//            val queue = _uiState.value.errorMessage
-//            queue.remove() // can throw exception if empty
-//            _uiState.value =
-//                _uiState.value.copy(errorMessage = Queue(mutableListOf())) // force recompose
-//            _uiState.value = _uiState.value.copy(errorMessage = queue)
-//        } catch (e: Exception) {
-//            Log.d(TAG, "removeHeadMessage: Nothing to remove from DialogQueue")
-//        }
+    protected fun removeMessage() {
         _uiState.value = _uiState.value.copy(uiMessage = null)
 
     }

@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.presentation.components.CircularImage
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
@@ -127,7 +129,7 @@ fun UploadImage(
                 color = MaterialTheme.colors.primary,
                 progressColor = MaterialTheme.colors.background
             ) {
-                Text(text = "Upload", style = MaterialTheme.typography.body1)
+                Text(text = stringResource(R.string.upload), style = MaterialTheme.typography.body1)
             }
         }
     }
@@ -199,7 +201,7 @@ fun UploadImageTop(
 
         Text(
             textAlign = TextAlign.Center,
-            text = "Upload Image",
+            text = stringResource(R.string.upload_image),
             style = MaterialTheme.typography.h3,
             color = MaterialTheme.colors.onBackground,
             fontSize = 40.sp
@@ -207,7 +209,7 @@ fun UploadImageTop(
 
         Text(
             textAlign = TextAlign.Center,
-            text = "Click the image above and pick an image",
+            text = stringResource(R.string.click_image_above_and_pick_an_image),
             style = MaterialTheme.typography.body2,
             color = Black4
         )

@@ -15,6 +15,7 @@ import com.example.ibrasaloonapp.network.model.UserUpdateDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.UserRepository
+import com.example.ibrasaloonapp.ui.defaultErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -81,7 +82,7 @@ constructor(
                 }
 
                 is EditProfileEvent.OnRemoveHeadFromQueue -> {
-                    removeHeadMessage()
+                    removeMessage()
                 }
             }
         }
@@ -106,7 +107,7 @@ constructor(
             is ApiResult.Success -> {
                 Log.d(TAG, "updateProfile: updated")
                 _events.send(UIEvent.UpdateUser(result.value))
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = "Updated",
                         "You'r profile has been updated !"
@@ -114,10 +115,10 @@ constructor(
                 )
             }
             is ApiResult.GenericError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = "Error",
-                        description = result.errorMessage
+                        description = result.code.defaultErrorMessage(context)
                     )
                 )
                 if (result.code == 401) {
@@ -126,7 +127,7 @@ constructor(
             }
 
             is ApiResult.NetworkError -> {
-                appendToMessageQueue(
+                sendMessage(
                     UIComponent.Dialog(
                         title = context.getString(R.string.error),
                         description = context.getString(R.string.something_went_wrong)

@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -80,13 +81,6 @@ fun AppointmentCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Text(
-                    text = "${appointment.service}",
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSurface
-                )
-
-
 
                 Text(
                     text = "${
@@ -107,19 +101,32 @@ fun AppointmentCard(
                 )
 
 
-
+                Text(
+                    text = "${stringResource(id = R.string.for_a)} ${appointment.service?.value}",
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colors.onSurface
+                )
 
                 Spacer(modifier = Modifier.padding(8.dp))
 
 
-                ImageChip(
-                    modifier = Modifier,
-                    text = appointment.worker.firstName +
-                            " ${appointment.worker.lastName}",
-                    url = appointment.worker.image,
-                    onClick = { /*TODO*/ },
-                    isSelected = true
-                )
+                Row() {
+                    Text(
+                        text = stringResource(id = R.string.with),
+                        style = MaterialTheme.typography.h6,
+                        textAlign = TextAlign.Center
+                    )
+
+                    ImageChip(
+                        modifier = Modifier,
+                        text = appointment.worker.firstName +
+                                " ${appointment.worker.lastName}",
+                        url = appointment.worker.image,
+                        onClick = { /*TODO*/ },
+                        isSelected = true
+                    )
+                }
+
             }
 
 

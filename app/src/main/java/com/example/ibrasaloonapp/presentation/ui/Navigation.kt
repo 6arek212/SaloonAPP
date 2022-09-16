@@ -170,7 +170,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
             NavHost(
                 modifier = Modifier.padding(it),
                 navController = navController,
-                startDestination = Screen.Home.route
+                startDestination = Screen.Splash.route
             ) {
                 splash(navController = navController)
                 login(navController = navController)
@@ -371,6 +371,7 @@ fun NavGraphBuilder.uploadImage(
             .previousBackStackEntry?.let {
                 hiltViewModel(it)
             }
+
 
         UploadImageView(
             navController = navController,

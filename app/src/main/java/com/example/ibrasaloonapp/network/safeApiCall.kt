@@ -25,39 +25,34 @@ suspend fun <T> safeApiCall(
 ): ApiResult<T> {
     return withContext(dispatcher) {
         try {
-            // throws TimeoutCancellationException
             withTimeout(NETWORK_TIMEOUT) {
                 ApiResult.Success(apiCall.invoke())
             }
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
             when (throwable) {
-//                is Code400Exception -> {
-//                    ApiResult.GenericError(throwable.code, throwable.message ?: "")
-//                }
-
                 is TimeoutCancellationException -> {
                     val code = 408 // timeout error code
-                    ApiResult.GenericError(code, NETWORK_ERROR_TIMEOUT)
+                    ApiResult.GenericError(code = code, errorMessage = NETWORK_ERROR_TIMEOUT)
                 }
-
                 is IOException -> {
                     ApiResult.NetworkError
                 }
                 is HttpException -> {
                     val code = throwable.code()
-                    val errorResponse = convertErrorBody(throwable)
-                    Log.d(TAG, "HttpException ${errorResponse}")
+                    val (message, errorCode) = convertErrorBody(throwable)
+                    Log.d(TAG, "code: ${code} HttpException: ${message} errorCode: ${errorCode}")
                     ApiResult.GenericError(
-                        code,
-                        errorResponse ?: ""
+                        code = code,
+                        genericCode = errorCode,
+                        errorMessage = message ?: ""
                     )
                 }
                 else -> {
                     Log.d(TAG, "safeApiCall: $NETWORK_ERROR_UNKNOWN")
                     ApiResult.GenericError(
-                        null,
-                        NETWORK_ERROR_UNKNOWN
+                        code = null,
+                        errorMessage = NETWORK_ERROR_UNKNOWN
                     )
                 }
             }
@@ -66,18 +61,15 @@ suspend fun <T> safeApiCall(
 }
 
 
-//class Code400Exception(message: String? = "SOME KIND OF ERROR 400-499", val code: Int) :
-//    IOException(message) {
-//}
-
-
-private fun convertErrorBody(throwable: HttpException): String? {
+private fun convertErrorBody(throwable: HttpException): Pair<String?, Int?> {
     return try {
         throwable.response()?.errorBody()?.string()?.let {
-            JSONObject(it).getString("message")
+            Log.d(TAG, "convertErrorBody: ${it} ${ JSONObject(it).getInt("errorCode")}")
+           return Pair(JSONObject(it).getString("message"), JSONObject(it).getInt("errorCode"))
         }
+        Pair(ERROR_UNKNOWN, null)
     } catch (exception: Exception) {
-        ERROR_UNKNOWN
+        Pair(ERROR_UNKNOWN, null)
     }
 }
 

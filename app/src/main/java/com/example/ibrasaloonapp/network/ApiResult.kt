@@ -2,12 +2,13 @@ package com.example.ibrasaloonapp.network
 
 sealed class ApiResult<out T> {
 
-    data class Success<out T>(val value: T): ApiResult<T>()
+    data class Success<out T>(val value: T) : ApiResult<T>()
 
     data class GenericError(
         val code: Int? = null,
+        val genericCode: Int? = null,
         val errorMessage: String = ""
-    ): ApiResult<Nothing>()
+    ) : ApiResult<Nothing>()
 
-    object NetworkError: ApiResult<Nothing>()
+    object NetworkError : ApiResult<Nothing>()
 }

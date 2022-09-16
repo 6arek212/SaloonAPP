@@ -45,7 +45,6 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "HomeView"
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeView(
     navController: NavController,
@@ -65,18 +64,9 @@ fun HomeView(
 
     LaunchedEffect(key1 = isLoggedIn) {
         Log.d(TAG, "HomeView: isLoggedIn ${isLoggedIn}  ${user}")
-        if (isLoggedIn) {
-            viewModel.onTriggerEvent(HomeEvent.GetData(isLoggedIn))
-        }
+        viewModel.onTriggerEvent(HomeEvent.GetData(isAuthed = isLoggedIn))
     }
 
-
-    LaunchedEffect(key1 = isLoggedIn) {
-        if (!isLoggedIn) {
-            viewModel.onTriggerEvent(HomeEvent.Rest)
-            viewModel.onTriggerEvent(HomeEvent.GetWorkers)
-        }
-    }
 
 
     LaunchedEffect(Unit) {
@@ -371,7 +361,7 @@ fun NotLoggedIn(
             contentPadding = PaddingValues(horizontal = 28.dp, vertical = 8.dp),
             border = BorderStroke(1.dp, Gray1),
             shape = MaterialTheme.shapes.large,
-            onClick = { onShowLoginDialog() },
+            onClick = onShowLoginDialog,
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent)
         ) {
 
@@ -544,16 +534,27 @@ fun Stories() {
 
         Spacer(modifier = Modifier.padding(8.dp))
 
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .horizontalScroll(scrollState)
-//        ) {
-//            StoryCard(image = R.drawable.story1)
-//            StoryCard(image = R.drawable.story2)
-//            StoryCard(image = R.drawable.story3)
-//            StoryCard(image = R.drawable.story4)
-//        }
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+
+            item {
+                StoryCard(image = R.drawable.story1)
+            }
+
+            item {
+                StoryCard(image = R.drawable.story2)
+            }
+
+            item {
+                StoryCard(image = R.drawable.story3)
+            }
+
+            item {
+                StoryCard(image = R.drawable.story4)
+            }
+        }
 
     }
 }
