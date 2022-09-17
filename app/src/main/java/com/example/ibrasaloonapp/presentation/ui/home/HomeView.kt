@@ -60,26 +60,11 @@ fun HomeView(
     val showLoginDialog = viewModel.state.value.showLoginDialog
     val uiMessage = viewModel.uiState.value.uiMessage
     val progress = viewModel.uiState.value.progressBarState
-    val events = viewModel.uiEvents
 
     LaunchedEffect(key1 = isLoggedIn) {
-        Log.d(TAG, "HomeView: isLoggedIn ${isLoggedIn}  ${user}")
         viewModel.onTriggerEvent(HomeEvent.GetData(isAuthed = isLoggedIn))
     }
 
-
-
-    LaunchedEffect(Unit) {
-        launch {
-            events.collect { event ->
-                when (event) {
-                    is MainUIEvent.Logout -> {
-                        mainViewModel.onTriggerEvent(MainEvent.Logout)
-                    }
-                }
-            }
-        }
-    }
 
 
     DefaultScreenUI(
@@ -94,18 +79,14 @@ fun HomeView(
             navController = navController,
             navigateToBookAppointment = {
                 navController.navigate(Screen.BookAppointment.route) {
-                    popUpTo(Screen.Home.route)
+                    popUpTo(Screen.Home.route){
+                        saveState = true
+                    }
+                    restoreState = true
                     launchSingleTop = true
-
                 }
             },
-            onLogin = { authData ->
-                mainViewModel.onTriggerEvent(
-                    MainEvent.Login(
-                        authData
-                    )
-                )
-            },
+
             user = user,
             appointment = appointment,
             workers = workers,
@@ -130,7 +111,7 @@ fun Home(
     navigateToBookAppointment: () -> Unit,
     onDismissLoginDialog: () -> Unit,
     onShowLoginDialog: () -> Unit,
-    onLogin: (AuthData) -> Unit,
+
     navController: NavController
 ) {
 
@@ -156,7 +137,6 @@ fun Home(
                     onDismissLoginDialog = onDismissLoginDialog,
                     onShowLoginDialog = onShowLoginDialog,
                     user = user,
-                    onLogin = onLogin,
                     isLoading = progress
                 )
             },
@@ -196,7 +176,7 @@ fun FrontLayer(
     onDismissLoginDialog: () -> Unit,
     onShowLoginDialog: () -> Unit,
     user: User?,
-    onLogin: (AuthData) -> Unit,
+
     isLoading: Boolean
 
 ) {
@@ -218,7 +198,6 @@ fun FrontLayer(
             onDismissLoginDialog = onDismissLoginDialog,
             onShowLoginDialog = onShowLoginDialog,
             user = user,
-            onLogin = onLogin,
             isLoading = isLoading
         )
 
@@ -248,7 +227,7 @@ fun Header(
     onDismissLoginDialog: () -> Unit,
     onShowLoginDialog: () -> Unit,
     user: User?,
-    onLogin: (AuthData) -> Unit,
+
     isLoading: Boolean
 ) {
 
@@ -332,7 +311,6 @@ fun Header(
                 showLoginDialog = showLoginDialog,
                 onDismissLoginDialog = onDismissLoginDialog,
                 onShowLoginDialog = onShowLoginDialog,
-                onLogin = onLogin
             )
         }
 
@@ -345,7 +323,7 @@ fun Header(
 fun NotLoggedIn(
     onShowLoginDialog: () -> Unit,
     onDismissLoginDialog: () -> Unit,
-    onLogin: (AuthData) -> Unit,
+
     showLoginDialog: Boolean,
     navController: NavController
 ) {
@@ -401,12 +379,7 @@ fun NotLoggedIn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                LoginView(
-                    navController = navController,
-                    onLoggedIn = { authData ->
-                        onDismissLoginDialog()
-                        onLogin(authData)
-                    })
+                LoginView(navController = navController)
             }
         }
 }
@@ -607,7 +580,6 @@ fun HomePreview() {
             navigateToBookAppointment = { /*TODO*/ },
             onDismissLoginDialog = { /*TODO*/ },
             onShowLoginDialog = { /*TODO*/ },
-            onLogin = {},
             navController = rememberNavController()
         )
     }

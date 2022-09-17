@@ -24,7 +24,7 @@ constructor(
 
 
         val authData = runBlocking(Dispatchers.IO) {
-            auth.get().getLoginStatus()
+            auth.get().getCacheAuthData()
         }
 
         Log.d(TAG, "intercept: ${authData}")

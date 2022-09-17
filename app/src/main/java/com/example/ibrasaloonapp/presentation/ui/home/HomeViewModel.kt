@@ -8,14 +8,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
+import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
 import com.example.ibrasaloonapp.ui.defaultErrorMessage
-import com.example.trainingapp.network.NetworkErrors
+import com.example.ibrasaloonapp.use.GetAppointmentAndWorkersUseCase
+import com.example.ibrasaloonapp.use.GetAppointmentUseCase
+import com.example.ibrasaloonapp.use.GetWorkersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,8 +35,8 @@ class HomeViewModel
 @Inject
 constructor(
     private val context: Application,
-    private val appointmentsRepository: AppointmentRepository,
-    private val workerRepository: WorkerRepository
+    private val getAppointmentUseCase: GetAppointmentUseCase,
+    private val getWorkersUseCase: GetWorkersUseCase
 ) : BaseViewModel() {
 
     private val _state: MutableState<HomeState> = mutableStateOf(HomeState())
@@ -39,18 +47,16 @@ constructor(
         viewModelScope.launch {
             when (event) {
                 is HomeEvent.GetData -> {
-                    loading(true)
-                    if (event.isAuthed) {
-                        getAppointment()
-                    } else {
+                    if (!event.isAuthed) {
                         _state.value = _state.value.copy(
                             appointment = null,
                             showLoginDialog = false,
                             refreshing = false
                         )
+                        getWorkers()
+                    } else {
+                        getAppointment()
                     }
-                    getWorkers()
-                    loading(false)
                 }
 
 
@@ -66,107 +72,85 @@ constructor(
                     removeMessage()
                 }
 
-                is HomeEvent.GetAppointment -> {
-                    loading(true)
-                    getAppointment()
-                    loading(false)
-                }
-
-                is HomeEvent.GetWorkers -> {
-                    loading(true)
-                    getWorkers()
-                    loading(false)
-                }
-
-                is HomeEvent.UpdateAppointment -> {
-                    _state.value = _state.value.copy(appointment = event.appointment)
-                }
-
                 is HomeEvent.Refresh -> {
-                    _state.value = _state.value.copy(refreshing = true)
-                    if (event.isAuthed) {
-                        getAppointment()
+                    if (!isLoading()) {
+                        _state.value = _state.value.copy(refreshing = true)
+                        if (!event.isAuthed) {
+                            _state.value = _state.value.copy(
+                                appointment = null,
+                                showLoginDialog = false,
+                                refreshing = false
+                            )
+                            getWorkers()
+                        } else {
+                            getAppointment()
+                        }
                     }
-                    getWorkers()
-                    _state.value = _state.value.copy(refreshing = false)
                 }
             }
 
         }
-    }
-
-
-    private suspend fun getAppointment() {
-
-        val result = appointmentsRepository.getAppointment()
-
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(appointment = result.value)
-                Log.d(TAG, "getAppointment: ${result.value}")
-            }
-
-            is ApiResult.GenericError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = result.code.defaultErrorMessage(context)
-                    )
-                )
-
-                if (result.code == 401) {
-                    sendUiEvent(MainUIEvent.Logout)
-                }
-            }
-
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
-
-
     }
 
 
     private suspend fun getWorkers() {
+        getWorkersUseCase().onEach {
+            when (it) {
 
-        val result = workerRepository.getWorkers()
+                is Resource.Loading -> {
+                    loading(it.value)
+                    if (!it.value && _state.value.refreshing) {
+                        _state.value = _state.value.copy(refreshing = false)
+                    }
+                }
 
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(workers = result.value)
-                Log.d(TAG, "getWorkers: ${result.value}")
-            }
+                is Resource.Success -> {
+                    it.data?.let { workers ->
+                        _state.value = _state.value.copy(workers = workers)
+                    }
+                }
 
-            is ApiResult.GenericError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = result.code.defaultErrorMessage(context)
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
                     )
-                )
-
-                if (result.code == 401) {
-                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
+        }.launchIn(viewModelScope)
+    }
 
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
+
+    private suspend fun getAppointment() {
+        getAppointmentUseCase().onEach {
+            when (it) {
+                is Resource.Loading -> {
+                    loading(it.value)
+                    if (!it.value && _state.value.refreshing) {
+                        _state.value = _state.value.copy(refreshing = false)
+                    }
+                }
+
+                is Resource.Success -> {
+                    Log.d(TAG, "getAppointment:------------- ${it.data}")
+                    _state.value = _state.value.copy(appointment = it.data)
+                    Log.d(TAG, "getAppointment: ${_state.value}")
+
+                    getWorkers()
+                }
+
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
                     )
-                )
+                }
             }
-        }
-
-
+        }.launchIn(viewModelScope)
     }
 
 

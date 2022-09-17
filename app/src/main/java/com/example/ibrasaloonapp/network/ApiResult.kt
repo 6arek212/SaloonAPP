@@ -12,3 +12,7 @@ sealed class ApiResult<out T> {
 
     object NetworkError : ApiResult<Nothing>()
 }
+
+
+
+

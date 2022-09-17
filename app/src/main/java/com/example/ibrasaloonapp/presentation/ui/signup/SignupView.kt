@@ -75,24 +75,8 @@ fun SignupView(
     val lastNameError = viewModel.state.value.lastNameError
     val phoneError = viewModel.state.value.phoneError
     val birthDateError = viewModel.state.value.birthDateError
-    val events = viewModel.uiEvents
 
 
-    LaunchedEffect(Unit) {
-        launch {
-            events.collect { event ->
-                when (event) {
-                    is MainUIEvent.LoggedIn -> {
-                        mainViewModel.onTriggerEvent(
-                            MainEvent.Login(
-                                event.authData
-                            )
-                        )
-                    }
-                }
-            }
-        }
-    }
 
     DefaultScreenUI(
         uiComponent = uiMessage,

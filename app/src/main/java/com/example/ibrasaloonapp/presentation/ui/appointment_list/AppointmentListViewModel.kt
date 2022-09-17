@@ -75,7 +75,7 @@ constructor(
                     )
                 )
                 if (result.code == 401) {
-                    sendUiEvent(MainUIEvent.Logout)
+//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
 
@@ -118,7 +118,7 @@ constructor(
                     )
                 )
                 if (result.code == 401) {
-                    sendUiEvent(MainUIEvent.Logout)
+//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
 

@@ -39,20 +39,9 @@ fun ProfileView(
 ) {
     val user = viewModel.state.value.user
     val progress = viewModel.uiState.value.progressBarState
-    val events = viewModel.uiEvents
     val uiMessage = viewModel.uiState.value.uiMessage
 
-    LaunchedEffect(Unit) {
-        launch {
-            events.collect { event ->
-                when (event) {
-                    is MainUIEvent.Logout -> {
-                        mainViewModel.onTriggerEvent(MainEvent.Logout)
-                    }
-                }
-            }
-        }
-    }
+
     user?.let {
 
         DefaultScreenUI(

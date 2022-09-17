@@ -22,15 +22,16 @@ open class BaseViewModel : ViewModel() {
     private val _uiState: MutableState<UIState> = mutableStateOf(UIState())
     val uiState: State<UIState> = _uiState
 
-    private val _uiEvents = Channel<MainUIEvent>()
-    val uiEvents = _uiEvents.receiveAsFlow()
-
 
     protected fun loading(state: Boolean) {
         if (state)
             _uiState.value = _uiState.value.copy(progressBarState = ProgressBarState.Loading)
         else
             _uiState.value = _uiState.value.copy(progressBarState = ProgressBarState.Idle)
+    }
+
+    protected fun isLoading(): Boolean {
+        return _uiState.value.progressBarState == ProgressBarState.Loading
     }
 
     protected fun setNetworkStatus(state: Boolean?) {
@@ -40,11 +41,6 @@ open class BaseViewModel : ViewModel() {
     }
 
 
-    protected fun sendUiEvent(uiEvent: MainUIEvent) {
-        viewModelScope.launch {
-            _uiEvents.send(uiEvent)
-        }
-    }
 
     protected fun sendMessage(uiComponent: UIComponent) {
         _uiState.value = _uiState.value.copy(uiMessage = uiComponent)

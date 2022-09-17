@@ -64,24 +64,13 @@ fun BookAppointmentView(
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
-    val uiEvents = viewModel.uiEvents
     val events = viewModel.events
 
 
     val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
 
-    LaunchedEffect(Unit) {
-        launch {
-            uiEvents.collect { event ->
-                when (event) {
-                    is MainUIEvent.Logout -> {
-                        mainViewModel.onTriggerEvent(MainEvent.Logout)
-                    }
-                }
-            }
-        }
-    }
+
 
 
     LaunchedEffect(Unit) {

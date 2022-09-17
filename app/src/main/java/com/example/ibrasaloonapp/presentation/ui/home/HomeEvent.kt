@@ -10,7 +10,6 @@ sealed class HomeEvent {
     class Refresh(val isAuthed: Boolean) : HomeEvent()
     object DismissLoginDialog : HomeEvent()
     object ShowLoginDialog : HomeEvent()
-    class UpdateAppointment(val appointment: Appointment) : HomeEvent()
     object OnRemoveHeadFromQueue : HomeEvent()
     object Rest : HomeEvent()
 

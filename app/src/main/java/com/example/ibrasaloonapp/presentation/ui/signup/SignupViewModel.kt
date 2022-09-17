@@ -12,13 +12,19 @@ import com.example.ibrasaloonapp.domain.model.OPT4Digits
 import com.example.ibrasaloonapp.domain.use_case.ValidatePhoneNumber
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.network.model.SignupDataDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.ui.login.CodeDigitPlace
 import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.ui.defaultErrorMessage
+import com.example.ibrasaloonapp.use.SendAuthVerificationUseCase
+import com.example.ibrasaloonapp.use.SignupUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,9 +35,10 @@ class SignupViewModel
 @Inject
 constructor(
     private val context: Application,
-    private val authRepository: AuthRepository,
     private val validatePhoneNumber: ValidatePhoneNumber,
-    private val required: ValidateRequired
+    private val required: ValidateRequired,
+    private val sendAuthVerificationUseCase: SendAuthVerificationUseCase,
+    private val signupUseCase: SignupUseCase
 ) : BaseViewModel() {
 
     private val _state: MutableState<SignupState> = mutableStateOf(SignupState())
@@ -66,49 +73,23 @@ constructor(
                 is SignupEvent.OnCodeDigitChanged -> {
                     when (event.codePlace) {
                         CodeDigitPlace.ONE -> {
-                            _state.value = _state.value.copy(
-                                verifyCode = OPT4Digits(
-                                    one = event.value,
-                                    two = _state.value.verifyCode.two,
-                                    three = _state.value.verifyCode.three,
-                                    four = _state.value.verifyCode.four,
-                                )
-                            )
+                            val code = _state.value.verifyCode.copy(one = event.value)
+                            _state.value = _state.value.copy(verifyCode = code)
                         }
                         CodeDigitPlace.TWO -> {
-                            _state.value = _state.value.copy(
-                                verifyCode = OPT4Digits(
-                                    one = _state.value.verifyCode.one,
-                                    two = event.value,
-                                    three = _state.value.verifyCode.three,
-                                    four = _state.value.verifyCode.four,
-                                )
-                            )
+                            val code = _state.value.verifyCode.copy(two = event.value)
+                            _state.value = _state.value.copy(verifyCode = code)
                         }
                         CodeDigitPlace.THREE -> {
-                            _state.value = _state.value.copy(
-                                verifyCode = OPT4Digits(
-                                    one = _state.value.verifyCode.one,
-                                    two = _state.value.verifyCode.two,
-                                    three = event.value,
-                                    four = _state.value.verifyCode.four,
-                                )
-                            )
+                            val code = _state.value.verifyCode.copy(three = event.value)
+                            _state.value = _state.value.copy(verifyCode = code)
                         }
                         CodeDigitPlace.FOUR -> {
-                            _state.value = _state.value.copy(
-                                verifyCode = OPT4Digits(
-                                    one = _state.value.verifyCode.one,
-                                    two = _state.value.verifyCode.two,
-                                    three = _state.value.verifyCode.three,
-                                    four = event.value,
-                                )
-                            )
+                            val code = _state.value.verifyCode.copy(four = event.value)
+                            _state.value = _state.value.copy(verifyCode = code)
                             signup()
                         }
                     }
-
-
                 }
 
                 is SignupEvent.Signup -> {
@@ -135,7 +116,6 @@ constructor(
         }
 
     }
-
 
     private fun nextPage() {
         val page = _state.value.page
@@ -166,40 +146,29 @@ constructor(
             return
         }
 
-        loading(true)
+        sendAuthVerificationUseCase(phone = phone).onEach {
+            when (it) {
+                is Resource.Loading -> {
+                    loading(it.value)
+                }
 
-        val result = authRepository.sendAuthVerification(phone = phone)
+                is Resource.Success -> {
+                    it.data?.let { vId ->
+                        _state.value = _state.value.copy(showCode = true)
+                        verifyId = vId
+                    }
+                }
 
-        when (result) {
-            is ApiResult.Success -> {
-                this.verifyId = result.value
-                _state.value = _state.value.copy(showCode = true)
-            }
-
-            is ApiResult.GenericError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = result.code.defaultErrorMessage(context)
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
                     )
-                )
-
-                _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
+                }
             }
-
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-                _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
-            }
-        }
-
-
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 
@@ -239,9 +208,8 @@ constructor(
             return
         }
 
-        loading(true)
 
-        val result = authRepository.signup(
+        signupUseCase(
             SignupDataDto(
                 firstName = firstName,
                 lastName = lastName,
@@ -250,38 +218,28 @@ constructor(
                 verifyId = vId,
                 code = code
             )
-        )
+        ).onEach { data ->
+            when (data) {
+                is Resource.Loading -> {
+                    loading(data.value)
+                }
 
-        when (result) {
-            is ApiResult.Success -> {
-                Log.d(TAG, "signup: signup in success")
-                sendUiEvent(MainUIEvent.LoggedIn(result.value))
-                nextPage()
-            }
+                is Resource.Success -> {
+                    nextPage()
+                }
 
-            is ApiResult.GenericError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = result.code.defaultErrorMessage(context)
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = data.message
+                        )
                     )
-                )
+                    _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
 
-                _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
+                }
             }
-
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-                _state.value = _state.value.copy(verifyCode = OPT4Digits(""))
-            }
-        }
-
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 }

@@ -42,19 +42,6 @@ fun EditProfileView(
     popBackStack: (user: User) -> Unit
 ) {
 
-    val uiEvents = viewModel.uiEvents
-
-    LaunchedEffect(Unit) {
-        launch {
-            uiEvents.collect { event ->
-                when (event) {
-                    is MainUIEvent.Logout -> {
-                        mainViewModel.onTriggerEvent(MainEvent.Logout)
-                    }
-                }
-            }
-        }
-    }
 
     profileViewModel?.let {
         Log.d(TAG, "EditProfileView: ${profileViewModel}")

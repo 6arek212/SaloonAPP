@@ -39,10 +39,4 @@ object AppModule {
     }
 
 
-    @Provides
-    @Singleton
-    fun provideUserId(): CustomString {
-        return CustomString()
-    }
-
 }

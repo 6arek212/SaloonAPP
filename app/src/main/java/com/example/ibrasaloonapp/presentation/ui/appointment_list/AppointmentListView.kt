@@ -35,19 +35,7 @@ fun AppointmentListView(
     val isRefreshing = viewModel.state.value.isRefreshing
     val progressBar = viewModel.uiState.value.progressBarState
     val appointments = viewModel.state.value.appointments
-    val events = viewModel.uiEvents
 
-    LaunchedEffect(Unit) {
-        launch {
-            events.collect { event ->
-                when (event) {
-                    is MainUIEvent.Logout -> {
-                        mainViewModel.onTriggerEvent(MainEvent.Logout)
-                    }
-                }
-            }
-        }
-    }
 
     DefaultScreenUI(
         onRemoveUIComponent = { viewModel.onTriggerEvent(AppointmentListEvent.OnRemoveHeadFromQueue) },
@@ -87,7 +75,7 @@ fun AppointmentListView(
                 onRefresh = { viewModel.onTriggerEvent(AppointmentListEvent.Refresh) }) {
 
                 LazyColumn(
-                    modifier=Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {

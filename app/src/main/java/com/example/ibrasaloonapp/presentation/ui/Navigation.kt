@@ -21,10 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.MenuItem
@@ -74,6 +71,8 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
             events.collect { event ->
                 when (event) {
                     is MainUIEvent.Logout -> {
+                        Log.d(TAG, "Navigation: Logged out")
+
                         scope.launch { scaffoldState.drawerState.close() }
                         val currentRout = navController.currentDestination?.route
                         currentRout?.let {
@@ -89,6 +88,14 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                         }
                     }
 
+                    is MainUIEvent.LoggedIn -> {
+                        Log.d(TAG, "Navigation: LoggedIn")
+
+                    }
+
+                    is MainUIEvent.AuthDataReady -> {
+                        Log.d(TAG, "Navigation: AuthDataReady")
+                    }
                 }
             }
         }
@@ -146,7 +153,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 DrawerHeader()
                 DrawerBody(items = drawerItems, onClick = { item ->
                     if (item.id != "logout") {
-                        Log.d(TAG, "Navigation: ${item.id}")
+                        Log.d(TAG, "Navigation: drawerItem ${item.id}")
                         navController.navigate(item.id) {
                             popUpTo(Screen.Home.route) {
                                 saveState = true
@@ -243,16 +250,17 @@ fun NavGraphBuilder.home(
     ) { backStackEntry ->
 
         val viewModel: HomeViewModel = hiltViewModel()
-
-        val appointment = backStackEntry
-            .savedStateHandle
-            .getLiveData<Appointment>(APPOINTMENT_KEY)
-            .observeAsState().value
-
-
-        appointment?.let {
-            viewModel.onTriggerEvent(HomeEvent.UpdateAppointment(appointment))
-        }
+//
+//        val appointment = backStackEntry
+//            .savedStateHandle
+//            .getLiveData<Appointment>(APPOINTMENT_KEY)
+//            .observeAsState().value
+//
+//
+//        appointment?.let {
+//            viewModel.onTriggerEvent(HomeEvent.UpdateAppointment(appointment))
+//        }
+//        backStackEntry.savedStateHandle.remove<Appointment>(APPOINTMENT_KEY)
 
         HomeView(
             navController = navController,
@@ -287,9 +295,9 @@ fun NavGraphBuilder.bookAppointment(
         BookAppointmentView(
             navController = navController,
             popBackStack = { appointment ->
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(APPOINTMENT_KEY, appointment)
+//                navController.previousBackStackEntry
+//                    ?.savedStateHandle
+//                    ?.set(APPOINTMENT_KEY, appointment)
             }, mainViewModel = mainViewModel
         )
     }

@@ -57,7 +57,7 @@ constructor(
 
     private fun getCurrentToken(): String? {
         return runBlocking(Dispatchers.IO) {
-            auth.get().getLoginStatus()?.token
+            auth.get().getCacheAuthData()?.token
         }
     }
 

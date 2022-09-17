@@ -11,15 +11,22 @@ import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.core.getDateAsString
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.network.model.BookAppointmentDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
+import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
 import com.example.ibrasaloonapp.ui.CustomString
+import com.example.ibrasaloonapp.use.GetAppointmentUseCase
+import com.example.ibrasaloonapp.use.GetWorkersUseCase
 import com.example.trainingapp.network.NetworkErrors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,9 +39,10 @@ class BookAppointmentViewModel
 constructor(
     private val context: Application,
     private val repository: AppointmentRepository,
+    private val authRepository: AuthRepository,
     private val workerRepository: WorkerRepository,
+    private val getWorkersUseCase: GetWorkersUseCase,
     private val validateRequired: ValidateRequired,
-    private val userId: CustomString,
     private val application: Application
 ) : BaseViewModel() {
 
@@ -161,7 +169,7 @@ constructor(
                     )
                 )
                 if (result.code == 401) {
-                    sendUiEvent(MainUIEvent.Logout)
+//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
 
@@ -181,57 +189,29 @@ constructor(
 
 
     private suspend fun getWorkers() {
-        loading(true)
+        getWorkersUseCase().onEach {
+            when (it) {
 
-        val result = workerRepository.getWorkers()
+                is Resource.Loading -> {
+                    loading(it.value)
+                }
 
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(workers = result.value)
-                Log.d(TAG, "getWorkers: ${result.value}")
-            }
-
-            is ApiResult.GenericError -> {
-                Log.d(TAG, "GenericError: ${result.errorMessage}")
-
-                val message = when (result.code) {
-
-                    NetworkErrors.ERROR_400 -> {
-                        context.getString(R.string.bad_request)
-                    }
-
-                    NetworkErrors.ERROR_401 -> {
-                        context.getString(R.string.not_authorized)
-                    }
-
-                    else -> {
-                        context.getString(R.string.something_went_wrong)
+                is Resource.Success -> {
+                    it.data?.let { workers ->
+                        _state.value = _state.value.copy(workers = workers)
                     }
                 }
 
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = message
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
                     )
-                )
-                if (result.code == 401) {
-                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
-
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
-
-
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 
@@ -281,7 +261,7 @@ constructor(
                     )
                 )
                 if (result.code == 401) {
-                    sendUiEvent(MainUIEvent.Logout)
+//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
 
@@ -318,9 +298,9 @@ constructor(
     private suspend fun book() {
         val service = _state.value.selectedService
         val appointment = _state.value.selectedAppointment
-        val userId = userId.value ?: return
+        val userId = authRepository.getUserId() ?: return
 
-        if (appointment == null  || service.isBlank())
+        if (appointment == null || service.isBlank())
             return
 
         loading(true)
@@ -381,7 +361,7 @@ constructor(
                     )
                 )
                 if (result.code == 401) {
-                    sendUiEvent(MainUIEvent.Logout)
+//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
 

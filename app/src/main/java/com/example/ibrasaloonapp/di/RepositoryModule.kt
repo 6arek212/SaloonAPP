@@ -65,15 +65,13 @@ object RepositoryModule {
     fun provideAuthRepository(
         service: AuthService,
         mapper: AuthDataDtoMapper,
-        userId: CustomString,
         @ApplicationContext
         application: Context
     ): AuthRepository {
         return AuthRepositoryImpl(
             authService = service,
             authDataDtoMapper = mapper,
-            application = application,
-            userId = userId
+            application = application
         )
     }
 

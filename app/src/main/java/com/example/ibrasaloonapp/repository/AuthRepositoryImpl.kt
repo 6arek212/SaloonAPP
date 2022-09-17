@@ -7,6 +7,7 @@ import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.services.AuthService
+import com.example.ibrasaloonapp.presentation.AuthEvent
 import com.example.ibrasaloonapp.ui.*
 import com.example.trainingapp.util.safeApiCall
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,32 +24,43 @@ constructor(
     private val authService: AuthService,
     private val authDataDtoMapper: AuthDataDtoMapper,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val userId: CustomString
 ) : AuthRepository {
 
+    private val _authData = MutableStateFlow<AuthEvent>(AuthEvent.Nothing)
+    val authData: Flow<AuthEvent> = _authData
 
-    override suspend fun getUserId(): String? {
-        Log.d(TAG, "getUserId: ${userId.value}")
-        return userId.value
+    private var userId: String? = null
+
+    override suspend fun getAuthFlow(): Flow<AuthEvent> {
+        return authData
     }
 
-    override suspend fun getLoginStatus(): AuthData? {
+
+    override fun getUserId(): String? {
+        return userId
+    }
+
+    override suspend fun getCacheAuthData(): AuthData? {
         val authData = application.dataStore.data.first().getAuthData()
         authData?.let {
             if (it.token.isEmpty()) {
                 return null
             }
-            userId.value = it.user.id
+            userId = it.user.id
+            _authData.emit(AuthEvent.Login(it))
         }
         return authData
     }
 
-    override suspend fun sendAuthVerification(phone: String, isLogin: Boolean?): ApiResult<String> {
+    override suspend fun sendAuthVerification(
+        phone: String,
+        forLogin: Boolean?
+    ): ApiResult<String> {
         return safeApiCall(dispatcher) {
             authService.sendAuthVerification(
                 AuthVerificationDto(
                     phone = phone,
-                    isLogin = isLogin
+                    isLogin = forLogin
                 )
             ).verifyId
         }
@@ -67,7 +79,8 @@ constructor(
                 application.dataStore.edit { settings ->
                     settings.insertAuthData(result.value)
                 }
-                userId.value = result.value.user.id
+                userId = result.value.user.id
+                _authData.emit(AuthEvent.Login(result.value))
                 ApiResult.Success(result.value)
             }
 
@@ -87,10 +100,11 @@ constructor(
 
 
     override suspend fun logout() {
-        userId.value = null
+        userId = null
         application.dataStore.edit { settings ->
             settings.clearAuthData()
         }
+        _authData.emit(AuthEvent.Logout)
     }
 
     override suspend fun signup(signupDataDto: SignupDataDto): ApiResult<AuthData> {
@@ -106,7 +120,8 @@ constructor(
                 application.dataStore.edit { settings ->
                     settings.insertAuthData(result.value)
                 }
-                userId.value = result.value.user.id
+                userId = result.value.user.id
+                _authData.emit(AuthEvent.Login(result.value))
                 ApiResult.Success(result.value)
             }
 

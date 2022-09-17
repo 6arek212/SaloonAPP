@@ -34,7 +34,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginView(
-    onLoggedIn: (AuthData) -> Unit = {},
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -45,30 +44,18 @@ fun LoginView(
     val progress = viewModel.uiState.value.progressBarState
     val uiMessage = viewModel.uiState.value.uiMessage
     val showCode = viewModel.state.value.showCode
-    val events = viewModel.events
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
     val interactionSource = remember { MutableInteractionSource() }
 
-
     LaunchedEffect(Unit) {
-        launch {
-            events.collect { event ->
-                when (event) {
-                    is LoginViewModel.UIEvent.LoggedIn -> {
-                        onLoggedIn(event.authData)
-                    }
-                }
-            }
-        }
+        viewModel.onTriggerEvent(LoginEvent.Reset)
     }
 
-
-
-
     DefaultScreenUI(
+        progressBarState = if (showCode) progress else ProgressBarState.Idle,
         onRemoveUIComponent = { viewModel.onTriggerEvent(LoginEvent.OnRemoveHeadFromQueue) },
         uiComponent = uiMessage
     ) {
