@@ -11,16 +11,17 @@ import javax.inject.Inject
 
 
 private const val TAG = "SendAuthVerificationUse"
+
 class SendAuthVerificationUseCase
 @Inject
 constructor(
     val authRepository: AuthRepository,
     val context: Application
 ) {
-    suspend operator fun invoke(phone: String) = flow {
+    suspend operator fun invoke(phone: String, forLogin: Boolean) = flow {
         emit(Resource.Loading(true))
 
-        val result = authRepository.sendAuthVerification(phone = phone, forLogin = true)
+        val result = authRepository.sendAuthVerification(phone = phone, forLogin = forLogin)
 
         when (result) {
             is ApiResult.Success -> {

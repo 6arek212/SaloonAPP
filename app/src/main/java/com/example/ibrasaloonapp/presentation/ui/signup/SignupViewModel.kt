@@ -146,7 +146,7 @@ constructor(
             return
         }
 
-        sendAuthVerificationUseCase(phone = phone).onEach {
+        sendAuthVerificationUseCase(phone = phone , forLogin = false).onEach {
             when (it) {
                 is Resource.Loading -> {
                     loading(it.value)

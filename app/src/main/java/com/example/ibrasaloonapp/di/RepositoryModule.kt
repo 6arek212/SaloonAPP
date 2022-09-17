@@ -10,7 +10,6 @@ import com.example.ibrasaloonapp.network.services.AuthService
 import com.example.ibrasaloonapp.network.services.UserService
 import com.example.ibrasaloonapp.network.services.WorkerService
 import com.example.ibrasaloonapp.repository.*
-import com.example.ibrasaloonapp.ui.CustomString
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

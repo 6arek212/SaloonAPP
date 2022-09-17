@@ -2,11 +2,9 @@ package com.example.ibrasaloonapp.repository
 
 import com.example.ibrasaloonapp.core.ServiceType
 import com.example.ibrasaloonapp.domain.model.Appointment
-import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.services.AppointmentService
-import com.example.ibrasaloonapp.ui.CustomString
 import com.example.trainingapp.util.safeApiCall
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

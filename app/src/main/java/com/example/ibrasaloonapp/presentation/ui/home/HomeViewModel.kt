@@ -8,17 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
-import com.example.ibrasaloonapp.domain.model.Appointment
-import com.example.ibrasaloonapp.domain.model.User
-import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
-import com.example.ibrasaloonapp.presentation.MainUIEvent
-import com.example.ibrasaloonapp.repository.AppointmentRepository
-import com.example.ibrasaloonapp.repository.AuthRepository
-import com.example.ibrasaloonapp.repository.WorkerRepository
-import com.example.ibrasaloonapp.ui.defaultErrorMessage
-import com.example.ibrasaloonapp.use.GetAppointmentAndWorkersUseCase
 import com.example.ibrasaloonapp.use.GetAppointmentUseCase
 import com.example.ibrasaloonapp.use.GetWorkersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

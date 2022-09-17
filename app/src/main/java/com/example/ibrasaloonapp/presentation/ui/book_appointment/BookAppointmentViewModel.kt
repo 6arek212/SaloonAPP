@@ -14,17 +14,13 @@ import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.network.model.BookAppointmentDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
-import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
 import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
-import com.example.ibrasaloonapp.ui.CustomString
-import com.example.ibrasaloonapp.use.GetAppointmentUseCase
 import com.example.ibrasaloonapp.use.GetWorkersUseCase
 import com.example.trainingapp.network.NetworkErrors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
