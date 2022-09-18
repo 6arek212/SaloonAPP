@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "EditProfileView"
 
-const val USER_KEY = "user_key"
 
 
 @Composable
@@ -38,8 +37,7 @@ fun EditProfileView(
     navController: NavController,
     profileViewModel: ProfileViewModel?,
     mainViewModel: MainActivityViewModel,
-    viewModel: EditProfileViewModel = hiltViewModel(),
-    popBackStack: (user: User) -> Unit
+    viewModel: EditProfileViewModel = hiltViewModel()
 ) {
 
 
@@ -50,19 +48,7 @@ fun EditProfileView(
         val phone = viewModel.state.value.phone
         val progress = viewModel.uiState.value.progressBarState
         val uiMessage = viewModel.uiState.value.uiMessage
-        val events = viewModel.events
 
-        LaunchedEffect(Unit) {
-            launch {
-                events.collect { event ->
-                    when (event) {
-                        is EditProfileViewModel.UIEvent.UpdateUser -> {
-                            popBackStack(event.user)
-                        }
-                    }
-                }
-            }
-        }
 
 
         DefaultScreenUI(

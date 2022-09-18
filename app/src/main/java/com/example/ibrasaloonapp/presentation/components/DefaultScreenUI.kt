@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.presentation.theme.Gray2
@@ -38,7 +39,7 @@ fun DefaultScreenUI(
     uiComponent: UIComponent? = null,
     onRemoveUIComponent: () -> Unit,
     progressBarState: ProgressBarState = ProgressBarState.Idle,
-    dialogOnConfirm: () -> Unit = {},
+    dialogOnConfirm: (DialogEvent) -> Unit = {},
     networkStatus: Boolean? = null,
     onDismissNetworkMessage: (() -> Unit)? = null,
     isSplashRoute: Boolean = false,
@@ -59,7 +60,6 @@ fun DefaultScreenUI(
                 .padding(padding)
         ) {
             content()
-            //process the queue
 
 
             when (uiComponent) {
@@ -68,7 +68,9 @@ fun DefaultScreenUI(
                         title = uiComponent.title,
                         description = uiComponent.description,
                         onConfirm = {
-                            dialogOnConfirm()
+                            uiComponent.dialogEvent?.let {
+                                dialogOnConfirm(it)
+                            }
                             onRemoveUIComponent()
                         },
                         onDismiss = onRemoveUIComponent,
@@ -126,7 +128,9 @@ private fun TimedLayout(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = if (networkStatus) stringResource(id = R.string.network_available) else stringResource(id = R.string.network_not_available),
+            text = if (networkStatus) stringResource(id = R.string.network_available) else stringResource(
+                id = R.string.network_not_available
+            ),
             color = Gray2,
             style = MaterialTheme.typography.body2
         )

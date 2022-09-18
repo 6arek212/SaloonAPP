@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
+import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.components.CircularImage
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.ProgressButton
@@ -44,23 +45,21 @@ private const val TAG = "UploadImageView"
 @Composable
 fun UploadImageView(
     navController: NavController,
+    mainActivityViewModel: MainActivityViewModel,
     viewModel: UploadImageViewModel = hiltViewModel(),
-    profileViewModel: ProfileViewModel?,
-    popBackStack: (String) -> Unit
 ) {
     val progress = viewModel.uiState.value.progressBarState
-    val events = viewModel.events
     val buttonVisible = viewModel.uploadState.value.buttonVisible
     val selectedImageUri = viewModel.uploadState.value.imageUri
-    val selectedImageUrl = profileViewModel?.state?.value?.user?.image
+    val selectedImageUrl = mainActivityViewModel.state.value.authData?.user?.image
     val uiMessage = viewModel.uiState.value.uiMessage
+    val events = viewModel.events
 
     LaunchedEffect(Unit) {
         events.collect { event ->
             when (event) {
-                is UploadUIEvent.ImageUploaded -> {
-                    popBackStack(event.imagePath)
-                }
+                is UploadUIEvent.ImageUploaded -> navController.popBackStack()
+                else -> {}
             }
         }
     }

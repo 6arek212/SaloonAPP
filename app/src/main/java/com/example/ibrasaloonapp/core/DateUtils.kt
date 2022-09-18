@@ -28,6 +28,7 @@ fun getCurrentDateAsString(): String {
     return date
 }
 
+
 fun getDateAsString(): String {
     val c = Calendar.getInstance()
     c.set(Calendar.HOUR_OF_DAY, 0)
@@ -79,6 +80,8 @@ enum class TimePatterns(val value: String) {
     EEEE_MM_DD("EEEE, MMM dd"),
     DATE_TIME("EEEE MMM dd, yyyy HH:mm")
 }
+
+
 
 
 fun stringDateFormat(

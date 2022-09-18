@@ -6,35 +6,33 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.core.domain.UIComponent
-import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
-import com.example.ibrasaloonapp.presentation.MainUIEvent
-import com.example.ibrasaloonapp.repository.AppointmentRepository
-import com.example.ibrasaloonapp.ui.defaultErrorMessage
-import com.example.trainingapp.network.NetworkErrors
+import com.example.ibrasaloonapp.use.GetAppointmentsUseCase
+import com.example.ibrasaloonapp.use.UnBookAppointmentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-private const val TAG = "AppointmentsListVM"
+private const val TAG = "AppointmentListViewMode"
 
 @HiltViewModel
 class AppointmentsListViewModel
 @Inject
 constructor(
     private val context: Application,
-    private val repository: AppointmentRepository
+    private val getAppointmentsUseCase: GetAppointmentsUseCase,
+    private val unBookAppointmentUseCase: UnBookAppointmentUseCase
 ) : BaseViewModel() {
 
     private val _state: MutableState<AppointmentListState> = mutableStateOf(AppointmentListState())
     val state: State<AppointmentListState> = _state
 
-
-    init {
-        onTriggerEvent(AppointmentListEvent.GetAppointments)
-    }
 
     fun onTriggerEvent(event: AppointmentListEvent) {
         viewModelScope.launch {
@@ -53,86 +51,79 @@ constructor(
                 is AppointmentListEvent.UnBookAppointment -> {
                     unbook(id = event.id, index = event.index)
                 }
+
+                is AppointmentListEvent.ShowUnbookConfirmDialog -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.unbook),
+                            description = context.getString(R.string.are_you_sure_unbook_your_appointment),
+                            actionButtons = true,
+                            dialogEvent = DialogEvent.Unbook(id = event.id, index = event.index)
+                        )
+                    )
+                }
             }
         }
     }
 
     private suspend fun getAppointments() {
-        loading(true)
-        val result = repository.getAppointments()
+        getAppointmentsUseCase().onEach { data ->
+            when (data) {
+                is Resource.Loading -> {
+                    loading(data.value)
+                }
 
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(appointments = result.value)
-            }
+                is Resource.Success -> {
+                    data.data?.let { appointments ->
+                        _state.value = _state.value.copy(appointments = appointments)
+                    }
+                }
 
-            is ApiResult.GenericError -> {
-
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = result.code.defaultErrorMessage(context)
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = data.message
+                        )
                     )
-                )
-                if (result.code == 401) {
-//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
 
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 
     suspend fun unbook(id: String, index: Int) {
-        loading(true)
-        val result = repository.unbookAppointment(id)
+        unBookAppointmentUseCase(appointmentId = id).onEach { data ->
+            when (data) {
+                is Resource.Loading -> {
+                    loading(data.value)
+                }
 
-        when (result) {
-            is ApiResult.Success -> {
-                val list = ArrayList(_state.value.appointments)
-                list.removeAt(index)
-                _state.value = _state.value.copy(appointments = list)
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.unbook),
-                        description = context.getString(R.string.your_appointment_has_been_unbooked)
+                is Resource.Success -> {
+                    val list = ArrayList(_state.value.appointments)
+                    list.removeAt(index)
+                    _state.value = _state.value.copy(appointments = list)
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.unbook),
+                            description = context.getString(R.string.your_appointment_has_been_unbooked)
 
+                        )
                     )
-                )
-            }
+                }
 
-            is ApiResult.GenericError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = result.code.defaultErrorMessage(context)
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = data.message
+                        )
                     )
-                )
-                if (result.code == 401) {
-//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
 
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
-
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 }

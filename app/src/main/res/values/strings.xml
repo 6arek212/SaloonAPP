@@ -77,6 +77,25 @@
     <string name="upload">Upload</string>
     <string name="booked">Booked</string>
     <string name="signup">Signup</string>
+    <string name="updated">Updated</string>
+    <string name="your_profile_has_been_updated">You\'r profile has been updated</string>
+    <string name="are_you_sure_you_want_to_logout">Are you sure you want to logout?</string>
+    <string name="are_you_sure_unbook_your_appointment">Are you sure you want to cancel your appointment?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="user_with_this_number_already_exists">user with this number already exists</string>
+    <string name="try_again_after_some_time">You have too many tries , try again after some time</string>
+    <string name="you_must_verify_phone_first">You must verify the phone number first</string>
+    <string name="the_filed_cant_be_blank">The %s can\'t be blank</string>
+    <string name="the_filed_cant_be_longer_than">The %s can\'t be longer than %d letters</string>
+    <string name="field_must_contain_letters_spaces">%s must contain letters and spaces only</string>
+    <string name="the_filed_cant_be_less_than">The %s can\'t be less than %d letters</string>
+    <string name="the_filed_is_not_valid">The %s number is not valid</string>
+    <string name="next">Next</string>
+    <string name="done">Done</string>
+    <string name="click_here">Click here</string>
+    <string name="lets_add_a_profile_image">Lets add a profile image</string>
+    <string name="login_or_signup">Login or Signup</string>
 
 
 </resources>

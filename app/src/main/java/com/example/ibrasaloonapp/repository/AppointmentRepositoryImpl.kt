@@ -70,13 +70,3 @@ constructor(
 }
 
 
-val fakeAvailableDates = listOf(
-    "12/3/2022",
-    "30/5/2022",
-    "6/6/2022",
-    "5/7/2022",
-    "3/8/2022",
-)
-
-
-val fakeServiceType = ServiceType.values()

@@ -9,13 +9,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.UserRepository
 import com.example.ibrasaloonapp.ui.defaultErrorMessage
+import com.example.ibrasaloonapp.use.UploadImageUseCase
 import com.example.trainingapp.network.NetworkErrors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.InputStream
@@ -27,7 +31,7 @@ class UploadImageViewModel
 @Inject
 constructor(
     private val context: Application,
-    private val userRepository: UserRepository
+    private val uploadImageUseCase: UploadImageUseCase
 ) : BaseViewModel() {
 
     private var stream: InputStream? = null
@@ -37,7 +41,6 @@ constructor(
 
     private val _events = Channel<UploadUIEvent>()
     val events = _events.receiveAsFlow()
-
 
     fun onTriggerEvent(event: UploadImageEvent) {
         viewModelScope.launch {
@@ -78,39 +81,28 @@ constructor(
         val mime = MimeTypeMap.getSingleton()
         val type = mime.getExtensionFromMimeType(cR.getType(uri)) ?: return
 
-        loading(true)
-        val result = userRepository.uploadImage(st, type)
+        uploadImageUseCase(inputStream = st, fileType = type).onEach {
+            when (it) {
+                is Resource.Loading -> {
+                    loading(it.value)
+                }
 
-        when (result) {
-            is ApiResult.Success -> {
-//                _uploadState.value = _uploadState.value.copy(imageUri = null)
-                _events.send(UploadUIEvent.ImageUploaded(result.value))
-            }
-            is ApiResult.GenericError -> {
+                is Resource.Success -> {
+                    it.data?.let { imagePath ->
+                        _events.send(UploadUIEvent.ImageUploaded)
+                    }
+                }
 
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = result.code.defaultErrorMessage(context)
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
                     )
-                )
-                if (result.code == 401) {
-//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
-
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
-
-
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 

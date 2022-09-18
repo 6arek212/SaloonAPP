@@ -18,15 +18,15 @@ interface UserService {
     suspend fun getUsers(): UsersResponse
 
 
-    @GET("users/{:id}")
-    suspend fun getUser(): UserResponse
+    @GET("users/{:userId}")
+    suspend fun getUser(@Query("userId") userId: String): UserResponse
 
 
-    @PATCH("users")
-    suspend fun updateUser(@Body user: UserUpdateDto): UserResponse
+    @PATCH("users/{:userId}")
+    suspend fun updateUser(@Body user: UserUpdateDto, @Query("userId") userId: String): UserResponse
 
 
-    @DELETE("users/{:id}")
+    @DELETE("users/{:userId}")
     suspend fun deleteUser(): MessageResponse
 
 

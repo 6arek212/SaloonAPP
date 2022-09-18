@@ -92,11 +92,13 @@ object RepositoryModule {
     @Provides
     fun provideUserRepository(
         userDtoMapper: UserDtoMapper,
-        userService: UserService
+        userService: UserService,
+        authRepository: AuthRepository
     ): UserRepository {
         return UserRepositoryImpl(
             userDtoMapper = userDtoMapper,
-            userService = userService
+            userService = userService,
+            authRepository = authRepository
         )
     }
 

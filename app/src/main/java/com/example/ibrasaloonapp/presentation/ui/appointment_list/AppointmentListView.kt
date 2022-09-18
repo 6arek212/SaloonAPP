@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
@@ -23,7 +24,6 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AppointmentListView(
     navController: NavController,
@@ -37,11 +37,27 @@ fun AppointmentListView(
     val appointments = viewModel.state.value.appointments
 
 
+    LaunchedEffect(Unit) {
+        viewModel.onTriggerEvent(AppointmentListEvent.GetAppointments)
+    }
+
     DefaultScreenUI(
         onRemoveUIComponent = { viewModel.onTriggerEvent(AppointmentListEvent.OnRemoveHeadFromQueue) },
         uiComponent = uiMessage,
         progressBarState = progressBar,
-        dialogOnConfirm = {}
+        dialogOnConfirm = { event ->
+            when (event) {
+                is DialogEvent.Unbook -> {
+                    viewModel.onTriggerEvent(
+                        AppointmentListEvent.UnBookAppointment(
+                            event.id,
+                            event.index
+                        )
+                    )
+                }
+                else -> {}
+            }
+        }
     ) {
 
         Column(
@@ -96,7 +112,7 @@ fun AppointmentListView(
                             modifier = Modifier,
                             appointment = appointment, onUnbook = {
                                 viewModel.onTriggerEvent(
-                                    AppointmentListEvent.UnBookAppointment(
+                                    AppointmentListEvent.ShowUnbookConfirmDialog(
                                         appointment.id,
                                         index
                                     )

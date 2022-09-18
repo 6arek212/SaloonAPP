@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.datastore.preferences.core.edit
 import com.example.ibrasaloonapp.domain.model.AuthData
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.services.AuthService
@@ -40,27 +41,40 @@ constructor(
         return userId
     }
 
-    override suspend fun getCacheAuthData(): AuthData? {
+    override suspend fun updateUserImage(path: String) {
+        _authData.emit(AuthEvent.UpdateUserImage(path = path))
+    }
+
+    override suspend fun updateUserData(user: User) {
+        _authData.emit(AuthEvent.UpdateUser(user))
+    }
+
+    override suspend fun getCacheAuthData(updateStatus: Boolean): AuthData? {
         val authData = application.dataStore.data.first().getAuthData()
         authData?.let {
             if (it.token.isEmpty()) {
                 return null
             }
             userId = it.user.id
-            _authData.emit(AuthEvent.Login(it))
+
+            if (updateStatus) {
+                _authData.emit(AuthEvent.Login(it))
+            }
         }
         return authData
     }
 
     override suspend fun sendAuthVerification(
         phone: String,
-        forLogin: Boolean?
+        forLogin: Boolean?,
+        forSignup: Boolean?
     ): ApiResult<String> {
         return safeApiCall(dispatcher) {
             authService.sendAuthVerification(
                 AuthVerificationDto(
                     phone = phone,
-                    isLogin = forLogin
+                    isLogin = forLogin,
+                    isSignup = forSignup
                 )
             ).verifyId
         }

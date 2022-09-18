@@ -1,13 +1,17 @@
 package com.example.ibrasaloonapp.presentation
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
+import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.utils.ConnectivityObserver
 import com.example.ibrasaloonapp.repository.AuthRepository
+import com.example.ibrasaloonapp.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
@@ -23,7 +27,8 @@ class MainActivityViewModel
 @Inject
 constructor(
     private val networkConnectivityObserver: ConnectivityObserver,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val context: Application
 ) : BaseViewModel() {
 
     private val _state: MutableState<AuthState> = mutableStateOf(AuthState())
@@ -57,9 +62,10 @@ constructor(
                 is MainEvent.ShowLogoutDialog -> {
                     sendMessage(
                         UIComponent.Dialog(
-                            title = "Logout",
-                            "Are you sure you want to logout?",
-                            actionButtons = true
+                            title = context.getString(R.string.logut),
+                            description = context.getString(R.string.are_you_sure_you_want_to_logout),
+                            actionButtons = true,
+                            dialogEvent = DialogEvent.Logout
                         )
                     )
                 }
@@ -80,7 +86,7 @@ constructor(
     }
 
     private suspend fun checkAuth() {
-        val authData = authRepository.getCacheAuthData()
+        val authData = authRepository.getCacheAuthData(updateStatus = true)
         if (authData != null) {
             _state.value = state.value.copy(isLoggedIn = true, authData = authData)
             sendUiEvent(MainUIEvent.AuthDataReady)
@@ -101,8 +107,26 @@ constructor(
                     }
 
                     is AuthEvent.Login -> {
-                        _state.value = state.value.copy(isLoggedIn = true, authData = data.authData)
+                        Log.d(TAG, "observeAuthStatus: Login ${data.authData}")
+                        _state.value = state.value.copy(
+                            isLoggedIn = true,
+                            authData = data.authData
+                        )
                         sendUiEvent(MainUIEvent.LoggedIn)
+                    }
+
+                    is AuthEvent.UpdateUser -> {
+                        val authData = _state.value.authData?.copy(user = data.user)
+                        _state.value = state.value.copy(authData = authData)
+                    }
+
+                    is AuthEvent.UpdateUserImage -> {
+                        Log.d(TAG, "observeAuthStatus: ${data.path}  returned image")
+                        val newUser = _state.value.authData?.user?.copy(image = data.path)
+                        if (newUser != null) {
+                            val authData = _state.value.authData?.copy(user = newUser)
+                            _state.value = state.value.copy(authData = authData)
+                        }
                     }
 
                     is AuthEvent.Nothing -> {

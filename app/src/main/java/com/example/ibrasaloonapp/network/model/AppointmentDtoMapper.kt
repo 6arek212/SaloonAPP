@@ -2,9 +2,9 @@ package com.example.ibrasaloonapp.network.model
 
 import android.app.Application
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.KeyValueWrapper
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.util.DomainMapper
-import com.example.ibrasaloonapp.presentation.ui.book_appointment.ServiceType
 import javax.inject.Inject
 
 
@@ -18,19 +18,20 @@ constructor(
     private val context: Application,
     private val customerMapper: UserDtoMapper
 ) : DomainMapper<AppointmentDto, Appointment> {
+
     override fun mapToDomainModel(model: AppointmentDto): Appointment {
 
         val service = model.service?.let {
             when (it) {
                 HAIR_CUT -> {
-                    ServiceType.HairCut(model.service, context.getString(R.string.hair_cut))
+                    KeyValueWrapper(model.service, context.getString(R.string.hair_cut))
                 }
 
                 Wax -> {
-                    ServiceType.HairCut(model.service, context.getString(R.string.wax))
+                    KeyValueWrapper(model.service, context.getString(R.string.wax))
                 }
                 else -> {
-                    ServiceType.HairCut(it, it)
+                    KeyValueWrapper(it,it)
                 }
             }
         }

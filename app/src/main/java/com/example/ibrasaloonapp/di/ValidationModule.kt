@@ -1,6 +1,7 @@
 package com.example.ibrasaloonapp.di
 
-import com.example.ibrasaloonapp.domain.use_case.ValidatePassword
+import android.app.Application
+import com.example.ibrasaloonapp.domain.use_case.ValidateName
 import com.example.ibrasaloonapp.domain.use_case.ValidatePhoneNumber
 import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
 import dagger.Module
@@ -16,20 +17,21 @@ object ValidationModule {
 
     @Provides
     @Singleton
-    fun provideValidationRequired(): ValidateRequired {
-        return ValidateRequired()
+    fun provideValidationRequired(context: Application): ValidateRequired {
+        return ValidateRequired(context)
     }
 
     @Provides
     @Singleton
-    fun providePhoneValidation(): ValidatePhoneNumber {
-        return ValidatePhoneNumber()
+    fun providePhoneValidation(context: Application): ValidatePhoneNumber {
+        return ValidatePhoneNumber(context)
     }
+
 
     @Provides
     @Singleton
-    fun providePasswordValidation(): ValidatePassword {
-        return ValidatePassword()
+    fun provideNameValidation(context: Application): ValidateName {
+        return ValidateName(context)
     }
 
 }

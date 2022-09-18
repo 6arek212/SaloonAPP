@@ -9,8 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
-import com.example.ibrasaloonapp.domain.use_case.ValidatePhoneNumber
-import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
+import com.example.ibrasaloonapp.domain.use_case.*
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.network.model.SignupDataDto
@@ -30,6 +29,10 @@ import javax.inject.Inject
 
 private const val TAG = "SignupViewModel"
 
+const val INFO_PAGE_NUMBER = 1
+const val PHONE_PAGE_NUMBER = 2
+const val UPLOAD_PAGE_NUMBER = 3
+
 @HiltViewModel
 class SignupViewModel
 @Inject
@@ -37,8 +40,9 @@ constructor(
     private val context: Application,
     private val validatePhoneNumber: ValidatePhoneNumber,
     private val required: ValidateRequired,
+    private val nameValidator: ValidateName,
     private val sendAuthVerificationUseCase: SendAuthVerificationUseCase,
-    private val signupUseCase: SignupUseCase
+    private val signupUseCase: SignupUseCase,
 ) : BaseViewModel() {
 
     private val _state: MutableState<SignupState> = mutableStateOf(SignupState())
@@ -46,28 +50,43 @@ constructor(
 
     val pagesNumber: Int = 4
     private var verifyId: String? = null
+    private var isVerified: Boolean = false
 
     fun onTriggerEvent(event: SignupEvent) {
         viewModelScope.launch {
             when (event) {
-
-                is SignupEvent.UpdateImage -> {
-                    _state.value = _state.value.copy(image = event.imagePath)
-                }
-
                 is SignupEvent.OnPhoneChanged -> {
-                    _state.value = _state.value.copy(phone = event.phone)
+                    val phoneValidate = validatePhoneNumber.execute(event.phone)
+                    _state.value = _state.value.copy(
+                        phone = event.phone,
+                        phoneError = phoneValidate.errorMessage
+                    )
                 }
 
                 is SignupEvent.OnBirthDateChanged -> {
-                    _state.value = _state.value.copy(birthDate = event.birthdate)
+                    val birthDateValidate =
+                        required.execute(context.getString(R.string.birth_date), event.birthdate)
+                    _state.value = _state.value.copy(
+                        birthDate = event.birthdate,
+                        birthDateError = birthDateValidate.errorMessage
+                    )
                 }
                 is SignupEvent.OnFirstNameChanged -> {
-                    _state.value = _state.value.copy(firstName = event.name)
+                    val firstNameValidate =
+                        nameValidator.execute(context.getString(R.string.first_name), event.name)
+                    _state.value = _state.value.copy(
+                        firstName = event.name,
+                        firstNameError = firstNameValidate.errorMessage
+                    )
                 }
 
                 is SignupEvent.OnLastNameChanged -> {
-                    _state.value = _state.value.copy(lastName = event.last)
+                    val lastNameValidate =
+                        nameValidator.execute(context.getString(R.string.last_name), event.last)
+                    _state.value = _state.value.copy(
+                        lastName = event.last,
+                        lastNameError = lastNameValidate.errorMessage
+                    )
                 }
 
                 is SignupEvent.OnCodeDigitChanged -> {
@@ -119,14 +138,73 @@ constructor(
 
     private fun nextPage() {
         val page = _state.value.page
-        if (page < pagesNumber)
+        if (page < pagesNumber) {
+            if (page == INFO_PAGE_NUMBER && !validateInfoPage()) {
+                return
+            }
+
+            if (page == PHONE_PAGE_NUMBER && !validatePhonePage()) {
+                return
+            }
             _state.value = _state.value.copy(page = page + 1)
+        }
     }
 
     private fun prevPage() {
         val page = _state.value.page
-        if (page > 1 && page != pagesNumber)
+        if (page > 1 && page != pagesNumber && page != UPLOAD_PAGE_NUMBER)
             _state.value = _state.value.copy(page = page - 1)
+    }
+
+
+    private fun validatePhonePage(): Boolean {
+        val phone = _state.value.phone
+        val phoneValidate = validatePhoneNumber.execute(phone)
+
+        if (!phoneValidate.successful) {
+            _state.value = _state.value.copy(phoneError = phoneValidate.errorMessage)
+            return false
+        }
+
+        if (!isVerified) {
+            sendMessage(
+                UIComponent.Dialog(
+                    title = context.getString(R.string.error),
+                    description = context.getString(R.string.you_must_verify_phone_first)
+                )
+            )
+            return false
+        }
+
+        return true
+    }
+
+
+    private fun validateInfoPage(): Boolean {
+        val firstName = _state.value.firstName
+        val lastName = _state.value.lastName
+        val birthDate = _state.value.birthDate
+
+
+        val firstNameValidate =
+            nameValidator.execute(context.getString(R.string.first_name), firstName)
+        val lastNameValidate =
+            nameValidator.execute(context.getString(R.string.last_name), lastName)
+        val birthDateValidate = required.execute(context.getString(R.string.birth_date), birthDate)
+
+
+        _state.value = _state.value.copy(
+            firstNameError = firstNameValidate.errorMessage,
+            lastNameError = lastNameValidate.errorMessage,
+            birthDateError = birthDateValidate.errorMessage,
+        )
+
+
+        return !listOf(
+            firstNameValidate,
+            lastNameValidate,
+            birthDateValidate
+        ).any { !it.successful }
     }
 
 
@@ -146,7 +224,7 @@ constructor(
             return
         }
 
-        sendAuthVerificationUseCase(phone = phone , forLogin = false).onEach {
+        sendAuthVerificationUseCase(phone = phone, forSignup = true).onEach {
             when (it) {
                 is Resource.Loading -> {
                     loading(it.value)
@@ -173,40 +251,12 @@ constructor(
 
 
     private suspend fun signup() {
-        val firstName = _state.value.firstName
-        val lastName = _state.value.lastName
-        val phone = _state.value.phone
+        val firstName = _state.value.firstName.trim()
+        val lastName = _state.value.lastName.trim()
         val birthDate = _state.value.birthDate
+        val phone = _state.value.phone
         val code = _state.value.verifyCode.getCode()
-        val vId = verifyId
-
-
-        val firstNameValidate = required.execute("First Name", firstName)
-        val lastNameValidate = required.execute("Last Name", lastName)
-        val birthDateValidate = required.execute("Birth Date", birthDate)
-        val phoneValidate = validatePhoneNumber.execute(phone)
-        val codeValidate = required.execute("Code", code)
-
-
-        val hasError = listOf(
-            firstNameValidate,
-            lastNameValidate,
-            birthDateValidate,
-            phoneValidate,
-            codeValidate
-        ).any { !it.successful }
-
-        _state.value = _state.value.copy(
-            phoneError = phoneValidate.errorMessage,
-            firstNameError = firstNameValidate.errorMessage,
-            lastNameError = lastNameValidate.errorMessage,
-            birthDateError = birthDateValidate.errorMessage,
-        )
-
-        if (hasError || vId == null) {
-            Log.d(TAG, "signup: error sent to UI")
-            return
-        }
+        val vId = verifyId ?: return
 
 
         signupUseCase(
@@ -225,6 +275,7 @@ constructor(
                 }
 
                 is Resource.Success -> {
+                    isVerified = true
                     nextPage()
                 }
 

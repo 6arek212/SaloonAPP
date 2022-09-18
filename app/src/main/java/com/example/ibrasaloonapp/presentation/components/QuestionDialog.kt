@@ -14,10 +14,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.theme.AppTheme
 import com.example.ibrasaloonapp.presentation.theme.Black1
@@ -33,8 +35,8 @@ fun QuestionDialog(
     title: String,
     description: String,
     actionButtons: Boolean = false,
-    buttonConfirmText: String = "Yes",
-    buttonNegativeText: String = "No",
+    buttonConfirmText: String = stringResource(R.string.yes),
+    buttonNegativeText: String = stringResource(R.string.no),
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -75,7 +77,9 @@ fun QuestionDialog(
         )
 
         Card(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             backgroundColor = MaterialTheme.colors.background,
             elevation = 18.dp,
             shape = MaterialTheme.shapes.medium
@@ -88,19 +92,21 @@ fun QuestionDialog(
                 verticalArrangement = Arrangement.Center
             ) {
 
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.h5,
-                    textAlign = TextAlign.Center
-                )
+                Column (modifier = Modifier.align(Alignment.Start)){
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.h5,
+                        textAlign = TextAlign.Start
+                    )
 
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.body2,
-                    color = Black4,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.W400
-                )
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.body2,
+                        color = Black4,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.W400
+                    )
+                }
 
                 if (actionButtons) {
 

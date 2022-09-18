@@ -23,19 +23,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.domain.model.MenuItem
-import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
-import com.example.ibrasaloonapp.presentation.ui.book_appointment.APPOINTMENT_KEY
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
-import com.example.ibrasaloonapp.presentation.ui.edit_profile.USER_KEY
 import com.example.ibrasaloonapp.presentation.ui.home.*
 import com.example.ibrasaloonapp.presentation.ui.login.LoginView
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
@@ -136,7 +133,11 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
         onRemoveUIComponent = { mainViewModel.onTriggerEvent(MainEvent.RemoveMessage) },
         uiComponent = uiMessage,
         dialogOnConfirm = {
-            mainViewModel.onTriggerEvent(MainEvent.Logout)
+            when(it){
+                is DialogEvent.Logout->{
+                    mainViewModel.onTriggerEvent(MainEvent.Logout)
+                }
+            }
         },
         networkStatus = networkStatus,
         onDismissNetworkMessage = { mainViewModel.onTriggerEvent(MainEvent.DismissNetworkMessage) },
@@ -147,7 +148,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
             modifier = Modifier.statusBarsPadding(),
             scaffoldState = scaffoldState,
             drawerBackgroundColor = Gray2,
-            drawerGesturesEnabled = user != null,
+            drawerGesturesEnabled = user != null && currentDestination != Screen.Splash.route,
             drawerContent =
             {
                 DrawerHeader()
@@ -185,9 +186,10 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 home(navController = navController, mainViewModel = mainViewModel)
                 appointmentList(navController = navController, mainViewModel = mainViewModel)
                 bookAppointment(navController = navController, mainViewModel = mainViewModel)
+
+                uploadImage(navController = navController, mainViewModel = mainViewModel)
                 profile(navController = navController, mainViewModel = mainViewModel)
                 editProfile(navController = navController, mainViewModel = mainViewModel)
-                uploadImage(navController = navController, mainViewModel = mainViewModel)
             }
         }
     }
@@ -224,17 +226,6 @@ fun NavGraphBuilder.signup(
         route = Screen.Signup.route,
         arguments = emptyList()
     ) { backStackEntry ->
-
-        val updatedImagePath = backStackEntry
-            .savedStateHandle
-            .getLiveData<String>(IMAGE_KEY)
-            .observeAsState().value
-
-        val viewModel: SignupViewModel = hiltViewModel()
-        updatedImagePath?.let {
-            viewModel.onTriggerEvent(SignupEvent.UpdateImage(updatedImagePath))
-        }
-
         SignupView(navController = navController, mainViewModel = mainViewModel)
     }
 }
@@ -313,10 +304,6 @@ fun NavGraphBuilder.profile(
         arguments = emptyList(),
     ) { backStackEntry ->
 
-        val user = backStackEntry
-            .savedStateHandle
-            .getLiveData<User>(USER_KEY)
-            .observeAsState().value
 
         val updatedImagePath = backStackEntry
             .savedStateHandle
@@ -325,9 +312,7 @@ fun NavGraphBuilder.profile(
 
         val viewModel: ProfileViewModel = hiltViewModel()
 
-        user?.let {
-            viewModel.onTriggerEvent(ProfileEvent.UpdateUser(user))
-        }
+
 
         updatedImagePath?.let {
             viewModel.onTriggerEvent(ProfileEvent.UpdateImage(updatedImagePath))
@@ -357,11 +342,7 @@ fun NavGraphBuilder.editProfile(
         EditProfileView(
             navController = navController,
             profileViewModel = previousViewModel,
-            popBackStack = { user ->
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(USER_KEY, user)
-            }, mainViewModel = mainViewModel
+            mainViewModel = mainViewModel
         )
     }
 }
@@ -383,13 +364,8 @@ fun NavGraphBuilder.uploadImage(
 
         UploadImageView(
             navController = navController,
-            profileViewModel = previousViewModel,
-            popBackStack = { imagePath ->
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(IMAGE_KEY, imagePath)
-                navController.popBackStack()
-            })
+            mainActivityViewModel = mainViewModel
+        )
     }
 }
 

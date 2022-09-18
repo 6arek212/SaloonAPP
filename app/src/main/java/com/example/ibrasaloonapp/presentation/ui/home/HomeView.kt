@@ -345,7 +345,7 @@ fun NotLoggedIn(
 
             //stringResource(id = R.string.login_or_create_account)
             Text(
-                text = "Login Or Signup",
+                text = stringResource(R.string.login_or_signup),
                 style = MaterialTheme.typography.h4,
                 color = Gray1,
             )

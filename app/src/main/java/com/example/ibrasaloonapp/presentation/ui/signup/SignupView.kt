@@ -62,7 +62,7 @@ fun SignupView(
     val uiMessage = viewModel.uiState.value.uiMessage
     val progress = viewModel.uiState.value.progressBarState
 
-    val image = viewModel.state.value.image
+    val image = mainViewModel.state.value.authData?.user?.image
     val showCode = viewModel.state.value.showCode
     val verifyCode = viewModel.state.value.verifyCode
     val pagesNumber = viewModel.pagesNumber
@@ -172,7 +172,7 @@ fun Signup(
     ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (page in 2 until pagesNumber) {
+            if (page in 2 until pagesNumber && page != UPLOAD_PAGE_NUMBER) {
                 IconButton(onClick = { onPrevPage() }) {
                     Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "back arrow")
                 }
@@ -245,11 +245,11 @@ fun Signup(
         Spacer(modifier = Modifier.padding(4.dp))
 
         Button(
-            contentPadding = PaddingValues(4.dp),
+            contentPadding = PaddingValues(horizontal = 4.dp , vertical = 8.dp),
             modifier = Modifier.fillMaxWidth(),
             onClick = { if (page == pagesNumber) onDone() else onNextPage() }) {
             Text(
-                text = if (page < pagesNumber) "Next" else "Done",
+                text = if (page < pagesNumber) stringResource(R.string.next) else stringResource(R.string.done),
                 style = MaterialTheme.typography.body1
             )
         }
@@ -440,8 +440,7 @@ fun PhonePage(
                 Spacer(modifier = Modifier.padding(4.dp))
 
                 Button(onClick = { sendAuthVerification() }) {
-                    Text(text = "Verify")
-
+                    Text(text = stringResource(id = R.string.verify))
                 }
             }
         }
@@ -520,7 +519,7 @@ fun UploadImage(
 
         Text(
             textAlign = TextAlign.Center,
-            text = "Lets add a profile image",
+            text = stringResource(R.string.lets_add_a_profile_image),
             style = MaterialTheme.typography.h2,
             color = MaterialTheme.colors.onBackground,
         )
@@ -531,7 +530,7 @@ fun UploadImage(
             onClick = navigateToUploadImage,
             colors = ButtonDefaults.buttonColors(backgroundColor = Gray1)
         ) {
-            Text(text = "Click here", color = MaterialTheme.colors.onBackground)
+            Text(text = stringResource(R.string.click_here), color = MaterialTheme.colors.onBackground)
         }
     }
 }

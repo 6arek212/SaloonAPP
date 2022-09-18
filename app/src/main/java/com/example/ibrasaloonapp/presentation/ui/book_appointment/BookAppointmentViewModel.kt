@@ -5,26 +5,26 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.KeyValueWrapper
+import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.core.getDateAsString
-import com.example.ibrasaloonapp.domain.use_case.ValidateRequired
-import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.network.Resource
-import com.example.ibrasaloonapp.network.model.BookAppointmentDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
-import com.example.ibrasaloonapp.repository.AppointmentRepository
 import com.example.ibrasaloonapp.repository.AuthRepository
-import com.example.ibrasaloonapp.repository.WorkerRepository
-import com.example.ibrasaloonapp.use.GetWorkersUseCase
-import com.example.trainingapp.network.NetworkErrors
+import com.example.ibrasaloonapp.use.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private const val TAG = "BookAppointmentViewMode"
@@ -34,12 +34,12 @@ class BookAppointmentViewModel
 @Inject
 constructor(
     private val context: Application,
-    private val repository: AppointmentRepository,
     private val authRepository: AuthRepository,
-    private val workerRepository: WorkerRepository,
     private val getWorkersUseCase: GetWorkersUseCase,
-    private val validateRequired: ValidateRequired,
-    private val application: Application
+    private val bookAppointmentUseCase: BookAppointmentUseCase,
+    private val getAvailableAppointmentUseCase: GetAvailableAppointmentUseCase,
+    private val getServicesUseCase: GetServicesUseCase,
+    private val getWorkingDatesUseCase: GetWorkingDatesUseCase,
 ) : BaseViewModel() {
 
 
@@ -60,7 +60,7 @@ constructor(
                     _state.value = _state.value.copy(
                         selectedWorker = event.worker,
                         selectedWorkingDate = null,
-                        selectedService = "",
+                        selectedService = null,
                         selectedAppointment = null,
                         workingDates = listOf(),
                         services = listOf(),
@@ -72,7 +72,7 @@ constructor(
                 is BookAppointmentEvent.OnSelectedWorkingDate -> {
                     _state.value = _state.value.copy(
                         selectedWorkingDate = event.date,
-                        selectedService = "",
+                        selectedService = null,
                         selectedAppointment = null,
                         services = listOf(),
                         availableAppointments = listOf()
@@ -123,64 +123,33 @@ constructor(
     }
 
     private suspend fun getWorkingDates() {
-        val workerId = _state.value.selectedWorker
+        val workerId = _state.value.selectedWorker?.id ?: return
         val fromDate = getDateAsString()
-        Log.d(TAG, "getWorkingDates: ${fromDate}")
+        Log.d(TAG, "getWorkingDates: $fromDate $workerId")
 
-        if (workerId == null)
-            return
+        getWorkingDatesUseCase(fromDate = fromDate, workerId = workerId).onEach {
+            when (it) {
 
-        loading(true)
+                is Resource.Loading -> {
+                    loading(it.value)
+                }
 
-        val result = workerRepository.getWorkingDates(workerId = workerId.id, fromDate = fromDate)
-
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(workingDates = result.value)
-                Log.d(TAG, "getWorkingDates: ${result.value}")
-            }
-
-            is ApiResult.GenericError -> {
-                Log.d(TAG, "GenericError: ${result.errorMessage}")
-
-                val message = when (result.code) {
-
-                    NetworkErrors.ERROR_400 -> {
-                        context.getString(R.string.bad_request)
-                    }
-
-                    NetworkErrors.ERROR_401 -> {
-                        context.getString(R.string.not_authorized)
-                    }
-
-                    else -> {
-                        context.getString(R.string.something_went_wrong)
+                is Resource.Success -> {
+                    it.data?.let { workingDates ->
+                        _state.value = _state.value.copy(workingDates = workingDates)
                     }
                 }
 
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = message
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
                     )
-                )
-                if (result.code == 401) {
-//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
-
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
-
-
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 
@@ -218,160 +187,119 @@ constructor(
         if (workerId == null || workingDate == null)
             return
 
-        loading(true)
 
-        val result = repository.getAvailableAppointments(
-            workingDate,
-            workerId
-        )
+        getAvailableAppointmentUseCase(
+            workingDate = workingDate,
+            workerId = workerId
+        ).onEach { data ->
+            when (data) {
 
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(availableAppointments = result.value)
-                Log.d(TAG, "getAvailableAppointments: ${result.value}")
-            }
+                is Resource.Loading -> {
+                    loading(data.value)
+                }
 
-            is ApiResult.GenericError -> {
-                Log.d(TAG, "GenericError: ${result.errorMessage}")
-
-                val message = when (result.code) {
-
-                    NetworkErrors.ERROR_400 -> {
-                        context.getString(R.string.bad_request)
-                    }
-
-                    NetworkErrors.ERROR_401 -> {
-                        context.getString(R.string.not_authorized)
-                    }
-
-                    else -> {
-                        context.getString(R.string.something_went_wrong)
+                is Resource.Success -> {
+                    data.data?.let { availableAppointments ->
+                        _state.value =
+                            _state.value.copy(availableAppointments = availableAppointments)
                     }
                 }
 
-
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = message
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = data.message
+                        )
                     )
-                )
-                if (result.code == 401) {
-//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
 
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
+        }.launchIn(viewModelScope)
 
-
-        loading(false)
     }
 
 
     private suspend fun getServices() {
         val workerId = _state.value.selectedWorker?.id ?: return
+        getServicesUseCase(workerId = workerId).onEach { data ->
+            when (data) {
+                is Resource.Loading -> {
+                    loading(data.value)
+                }
 
-        loading(true)
-        val list = listOf(
-            ServiceType.HairCut("Hair Cut", application.getString(R.string.hair_cut)),
-            ServiceType.HairCut("Wax", application.getString(R.string.wax)),
-        )
+                is Resource.Success -> {
+                    data.data?.let { services ->
+                        _state.value = _state.value.copy(services = services)
+                    }
+                }
 
-        _state.value = _state.value.copy(services = list)
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = data.message
+                        )
+                    )
+                }
+            }
 
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 
     private suspend fun book() {
-        val service = _state.value.selectedService
+        val service = _state.value.selectedService?.key
         val appointment = _state.value.selectedAppointment
         val userId = authRepository.getUserId() ?: return
 
-        if (appointment == null || service.isBlank())
+        if (appointment == null || service == null)
             return
 
-        loading(true)
 
-        val appointmentDTO =
-            BookAppointmentDto(
-                service = service,
-                appointmentId = appointment.id,
-                userId = userId
-            )
+        bookAppointmentUseCase(
+            service = service,
+            appointmentId = appointment.id,
+            userId = userId
+        ).onEach {
+            when (it) {
 
-        val result = repository.bookAppointment(appointmentDTO)
+                is Resource.Loading -> {
+                    loading(it.value)
+                }
 
-        when (result) {
-            is ApiResult.Success -> {
-                _state.value = _state.value.copy(
-                    selectedWorker = null,
-                    selectedWorkingDate = null,
-                    selectedService = "",
-                    selectedAppointment = null,
-                    workingDates = listOf(),
-                    services = listOf(),
-                    availableAppointments = listOf(),
-                )
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.booked),
-                        description = context.getString(R.string.the_appointment_has_been_booked)
-                    )
-                )
-                _events.send(BookAppointmentUIEvent.OnBookAppointment(result.value))
-            }
-            is ApiResult.GenericError -> {
-                Log.d(TAG, "GenericError: ${result.errorMessage}")
-                val message = when (result.code) {
-
-                    NetworkErrors.ERROR_400 -> {
-                        when (result.genericCode) {
-                            1 -> context.getString(R.string.you_already_have_an_appointment)
-                            2 -> context.getString(R.string.appointment_has_already_been_booked)
-                            else -> context.getString(R.string.bad_request)
-                        }
-                    }
-
-                    NetworkErrors.ERROR_401 -> {
-                        context.getString(R.string.not_authorized)
-                    }
-
-                    else -> {
-                        context.getString(R.string.something_went_wrong)
+                is Resource.Success -> {
+                    it.data?.let { appointment ->
+                        _state.value = _state.value.copy(
+                            selectedWorker = null,
+                            selectedWorkingDate = null,
+                            selectedService = null,
+                            selectedAppointment = null,
+                            workingDates = listOf(),
+                            services = listOf(),
+                            availableAppointments = listOf(),
+                        )
+                        sendMessage(
+                            UIComponent.Dialog(
+                                title = context.getString(R.string.booked),
+                                description = context.getString(R.string.the_appointment_has_been_booked)
+                            )
+                        )
+                        _events.send(BookAppointmentUIEvent.OnBookAppointment(appointment))
                     }
                 }
 
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = message
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
                     )
-                )
-                if (result.code == 401) {
-//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
+        }.launchIn(viewModelScope)
 
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
-
-        loading(false)
     }
 
 

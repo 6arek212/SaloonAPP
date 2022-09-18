@@ -7,9 +7,12 @@ import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.network.model.UserDtoMapper
 import com.example.ibrasaloonapp.network.model.UserUpdateDto
 import com.example.ibrasaloonapp.network.services.UserService
+import com.example.ibrasaloonapp.presentation.AuthEvent
 import com.example.trainingapp.util.safeApiCall
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -29,7 +32,8 @@ class UserRepositoryImpl
 constructor(
     private val userDtoMapper: UserDtoMapper,
     private val userService: UserService,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val authRepository: AuthRepository
 ) : UserRepository {
 
     override suspend fun uploadImage(
@@ -53,19 +57,26 @@ constructor(
         }
     }
 
-    override suspend fun getUser(): ApiResult<User> {
+    override suspend fun getUser(userId: String): ApiResult<User> {
         return safeApiCall(dispatcher) {
-            userDtoMapper.mapToDomainModel(userService.getUser().user)
+            userDtoMapper.mapToDomainModel(userService.getUser(userId = userId).user)
         }
     }
 
-    override suspend fun updateUser(user: UserUpdateDto): ApiResult<User> {
+    override suspend fun updateUser(userDto: UserUpdateDto, userId: String): ApiResult<User> {
         return safeApiCall(dispatcher) {
-            userDtoMapper.mapToDomainModel(userService.updateUser(user).user)
+            val userResult = userDtoMapper.mapToDomainModel(
+                userService.updateUser(
+                    user = userDto,
+                    userId = userId
+                ).user
+            )
+            authRepository.updateUserData(user = userResult)
+            userResult
         }
     }
 
-    override suspend fun deleteUser(): ApiResult<String> {
+    override suspend fun deleteUser(userId: String): ApiResult<String> {
         return safeApiCall(dispatcher) {
             userService.deleteUser().message
         }

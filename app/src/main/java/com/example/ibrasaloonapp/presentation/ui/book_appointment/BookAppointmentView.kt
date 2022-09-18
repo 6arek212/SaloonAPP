@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.KeyValueWrapper
 import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
@@ -211,9 +212,9 @@ fun PickAppointment(
     selectedAppointment: Appointment?,
     availableAppointments: List<Appointment>,
     onTriggerEvent: (BookAppointmentEvent) -> Unit,
-    selectedService: String
+    selectedService: KeyValueWrapper<String, String>?
 ) {
-    AnimatedVisibility(visible = selectedService.isNotBlank()) {
+    AnimatedVisibility(visible = selectedService != null) {
         Column() {
             Text(
                 modifier = Modifier.padding(start = 8.dp),
@@ -252,9 +253,9 @@ fun PickAppointment(
 @Composable
 fun PickService(
     selectedWorkingDate: String?,
-    services: List<ServiceType>,
+    services: List<KeyValueWrapper<String, String>>,
     onTriggerEvent: (BookAppointmentEvent) -> Unit,
-    selectedService: String
+    selectedService: KeyValueWrapper<String, String>?
 ) {
     AnimatedVisibility(visible = selectedWorkingDate != null) {
 
@@ -275,9 +276,9 @@ fun PickService(
                         text = ser.value,
                         onClick = {
                             onTriggerEvent(
-                                BookAppointmentEvent.OnSelectedService(ser.key)
+                                BookAppointmentEvent.OnSelectedService(ser)
                             )
-                        }, isSelected = ser.key == selectedService
+                        }, isSelected = ser.key == selectedService?.key
                     )
                 }
             }
@@ -353,7 +354,8 @@ private fun Workers(
                     onTriggerEvent(
                         BookAppointmentEvent.OnSelectedWorker(worker)
                     )
-                }, isSelected = worker == selectedWorker,
+                },
+                isSelected = worker == selectedWorker,
                 url = worker.image,
                 imageSize = 55.dp
             )
@@ -366,7 +368,7 @@ private fun Workers(
 @Composable
 fun BookAppointmentConfirmation(
     pickedDate: String? = null,
-    service: String? = null,
+    service: KeyValueWrapper<String, String>? = null,
     workerName: String? = null,
     onBook: () -> Unit,
     sheetState: BottomSheetState
@@ -431,7 +433,7 @@ fun BookAppointmentConfirmation(
                             )
                         }
                     }" +
-                    " ${stringResource(id = R.string.for_a)} ${service}",
+                    " ${stringResource(id = R.string.for_a)} ${service?.value}",
             style = MaterialTheme.typography.h6,
             textAlign = TextAlign.Center
         )

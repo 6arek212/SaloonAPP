@@ -11,13 +11,18 @@ import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.network.model.UserUpdateDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
+import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.UserRepository
 import com.example.ibrasaloonapp.ui.defaultErrorMessage
+import com.example.ibrasaloonapp.use.UpdateProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,20 +36,13 @@ class EditProfileViewModel
 constructor(
     private val context: Application,
     private val savedState: SavedStateHandle,
-    private val userRepository: UserRepository
+    private val updateProfileUseCase: UpdateProfileUseCase,
+    private val authRepository: AuthRepository
 ) : BaseViewModel() {
 
-    sealed class UIEvent {
-        class UpdateUser(val user: User) : UIEvent()
-    }
 
     private val _state: MutableState<EditProfileState> = mutableStateOf(EditProfileState())
     val state: State<EditProfileState> = _state
-
-
-    private val _events = Channel<UIEvent>()
-    val events = _events.receiveAsFlow()
-
 
     init {
         val userId = savedState.get<String>("userId")
@@ -93,50 +91,41 @@ constructor(
         val firstName = state.value.firstName
         val lastName = state.value.lastName
         val phone = state.value.phone
-
-        loading(true)
-
+        val userId = authRepository.getUserId() ?: return
         //need validation !
 
-        val userUpdate =
-            UserUpdateDto(firstName = firstName, lastName = lastName, phone = phone)
+        updateProfileUseCase(
+            firstName = firstName,
+            lastName = lastName,
+            phone = phone,
+            userId = userId
+        ).onEach {
+            when (it) {
+                is Resource.Loading -> {
+                    loading(it.value)
+                }
 
+                is Resource.Success -> {
+                    it.data?.let { user ->
+                        sendMessage(
+                            UIComponent.Dialog(
+                                title = context.getString(R.string.updated),
+                                context.getString(R.string.your_profile_has_been_updated)
+                            )
+                        )
+                    }
+                }
 
-        val result = userRepository.updateUser(userUpdate)
-        when (result) {
-            is ApiResult.Success -> {
-                Log.d(TAG, "updateProfile: updated")
-                _events.send(UIEvent.UpdateUser(result.value))
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = "Updated",
-                        "You'r profile has been updated !"
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
                     )
-                )
-            }
-            is ApiResult.GenericError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = "Error",
-                        description = result.code.defaultErrorMessage(context)
-                    )
-                )
-                if (result.code == 401) {
-//                    sendUiEvent(MainUIEvent.Logout)
                 }
             }
-
-            is ApiResult.NetworkError -> {
-                sendMessage(
-                    UIComponent.Dialog(
-                        title = context.getString(R.string.error),
-                        description = context.getString(R.string.something_went_wrong)
-                    )
-                )
-            }
-        }
-
-        loading(false)
+        }.launchIn(viewModelScope)
     }
 
 

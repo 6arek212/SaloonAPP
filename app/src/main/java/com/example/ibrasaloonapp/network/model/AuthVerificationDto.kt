@@ -7,6 +7,9 @@ data class AuthVerificationDto(
     val phone: String,
 
     @SerializedName("isLogin")
-    val isLogin: Boolean? = null
+    val isLogin: Boolean? = null,
+
+    @SerializedName("isSignup")
+    val isSignup: Boolean? = null
 ) {
 }

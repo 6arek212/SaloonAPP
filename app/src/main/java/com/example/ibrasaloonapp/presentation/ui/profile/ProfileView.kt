@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.presentation.ui.profile
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -37,10 +38,11 @@ fun ProfileView(
     viewModel: ProfileViewModel = hiltViewModel(),
     mainViewModel: MainActivityViewModel
 ) {
-    val user = viewModel.state.value.user
+    val user = mainViewModel.state.value.authData?.user
     val progress = viewModel.uiState.value.progressBarState
     val uiMessage = viewModel.uiState.value.uiMessage
 
+    Log.d(TAG, "ProfileView: ${user}")
 
     user?.let {
 
@@ -62,7 +64,7 @@ fun ProfileView(
                         .fillMaxWidth()
                         .zIndex(1f),
                     navigateToUpdatePage = {
-                        navController.navigate(Screen.EditProfile.route + "/${user.id}/${user.firstName}/${user.lastName}/${user.phone}"){
+                        navController.navigate(Screen.EditProfile.route + "/${user.id}/${user.firstName}/${user.lastName}/${user.phone}") {
                             popUpTo(Screen.Profile.route)
                             launchSingleTop = true
                         }
