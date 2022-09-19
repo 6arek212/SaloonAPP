@@ -7,11 +7,5 @@ data class UserUpdateDto(
     val firstName: String? = null,
 
     @SerializedName("lastName")
-    val lastName: String? = null,
-
-    @SerializedName("phone")
-    val phone: String? = null,
-
-
-    ) {
-}
+    val lastName: String? = null
+    )

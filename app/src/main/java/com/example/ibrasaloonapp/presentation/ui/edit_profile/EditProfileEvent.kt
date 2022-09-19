@@ -1,7 +1,6 @@
 package com.example.ibrasaloonapp.presentation.ui.edit_profile
 
-import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
-
+import com.example.ibrasaloonapp.presentation.ui.login.CodeDigitPlace
 
 sealed class EditProfileEvent {
     class OnFirstNameChanged(val name: String) : EditProfileEvent()
@@ -9,4 +8,8 @@ sealed class EditProfileEvent {
     class OnPhoneChanged(val phone: String) : EditProfileEvent()
     object UpdateProfile :EditProfileEvent()
     object OnRemoveHeadFromQueue : EditProfileEvent()
+    object SendAuthVerification : EditProfileEvent()
+    class OnCodeDigitChanged(val codePlace: CodeDigitPlace, val value: String) : EditProfileEvent()
+    object OnRestCode : EditProfileEvent()
+
 }

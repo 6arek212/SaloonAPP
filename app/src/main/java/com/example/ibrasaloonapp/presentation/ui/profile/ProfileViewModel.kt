@@ -15,6 +15,7 @@ import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.ui.upload.UploadUIEvent
+import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.UserRepository
 import com.example.ibrasaloonapp.ui.defaultErrorMessage
 import com.example.ibrasaloonapp.use.GetUserUseCase
@@ -33,6 +34,7 @@ class ProfileViewModel
 constructor(
     private val context: Application,
     private val savedState: SavedStateHandle,
+    private val authRepository: AuthRepository,
     private val getUserUseCase: GetUserUseCase
 ) : BaseViewModel() {
 
@@ -43,7 +45,7 @@ constructor(
 
     init {
         Log.d(TAG, " ProfileViewModel ")
-//        onTriggerEvent(ProfileEvent.GetUser)
+        onTriggerEvent(ProfileEvent.GetUser)
     }
 
     fun onTriggerEvent(event: ProfileEvent) {
@@ -57,37 +59,37 @@ constructor(
 //                    _state.value = _state.value.copy(user = user)
 //                }
 
-//                is ProfileEvent.GetUser -> {
-//                    getUser()
-//                }
+                is ProfileEvent.GetUser -> {
+                    getUser()
+                }
             }
         }
     }
 
 
-//    private suspend fun getUser() {
-//        getUserUseCase().onEach {
-//            when (it) {
-//                is Resource.Loading -> {
-//                    loading(it.value)
-//                }
-//
-//                is Resource.Success -> {
-//                    it.data?.let { user ->
-//                        _state.value = _state.value.copy(user = user)
-//                    }
-//                }
-//
-//                is Resource.Error -> {
-//                    sendMessage(
-//                        UIComponent.Dialog(
-//                            title = context.getString(R.string.error),
-//                            description = it.message
-//                        )
-//                    )
-//                }
-//            }
-//        }.launchIn(viewModelScope)
-//    }
+    private suspend fun getUser() {
+        val userId = authRepository.getUserId() ?: return
+
+        getUserUseCase(userId).onEach {
+            when (it) {
+                is Resource.Loading -> {
+                    loading(it.value)
+                }
+
+                is Resource.Success -> {
+
+                }
+
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Dialog(
+                            title = context.getString(R.string.error),
+                            description = it.message
+                        )
+                    )
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
 
 }

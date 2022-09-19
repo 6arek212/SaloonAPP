@@ -46,6 +46,10 @@ constructor(
                         context.getString(R.string.code_not_match)
                     }
 
+                    NetworkErrors.ERROR_400 -> {
+                        context.getString(R.string.user_with_this_number_already_exists)
+                    }
+
                     else -> {
                         context.getString(R.string.something_went_wrong)
                     }

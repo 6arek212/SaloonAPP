@@ -1,14 +1,9 @@
 package com.example.ibrasaloonapp.network.services
 
-import com.example.ibrasaloonapp.network.model.AuthVerificationDto
-import com.example.ibrasaloonapp.network.model.LoginDataDto
-import com.example.ibrasaloonapp.network.model.RefreshTokenDto
-import com.example.ibrasaloonapp.network.model.SignupDataDto
-import com.example.ibrasaloonapp.network.responses.AuthVerificationResponse
-import com.example.ibrasaloonapp.network.responses.LoginResponse
-import com.example.ibrasaloonapp.network.responses.RefreshTokenResponse
-import com.example.ibrasaloonapp.network.responses.SignupResponse
+import com.example.ibrasaloonapp.network.model.*
+import com.example.ibrasaloonapp.network.responses.*
 import retrofit2.http.Body
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 
 interface AuthService {
@@ -25,8 +20,8 @@ interface AuthService {
     suspend fun signupAndVerifyPhone(@Body data: SignupDataDto): SignupResponse
 
 
-    @POST("verify-phone")
-    suspend fun verifyPhone()
+    @PATCH("verify-update-phone")
+    suspend fun verifyAndUpdatePhone(@Body data: VerifyUpdatePhoneDto): MessageResponse
 
 
     @POST("refresh-token")

@@ -30,7 +30,7 @@ constructor(
     private val _authData = MutableStateFlow<AuthEvent>(AuthEvent.Nothing)
     val authData: Flow<AuthEvent> = _authData
 
-    private var userId: String? = null
+    private var user: User? = null
 
     override suspend fun getAuthFlow(): Flow<AuthEvent> {
         return authData
@@ -38,15 +38,27 @@ constructor(
 
 
     override fun getUserId(): String? {
-        return userId
+        return user?.id
     }
 
     override suspend fun updateUserImage(path: String) {
-        _authData.emit(AuthEvent.UpdateUserImage(path = path))
+        user?.let {
+            _authData.emit(AuthEvent.UpdateUser(it.copy(image = path)))
+            application.dataStore.edit { settings ->
+                settings[USER_IMAGE] = path
+            }
+        }
     }
 
     override suspend fun updateUserData(user: User) {
-        _authData.emit(AuthEvent.UpdateUser(user))
+        this.user?.let {
+            if (user.id == it.id) {
+                application.dataStore.edit { settings ->
+                    settings.insertUser(user)
+                }
+                _authData.emit(AuthEvent.UpdateUser(user))
+            }
+        }
     }
 
     override suspend fun getCacheAuthData(updateStatus: Boolean): AuthData? {
@@ -55,7 +67,7 @@ constructor(
             if (it.token.isEmpty()) {
                 return null
             }
-            userId = it.user.id
+            user = it.user
 
             if (updateStatus) {
                 _authData.emit(AuthEvent.Login(it))
@@ -80,6 +92,20 @@ constructor(
         }
     }
 
+
+    override suspend fun verifyAndUpdatePhone(dto: VerifyUpdatePhoneDto): ApiResult<String> {
+        return safeApiCall(dispatcher) {
+            val msg = authService.verifyAndUpdatePhone(dto).message
+            user?.let {
+                _authData.emit(AuthEvent.UpdateUser(it.copy(phone = dto.phone)))
+            }
+            application.dataStore.edit { settings ->
+                settings[PHONE] = dto.phone
+            }
+            msg
+        }
+    }
+
     override suspend fun login(loginDataDto: LoginDataDto): ApiResult<AuthData> {
         val result = safeApiCall(dispatcher) {
             val res = authService.loginAndVerifyPhone(loginDataDto).authDataDto
@@ -93,7 +119,7 @@ constructor(
                 application.dataStore.edit { settings ->
                     settings.insertAuthData(result.value)
                 }
-                userId = result.value.user.id
+                user = result.value.user
                 _authData.emit(AuthEvent.Login(result.value))
                 ApiResult.Success(result.value)
             }
@@ -114,7 +140,7 @@ constructor(
 
 
     override suspend fun logout() {
-        userId = null
+        user = null
         application.dataStore.edit { settings ->
             settings.clearAuthData()
         }
@@ -134,7 +160,7 @@ constructor(
                 application.dataStore.edit { settings ->
                     settings.insertAuthData(result.value)
                 }
-                userId = result.value.user.id
+                user = result.value.user
                 _authData.emit(AuthEvent.Login(result.value))
                 ApiResult.Success(result.value)
             }

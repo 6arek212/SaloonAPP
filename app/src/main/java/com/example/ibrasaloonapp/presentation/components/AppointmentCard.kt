@@ -8,15 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.stringDateFormat
@@ -44,7 +39,7 @@ fun AppointmentCard(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            if (appointment.isActive) {
+            if (appointment.status === "in-progress") {
                 Row(
                     modifier = Modifier
                         .padding(8.dp),

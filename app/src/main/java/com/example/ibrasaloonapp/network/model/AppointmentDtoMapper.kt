@@ -39,7 +39,7 @@ constructor(
         return Appointment(
             id = model.id ?: "",
             customer = model.customer?.let { customerMapper.mapToDomainModel(it) },
-            isActive = model.isActive,
+            status = model.status,
             service = service,
             startTime = model.startTime,
             endTime = model.endTime,
@@ -51,7 +51,7 @@ constructor(
         return AppointmentDto(
             id = domainModel.id,
             customer = domainModel.customer?.let { customerMapper.mapFromDomainModel(it) },
-            isActive = domainModel.isActive,
+            status = domainModel.status,
             service = domainModel.service?.value,
             startTime = domainModel.startTime,
             endTime = domainModel.endTime,

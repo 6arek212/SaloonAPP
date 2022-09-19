@@ -1,6 +1,7 @@
 package com.example.ibrasaloonapp.use
 
 import android.app.Application
+import android.util.Log
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult

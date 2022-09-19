@@ -5,12 +5,12 @@ import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.LoginDataDto
 import com.example.ibrasaloonapp.network.model.SignupDataDto
+import com.example.ibrasaloonapp.network.model.VerifyUpdatePhoneDto
 import com.example.ibrasaloonapp.presentation.AuthEvent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-
 
     suspend fun sendAuthVerification(
         phone: String,
@@ -38,5 +38,5 @@ interface AuthRepository {
 
     suspend fun updateUserImage(path: String)
 
-
+    suspend fun verifyAndUpdatePhone(dto: VerifyUpdatePhoneDto): ApiResult<String>
 }

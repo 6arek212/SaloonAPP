@@ -32,7 +32,9 @@ import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
+import com.example.ibrasaloonapp.presentation.ui.edit_profile.ChangePhoneNumberView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
+import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileViewModel
 import com.example.ibrasaloonapp.presentation.ui.home.*
 import com.example.ibrasaloonapp.presentation.ui.login.LoginView
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
@@ -133,8 +135,8 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
         onRemoveUIComponent = { mainViewModel.onTriggerEvent(MainEvent.RemoveMessage) },
         uiComponent = uiMessage,
         dialogOnConfirm = {
-            when(it){
-                is DialogEvent.Logout->{
+            when (it) {
+                is DialogEvent.Logout -> {
                     mainViewModel.onTriggerEvent(MainEvent.Logout)
                 }
             }
@@ -190,6 +192,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 uploadImage(navController = navController, mainViewModel = mainViewModel)
                 profile(navController = navController, mainViewModel = mainViewModel)
                 editProfile(navController = navController, mainViewModel = mainViewModel)
+                updatePhoneNumber(navController = navController, mainViewModel = mainViewModel)
             }
         }
     }
@@ -334,16 +337,34 @@ fun NavGraphBuilder.editProfile(
         route = Screen.EditProfile.route + "/{userId}/{firstName}/{lastName}/{phone}",
         arguments = Screen.EditProfile.arguments
     ) {
-        val previousViewModel: ProfileViewModel? = navController
+
+        EditProfileView(
+            navController = navController,
+            mainViewModel = mainViewModel
+        )
+    }
+}
+
+
+fun NavGraphBuilder.updatePhoneNumber(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel
+) {
+    composable(
+        route = Screen.UpdatePhoneNumber.route,
+        arguments = Screen.UpdatePhoneNumber.arguments
+    ) {
+        val previousViewModel: EditProfileViewModel? = navController
             .previousBackStackEntry?.let {
                 hiltViewModel(it)
             }
 
-        EditProfileView(
-            navController = navController,
-            profileViewModel = previousViewModel,
-            mainViewModel = mainViewModel
-        )
+        previousViewModel?.let {
+            ChangePhoneNumberView(
+                navController = navController,
+                editProfileViewModel = previousViewModel
+            )
+        }
     }
 }
 

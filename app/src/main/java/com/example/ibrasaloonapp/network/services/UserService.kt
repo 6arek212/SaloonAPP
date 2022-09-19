@@ -18,16 +18,16 @@ interface UserService {
     suspend fun getUsers(): UsersResponse
 
 
-    @GET("users/{:userId}")
-    suspend fun getUser(@Query("userId") userId: String): UserResponse
+    @GET("users/{userId}")
+    suspend fun getUser(@Path("userId") userId: String): UserResponse
 
 
-    @PATCH("users/{:userId}")
-    suspend fun updateUser(@Body user: UserUpdateDto, @Query("userId") userId: String): UserResponse
+    @PATCH("users/{userId}")
+    suspend fun updateUser(@Path("userId") userId: String, @Body user: UserUpdateDto): UserResponse
 
 
-    @DELETE("users/{:userId}")
-    suspend fun deleteUser(): MessageResponse
+    @DELETE("users/{userId}")
+    suspend fun deleteUser(@Path("userId") userId: String): MessageResponse
 
 
     @Multipart

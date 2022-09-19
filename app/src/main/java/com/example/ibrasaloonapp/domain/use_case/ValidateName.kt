@@ -45,7 +45,7 @@ constructor(
         }
 
 
-        if (!value.matches("^[a-z\\u0590-\\u05fe\\u0621-\\u064A]+( [a-z\\u0590-\\u05fe\\u0621-\\u064A]+)*[ ]*\$".toRegex())) {
+        if (!value.matches("^[a-zA-Z\\u0590-\\u05fe\\u0621-\\u064A]+( [a-zA-Z\\u0590-\\u05fe\\u0621-\\u064A]+)*[ ]*\$".toRegex())) {
             return ValidationResult(
                 successful = false,
                 errorMessage = context.getString(

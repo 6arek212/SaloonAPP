@@ -36,6 +36,18 @@ fun MutablePreferences.insertAuthData(authData: AuthData) {
 }
 
 
+
+
+fun MutablePreferences.insertUser(user: User) {
+    this[USER_ID] = user.id
+    this[USER_FIRST_NAME] = user.firstName
+    this[USER_LAST_NAME] = user.lastName
+    this[USER_IMAGE] = user.image ?: ""
+    this[PHONE] = user.phone
+}
+
+
+
 fun MutablePreferences.clearAuthData() {
     this[TOKEN] = ""
     this[REFRESH_TOKEN] = ""

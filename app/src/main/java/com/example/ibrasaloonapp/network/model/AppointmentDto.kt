@@ -23,6 +23,6 @@ data class AppointmentDto(
     @SerializedName("end_time")
     val endTime: String,
 
-    @SerializedName("isActive")
-    val isActive: Boolean
+    @SerializedName("status")
+    val status: String
 )

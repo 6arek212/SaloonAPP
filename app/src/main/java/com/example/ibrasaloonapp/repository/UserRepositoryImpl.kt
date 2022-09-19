@@ -59,12 +59,15 @@ constructor(
 
     override suspend fun getUser(userId: String): ApiResult<User> {
         return safeApiCall(dispatcher) {
-            userDtoMapper.mapToDomainModel(userService.getUser(userId = userId).user)
+            val user = userDtoMapper.mapToDomainModel(userService.getUser(userId = userId).user)
+            authRepository.updateUserData(user = user)
+            user
         }
     }
 
     override suspend fun updateUser(userDto: UserUpdateDto, userId: String): ApiResult<User> {
         return safeApiCall(dispatcher) {
+            Log.d(TAG, "updateUser: ${userId}")
             val userResult = userDtoMapper.mapToDomainModel(
                 userService.updateUser(
                     user = userDto,
@@ -78,7 +81,7 @@ constructor(
 
     override suspend fun deleteUser(userId: String): ApiResult<String> {
         return safeApiCall(dispatcher) {
-            userService.deleteUser().message
+            userService.deleteUser(userId = userId).message
         }
     }
 }

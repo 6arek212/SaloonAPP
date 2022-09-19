@@ -10,7 +10,7 @@ data class Appointment(
     val service: KeyValueWrapper<String, String>? = null,
     val startTime: String,
     val endTime: String,
-    val isActive: Boolean,
+    val status: String,
     val customer: User? = null,
     val worker: User
 )

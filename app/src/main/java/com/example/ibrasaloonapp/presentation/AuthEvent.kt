@@ -8,5 +8,4 @@ sealed class AuthEvent {
     object Logout : AuthEvent()
     class Login(val authData: AuthData) : AuthEvent()
     class UpdateUser(val user: User) : AuthEvent()
-    class UpdateUserImage(val path: String) : AuthEvent()
 }

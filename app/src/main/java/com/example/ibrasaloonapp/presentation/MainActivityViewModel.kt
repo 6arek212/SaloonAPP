@@ -120,15 +120,6 @@ constructor(
                         _state.value = state.value.copy(authData = authData)
                     }
 
-                    is AuthEvent.UpdateUserImage -> {
-                        Log.d(TAG, "observeAuthStatus: ${data.path}  returned image")
-                        val newUser = _state.value.authData?.user?.copy(image = data.path)
-                        if (newUser != null) {
-                            val authData = _state.value.authData?.copy(user = newUser)
-                            _state.value = state.value.copy(authData = authData)
-                        }
-                    }
-
                     is AuthEvent.Nothing -> {
 
                     }
