@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.Composable
@@ -87,7 +88,8 @@ fun ChangePhoneNumberView(
             },
             onRestCode = { editProfileViewModel.onTriggerEvent(EditProfileEvent.OnRestCode) },
             clearFocus = focusManager::clearFocus,
-            moveFocus = focusManager::moveFocus
+            moveFocus = focusManager::moveFocus,
+            close = navController::popBackStack
         )
     }
 
@@ -105,7 +107,8 @@ fun ChangePhoneNumber(
     onCodeDigitChanged: (CodeDigitPlace, String) -> Unit,
     onRestCode: () -> Unit,
     moveFocus: (focusDirection: FocusDirection) -> Unit,
-    clearFocus: () -> Unit
+    clearFocus: () -> Unit,
+    close: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val interactionSource = remember { MutableInteractionSource() }
@@ -122,7 +125,17 @@ fun ChangePhoneNumber(
             ) { clearFocus() }
     ) {
 
-        SubTitle(text = "Change Phone Number")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = close) {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "back arrow")
+            }
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            SubTitle(text = stringResource(R.string.change_phone_number))
+        }
+
+
 
         Spacer(modifier = Modifier.padding(16.dp))
 
@@ -134,7 +147,7 @@ fun ChangePhoneNumber(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     label = {
-                        Text(text = "Phone")
+                        Text(text = stringResource(id = R.string.phone))
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -200,7 +213,8 @@ fun ChangePhoneNumberPreview() {
             onRestCode = {},
             phoneError = null,
             clearFocus = {},
-            moveFocus = {}
+            moveFocus = {},
+            close = {}
         )
     }
 }

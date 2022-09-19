@@ -96,6 +96,12 @@
     <string name="click_here">Click here</string>
     <string name="lets_add_a_profile_image">Lets add a profile image</string>
     <string name="login_or_signup">Login or Signup</string>
+    <string name="change_phone_number">Change Phone Number</string>
+    <string name="in_progress">In Progress</string>
+    <string name="canceled">Canceled</string>
+    <string name="didnt_attend">Didn\'t Attend</string>
+    <string name="empty">Empty</string>
+    <string name="sec">sec</string>
 
 
 </resources>

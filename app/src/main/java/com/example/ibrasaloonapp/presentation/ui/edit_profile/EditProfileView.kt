@@ -121,7 +121,7 @@ fun EditProfileView(
                 value = firstName,
                 singleLine = true,
                 leadingIcon = {
-                    Icon(Icons.Filled.Person, "first name")
+                    Icon(Icons.Filled.Person, stringResource(id = R.string.first_name))
                 },
                 textStyle = MaterialTheme.typography.h4
             )
@@ -151,7 +151,7 @@ fun EditProfileView(
                 value = lastName,
                 singleLine = true,
                 leadingIcon = {
-                    Icon(Icons.Filled.Info, "last name")
+                    Icon(Icons.Filled.Info, stringResource(id = R.string.last_name))
                 },
                 textStyle = MaterialTheme.typography.h4
             )
@@ -177,7 +177,7 @@ fun EditProfileView(
                     }
                 },
                 label = {
-                    Text(text = "Phone")
+                    Text(text = stringResource(id = R.string.phone))
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,

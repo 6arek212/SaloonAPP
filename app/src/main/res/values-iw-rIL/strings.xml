@@ -95,5 +95,11 @@
     <string name="click_here">לחץ פה</string>
     <string name="lets_add_a_profile_image">בוא נוסיף תמונת פרופיל</string>
     <string name="login_or_signup">כנס או הרשם</string>
+    <string name="change_phone_number">החלפת מספר טלפון</string>
+    <string name="in_progress">בטיפול</string>
+    <string name="canceled">בוטל</string>
+    <string name="didnt_attend">לא הגיע</string>
+    <string name="empty">ריק</string>
+    <string name="sec">שנ\'</string>
 
 </resources>

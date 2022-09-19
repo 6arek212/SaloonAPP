@@ -39,8 +39,10 @@ fun CommonOtp(
     LaunchedEffect(
         key1 = code.one,
     ) {
-        if (code.one.isNotEmpty() || code.isEmpty()) {
+        if (code.one.isNotEmpty() ) {
             moveFocus(FocusDirection.Next)
+        }else{
+            moveFocus(FocusDirection.Left)
         }
     }
 
@@ -49,6 +51,8 @@ fun CommonOtp(
     ) {
         if (code.two.isNotEmpty()) {
             moveFocus(FocusDirection.Next)
+        }else{
+            moveFocus(FocusDirection.Left)
         }
     }
 
@@ -57,6 +61,18 @@ fun CommonOtp(
     ) {
         if (code.three.isNotEmpty()) {
             moveFocus(FocusDirection.Next)
+        }else{
+            moveFocus(FocusDirection.Left)
+        }
+    }
+
+    LaunchedEffect(
+        key1 = code.four,
+    ) {
+        if (code.four.isNotEmpty()) {
+            moveFocus(FocusDirection.Next)
+        }else{
+            moveFocus(FocusDirection.Left)
         }
     }
 

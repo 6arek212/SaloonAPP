@@ -1,7 +1,7 @@
 package com.example.ibrasaloonapp.presentation.ui.home
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,9 +15,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -79,7 +82,7 @@ fun HomeView(
             navController = navController,
             navigateToBookAppointment = {
                 navController.navigate(Screen.BookAppointment.route) {
-                    popUpTo(Screen.Home.route){
+                    popUpTo(Screen.Home.route) {
                         saveState = true
                     }
                     restoreState = true
@@ -233,10 +236,12 @@ fun Header(
 
     Log.d(TAG, "Header: $appointment  $user   $isLoading")
 
+
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 400.dp)
+            .heightIn(min = 500.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -313,8 +318,8 @@ fun Header(
                 onShowLoginDialog = onShowLoginDialog,
             )
         }
-
     }
+
 }
 
 
@@ -470,15 +475,17 @@ fun OurStaff(workers: List<User>) {
             contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(25.dp, Alignment.CenterHorizontally),
         ) {
-            items(items = workers) { worker ->
-                VerticalImageChip(
-                    modifier = Modifier,
-                    text = "${worker.firstName} ${worker.lastName}",
-                    onClick = {},
-                    isSelected = false,
-                    url = worker.image,
-                    imageSize = 100.dp
-                )
+            items(items = workers, key = { user -> user.id }) { worker ->
+                AnimationBox(enter = expandHorizontally() + fadeIn() , exit = fadeOut() + shrinkHorizontally()) {
+                    VerticalImageChip(
+                        modifier = Modifier,
+                        text = "${worker.firstName} ${worker.lastName}",
+                        onClick = {},
+                        isSelected = false,
+                        url = worker.image,
+                        imageSize = 100.dp
+                    )
+                }
             }
         }
 

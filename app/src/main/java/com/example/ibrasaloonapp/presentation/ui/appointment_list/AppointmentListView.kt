@@ -1,5 +1,9 @@
 package com.example.ibrasaloonapp.presentation.ui.appointment_list
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -85,12 +89,13 @@ fun AppointmentListView(
             }
 
 
-
+            val lazyState = rememberLazyListState()
             SwipeRefresh(
                 state = rememberSwipeRefreshState(isRefreshing),
                 onRefresh = { viewModel.onTriggerEvent(AppointmentListEvent.Refresh) }) {
 
                 LazyColumn(
+                    state = lazyState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -108,23 +113,25 @@ fun AppointmentListView(
                     itemsIndexed(
                         items = appointments,
                         key = { index, item -> item.id }) { index, appointment ->
-                        AppointmentCard(
-                            modifier = Modifier,
-                            appointment = appointment, onUnbook = {
-                                viewModel.onTriggerEvent(
-                                    AppointmentListEvent.ShowUnbookConfirmDialog(
-                                        appointment.id,
-                                        index
+
+                        AnimationBox{
+                            AppointmentCard(
+                                modifier = Modifier,
+                                appointment = appointment, onUnbook = {
+                                    viewModel.onTriggerEvent(
+                                        AppointmentListEvent.ShowUnbookConfirmDialog(
+                                            appointment.id,
+                                            index
+                                        )
                                     )
-                                )
-                            })
+                                })
+                        }
                     }
                 }
             }
         }
     }
 }
-
 
 
 

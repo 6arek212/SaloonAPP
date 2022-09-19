@@ -1,6 +1,7 @@
 package com.example.ibrasaloonapp.network.model
 
 import android.app.Application
+import android.util.Log
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.KeyValueWrapper
 import com.example.ibrasaloonapp.domain.model.Appointment
@@ -8,10 +9,11 @@ import com.example.ibrasaloonapp.domain.util.DomainMapper
 import javax.inject.Inject
 
 
-const val HAIR_CUT = "Hair cut"
+const val HAIR_CUT = "Hair Cut"
 const val Wax = "Wax"
 
 
+private const val TAG = "AppointmentDtoMapper"
 class AppointmentDtoMapper
 @Inject
 constructor(

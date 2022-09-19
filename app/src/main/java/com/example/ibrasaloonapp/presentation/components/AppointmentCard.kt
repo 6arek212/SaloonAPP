@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -30,7 +31,7 @@ fun AppointmentCard(
 
     Card(
         modifier = modifier,
-        elevation = 8.dp,
+        elevation = 2 .dp,
         backgroundColor = Gray1,
         shape = MaterialTheme.shapes.small
     ) {
@@ -39,32 +40,41 @@ fun AppointmentCard(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            if (appointment.status === "in-progress") {
-                Row(
-                    modifier = Modifier
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(modifier = Modifier) {
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clip(CircleShape)
-                                .background(Green)
-                                .width(15.dp)
-                                .height(15.dp)
-                        )
-                        Spacer(modifier = Modifier.padding(16.dp))
-                    }
-
-                    Spacer(modifier = Modifier.padding(4.dp))
-
-                    Text(
-                        text = stringResource(id = R.string.active_appointment),
-                        style = MaterialTheme.typography.h4,
-                        color = MaterialTheme.colors.onSurface
+            Row(
+                modifier = Modifier
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier) {
+                    Box(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clip(CircleShape)
+                            .background(
+                                when (appointment.status) {
+                                    "in-progress" -> Orange
+                                    "done" -> Green
+                                    "didnt-come" -> Black4
+                                    else -> Red
+                                }
+                            )
+                            .width(15.dp)
+                            .height(15.dp)
                     )
                 }
+
+                Spacer(modifier = Modifier.padding(2.dp))
+
+                Text(
+                    text = when (appointment.status) {
+                        "in-progress" -> stringResource(id = R.string.in_progress)
+                        "done" -> stringResource(id = R.string.done)
+                        "didnt-come" -> stringResource(id = R.string.didnt_attend)
+                        else -> stringResource(id = R.string.canceled)
+                    },
+                    style = MaterialTheme.typography.body2,
+                    color = MaterialTheme.colors.onSurface
+                )
             }
 
 
@@ -125,13 +135,15 @@ fun AppointmentCard(
             }
 
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onUnbook,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Red)
+            if (appointment.status == "in-progress") {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onUnbook,
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Red)
 
-            ) {
-                Text(text = stringResource(id = R.string.unbook))
+                ) {
+                    Text(text = stringResource(id = R.string.unbook))
+                }
             }
         }
 
