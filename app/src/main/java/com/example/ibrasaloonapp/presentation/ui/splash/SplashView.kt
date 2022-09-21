@@ -51,7 +51,7 @@ private const val TAG = "SplashView"
 @Composable
 fun SplashView(
     navController: NavController,
-    mainViewModel: MainActivityViewModel = hiltViewModel()
+    mainViewModel: MainActivityViewModel
 ) {
 
     val events = mainViewModel.uiEvents
@@ -67,17 +67,16 @@ fun SplashView(
     )
 
 
-    LaunchedEffect(key1 = true) {
-
+    LaunchedEffect(key1 = mainViewModel.uiEvents) {
+        Log.d(TAG, "SplashView: launch effect")
+//        mainViewModel.onTriggerEvent(MainEvent.GetAuthData)
 
         startAnimation = true
 
-
-        events.collect() { event ->
+        events.collect { event ->
             when (event) {
                 is MainUIEvent.AuthDataReady -> {
-                    //if (event.isAuthed)
-                    delay(duration.toLong())
+//                    delay(duration.toLong())
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }

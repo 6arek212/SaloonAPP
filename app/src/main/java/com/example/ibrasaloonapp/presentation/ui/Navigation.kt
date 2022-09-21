@@ -182,7 +182,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 navController = navController,
                 startDestination = Screen.Splash.route
             ) {
-                splash(navController = navController)
+                splash(navController = navController, mainViewModel = mainViewModel)
                 login(navController = navController)
                 signup(navController = navController, mainViewModel = mainViewModel)
                 home(navController = navController, mainViewModel = mainViewModel)
@@ -200,12 +200,13 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
 
 fun NavGraphBuilder.splash(
     navController: NavController,
+    mainViewModel: MainActivityViewModel
 ) {
     composable(
         route = Screen.Splash.route,
         arguments = emptyList()
     ) {
-        SplashView(navController = navController)
+        SplashView(navController = navController, mainViewModel = mainViewModel)
     }
 }
 

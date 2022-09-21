@@ -379,6 +379,7 @@ fun BookAppointmentConfirmation(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(.5f)
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

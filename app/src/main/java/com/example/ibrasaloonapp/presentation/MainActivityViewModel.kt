@@ -14,8 +14,7 @@ import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,8 +33,8 @@ constructor(
     private val _state: MutableState<AuthState> = mutableStateOf(AuthState())
     val state: State<AuthState> = _state
 
-    private val _uiEvents = Channel<MainUIEvent>()
-    val uiEvents = _uiEvents.receiveAsFlow()
+    private val _uiEvents = MutableStateFlow<MainUIEvent>(MainUIEvent.Nothing)
+    val uiEvents: StateFlow<MainUIEvent> = _uiEvents
 
     init {
         onTriggerEvent(MainEvent.GetAuthData)
@@ -79,21 +78,17 @@ constructor(
     }
 
 
-    private fun sendUiEvent(uiEvent: MainUIEvent) {
-        viewModelScope.launch {
-            _uiEvents.send(uiEvent)
-        }
-    }
+
 
     private suspend fun checkAuth() {
         val authData = authRepository.getCacheAuthData(updateStatus = true)
         if (authData != null) {
             _state.value = state.value.copy(isLoggedIn = true, authData = authData)
-            sendUiEvent(MainUIEvent.AuthDataReady)
         } else {
             _state.value = AuthState(isLoggedIn = false, authData = null)
-            sendUiEvent(MainUIEvent.AuthDataReady)
         }
+        _uiEvents.emit(MainUIEvent.AuthDataReady)
+        Log.d(TAG, "checkAuth: emit(MainUIEvent.AuthDataReady)")
     }
 
 
@@ -102,7 +97,7 @@ constructor(
             authRepository.getAuthFlow().collect() { data ->
                 when (data) {
                     is AuthEvent.Logout -> {
-                        sendUiEvent(MainUIEvent.Logout)
+                        _uiEvents.emit(MainUIEvent.Logout)
                         _state.value = state.value.copy(isLoggedIn = false, authData = null)
                     }
 
@@ -112,7 +107,7 @@ constructor(
                             isLoggedIn = true,
                             authData = data.authData
                         )
-                        sendUiEvent(MainUIEvent.LoggedIn)
+                        _uiEvents.emit(MainUIEvent.LoggedIn)
                     }
 
                     is AuthEvent.UpdateUser -> {
@@ -165,6 +160,10 @@ constructor(
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        Log.d(TAG, "onCleared: ")
+    }
 
 }
 

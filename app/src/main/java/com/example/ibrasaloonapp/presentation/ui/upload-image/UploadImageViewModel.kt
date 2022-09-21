@@ -80,7 +80,6 @@ constructor(
         val cR = context.contentResolver
         val mime = MimeTypeMap.getSingleton()
         val type = mime.getExtensionFromMimeType(cR.getType(uri)) ?: return
-
         uploadImageUseCase(inputStream = st, fileType = type).onEach {
             when (it) {
                 is Resource.Loading -> {
@@ -89,6 +88,7 @@ constructor(
 
                 is Resource.Success -> {
                     it.data?.let { imagePath ->
+                        this.stream = null
                         _events.send(UploadUIEvent.ImageUploaded)
                     }
                 }

@@ -28,11 +28,11 @@ constructor(
 ) : AuthRepository {
 
     private val _authData = MutableStateFlow<AuthEvent>(AuthEvent.Nothing)
-    val authData: Flow<AuthEvent> = _authData
+    val authData: StateFlow<AuthEvent> = _authData
 
     private var user: User? = null
 
-    override suspend fun getAuthFlow(): Flow<AuthEvent> {
+    override suspend fun getAuthFlow(): StateFlow<AuthEvent> {
         return authData
     }
 

@@ -41,7 +41,6 @@ fun CircularImage(
 
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
-            .size(Size.ORIGINAL)
             .data(uri ?: url)
             .crossfade(true)
             .build(),

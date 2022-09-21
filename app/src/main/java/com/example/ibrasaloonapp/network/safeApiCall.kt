@@ -25,9 +25,9 @@ suspend fun <T> safeApiCall(
 ): ApiResult<T> {
     return withContext(dispatcher) {
         try {
-            withTimeout(NETWORK_TIMEOUT) {
+//            withTimeout(NETWORK_TIMEOUT) {
                 ApiResult.Success(apiCall.invoke())
-            }
+//            }
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
             when (throwable) {
