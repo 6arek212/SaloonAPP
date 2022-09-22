@@ -270,16 +270,18 @@ fun PickService(
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start)
             ) {
                 items(items = services) { ser ->
-                    CustomChip(
+                    HeaderChip(
                         text = ser.title,
+                        headerText = "${ser.price}₪" ,
                         onClick = {
                             onTriggerEvent(
                                 BookAppointmentEvent.OnSelectedService(ser)
                             )
-                        }, isSelected = ser.id == selectedService?.id
+                        },
+                        isSelected = ser.id == selectedService?.id
                     )
                 }
             }

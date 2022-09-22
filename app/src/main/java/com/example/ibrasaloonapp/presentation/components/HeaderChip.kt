@@ -9,27 +9,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ibrasaloonapp.presentation.theme.AppTheme
+import com.example.ibrasaloonapp.presentation.theme.Orange
+import com.example.ibrasaloonapp.presentation.theme.Orange2
 
 
 @Composable
-fun HeaderChip() {
+fun HeaderChip(
+    text: String,
+    headerText: String,
+    onClick: () -> Unit,
+    isSelected: Boolean,
+) {
 
     Column(modifier = Modifier) {
-        CustomChip(text = "Hair Cut", onClick = { /*TODO*/ }, isSelected = false)
+        CustomChip(text = text, onClick = onClick, isSelected = isSelected)
         Card(
-            modifier = Modifier.offset(y = -0.dp),
+            modifier = Modifier.offset(y = -10.dp),
             elevation = 8.dp,
-            shape = MaterialTheme.shapes.large,
-
+            backgroundColor = Orange2,
+            shape = MaterialTheme.shapes.large
         ) {
-            Column(modifier = Modifier.padding(4.dp)) {
-                Text(text = "50₪", style = MaterialTheme.typography.body2)
+            Box(modifier = Modifier
+                .padding(vertical = 4.dp , horizontal = 8.dp)) {
+                Text(
+                    text = headerText,
+                    style = MaterialTheme.typography.body2,
+                    color = MaterialTheme.colors.background
+                )
             }
         }
-
     }
-
-
 }
 
 
@@ -37,7 +46,12 @@ fun HeaderChip() {
 @Composable
 fun Chip() {
     AppTheme {
-        HeaderChip()
+        HeaderChip(
+            text = "Hair Cut",
+            onClick = { },
+            isSelected = false,
+            headerText = "50₪"
+        )
     }
 
 }

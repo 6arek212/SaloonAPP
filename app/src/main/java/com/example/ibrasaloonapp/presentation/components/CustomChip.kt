@@ -33,11 +33,10 @@ fun CustomChip(
         backgroundColor = if (isSelected) Orange else backgroundColor,
         onClick = onClick,
         shape = MaterialTheme.shapes.large,
-
         ) {
         Box(
             modifier = Modifier
-//                .padding(contentPaddingValues)
+                .padding(contentPaddingValues)
         ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
