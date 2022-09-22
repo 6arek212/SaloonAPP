@@ -3,13 +3,9 @@ package com.example.ibrasaloonapp.use
 import android.app.Application
 import android.util.Log
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.Resource
-import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.repository.AppointmentRepository
-import com.example.ibrasaloonapp.repository.AuthRepository
-import com.example.ibrasaloonapp.repository.WorkerRepository
 import com.example.ibrasaloonapp.ui.defaultErrorMessage
 import com.example.trainingapp.network.NetworkErrors
 import kotlinx.coroutines.flow.flow
@@ -26,11 +22,12 @@ constructor(
 ) {
 
 
-    suspend operator fun invoke(workingDate: String, workerId: String) = flow {
+    suspend operator fun invoke(workingDate: String, fromDate: String, workerId: String) = flow {
         emit(Resource.Loading(true))
 
         val result = appointmentsRepository.getAvailableAppointments(
             workingDate,
+            fromDate,
             workerId
         )
 

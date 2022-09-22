@@ -28,6 +28,7 @@ interface AppointmentService {
     @GET("appointments/available")
     suspend fun getAvailableAppointments(
         @Query("workingDate") workingDate: String,
+        @Query("fromDate") fromDate: String,
         @Query("workerId") workerId: String
     ): AvailableAppointmentsResponse
 

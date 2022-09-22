@@ -15,6 +15,7 @@ interface AppointmentRepository {
 
     suspend fun getAvailableAppointments(
         workingDate: String,
+        fromDate: String,
         workerId: String
     ): ApiResult<List<Appointment>>
 

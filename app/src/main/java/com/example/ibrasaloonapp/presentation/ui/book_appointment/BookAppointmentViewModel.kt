@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.core.getCurrentDateAsString
 import com.example.ibrasaloonapp.core.getDateAsString
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
@@ -117,7 +118,6 @@ constructor(
     }
 
 
-
     private suspend fun getWorkingDates() {
         val workerId = _state.value.selectedWorker?.id ?: return
         val fromDate = getDateAsString()
@@ -177,16 +177,14 @@ constructor(
 
 
     private suspend fun getAvailableAppointments() {
-        val workerId = _state.value.selectedWorker?.id
-        val workingDate = _state.value.selectedWorkingDate
-
-        if (workerId == null || workingDate == null)
-            return
-
+        val workerId = _state.value.selectedWorker?.id ?: return
+        val fromDate = getCurrentDateAsString()
+        val workingDate = _state.value.selectedWorkingDate ?: return
 
         getAvailableAppointmentUseCase(
             workingDate = workingDate,
-            workerId = workerId
+            workerId = workerId,
+            fromDate = fromDate
         ).onEach { data ->
             when (data) {
 

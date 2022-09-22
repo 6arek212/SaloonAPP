@@ -1,6 +1,5 @@
 package com.example.ibrasaloonapp.repository
 
-import com.example.ibrasaloonapp.core.ServiceType
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.model.*
@@ -56,12 +55,14 @@ constructor(
 
     override suspend fun getAvailableAppointments(
         workingDate: String,
+        fromDate: String,
         workerId: String
     ): ApiResult<List<Appointment>> {
         return safeApiCall(dispatcher = dispatcher) {
             mapper.toDomainList(
                 service.getAvailableAppointments(
                     workingDate = workingDate,
+                    fromDate = fromDate,
                     workerId = workerId
                 ).availableAppointments
             )

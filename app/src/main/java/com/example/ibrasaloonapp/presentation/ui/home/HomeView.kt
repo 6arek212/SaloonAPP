@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
+import com.example.ibrasaloonapp.core.navigateToWaze
 import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.AuthData
@@ -205,18 +206,23 @@ fun FrontLayer(
             isLoading = isLoading
         )
 
+        Column(modifier = Modifier.padding(horizontal = 8.dp , vertical = 12.dp)) {
 
-        AnimatedVisibility(visible = workers.isNotEmpty()) {
-            OurStaff(workers = workers)
+            AnimatedVisibility(visible = workers.isNotEmpty()) {
+                Column() {
+                    OurStaff(workers = workers)
+                    Spacer(modifier = Modifier.padding(8.dp))
+                }
+            }
+
+
+            Stories()
+
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            AboutUs()
         }
 
-        Spacer(modifier = Modifier.padding(16.dp))
-
-        Stories()
-
-        Spacer(modifier = Modifier.padding(16.dp))
-
-        AboutUs()
     }
 }
 
@@ -429,16 +435,20 @@ fun Appointment(
         verticalArrangement = Arrangement.Center
     ) {
 
-
         if (appointment != null) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(id = R.string.you_have_appointment),
+                    text = "${stringResource(id = R.string.you_have_appointment)} ${
+                        stringResource(
+                            id = R.string.for_a
+                        )
+                    } ${appointment.service?.title}",
                     color = Color.White,
-                    style = MaterialTheme.typography.h3
+                    style = MaterialTheme.typography.h3,
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.padding(4.dp))
@@ -458,6 +468,29 @@ fun Appointment(
                     onClick = { },
                     isSelected = false,
                     url = appointment.worker.image
+                )
+            }
+        }
+
+
+        Spacer(modifier = Modifier.padding(16.dp))
+
+        TextButton(
+            modifier = Modifier,
+            onClick = { navigateToWaze(context) }) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    modifier = Modifier
+                        .size(25.dp),
+                    painter = painterResource(id = R.drawable.location),
+                    contentDescription = ""
+                )
+                Spacer(modifier = Modifier.padding(4.dp))
+
+                Text(
+                    text = stringResource(R.string.find_us),
+                    style = MaterialTheme.typography.h4,
+                    color = MaterialTheme.colors.background
                 )
             }
         }

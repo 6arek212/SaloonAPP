@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
@@ -26,7 +27,7 @@ suspend fun <T> safeApiCall(
     return withContext(dispatcher) {
         try {
 //            withTimeout(NETWORK_TIMEOUT) {
-                ApiResult.Success(apiCall.invoke())
+            ApiResult.Success(apiCall.invoke())
 //            }
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
@@ -64,8 +65,19 @@ suspend fun <T> safeApiCall(
 private fun convertErrorBody(throwable: HttpException): Pair<String?, Int?> {
     return try {
         throwable.response()?.errorBody()?.string()?.let {
-            Log.d(TAG, "convertErrorBody: ${it} ${ JSONObject(it).getInt("errorCode")}")
-           return Pair(JSONObject(it).getString("message"), JSONObject(it).getInt("errorCode"))
+            val errorCode = try {
+                JSONObject(it).getInt("errorCode")
+            } catch (e: JSONException) {
+                null
+            }
+
+            val message = try {
+                JSONObject(it).getString("message")
+            } catch (e: JSONException) {
+                null
+            }
+            Log.d(TAG, "convertErrorBody: $message $errorCode ")
+            return Pair(message, errorCode)
         }
         Pair(ERROR_UNKNOWN, null)
     } catch (exception: Exception) {

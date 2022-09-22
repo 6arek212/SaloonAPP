@@ -101,5 +101,8 @@
     <string name="didnt_attend">לא הגיע</string>
     <string name="empty">ריק</string>
     <string name="sec">שנ\'</string>
+    <string name="face_cut">זקן</string>
+    <string name="hair_cut_and_face_cut">תספורת + זקן</string>
+    <string name="find_us">מצא אותנו</string>
 
 </resources>

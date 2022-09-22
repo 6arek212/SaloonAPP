@@ -102,6 +102,9 @@
     <string name="didnt_attend">Didn\'t Attend</string>
     <string name="empty">Empty</string>
     <string name="sec">sec</string>
+    <string name="face_cut">Face Cut</string>
+    <string name="hair_cut_and_face_cut">Hair Cut And Face Cut</string>
+    <string name="find_us">Find Us</string>
 
 
 </resources>
