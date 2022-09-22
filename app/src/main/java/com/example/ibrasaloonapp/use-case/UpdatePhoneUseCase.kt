@@ -70,9 +70,6 @@ constructor(
                         context.getString(R.string.something_went_wrong)
                     }
                 }
-                if (result.code == 401) {
-                    authRepository.logout()
-                }
                 emit(Resource.Error(message = message))
             }
 

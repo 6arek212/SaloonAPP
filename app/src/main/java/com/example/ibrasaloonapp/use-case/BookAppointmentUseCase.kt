@@ -21,7 +21,6 @@ class BookAppointmentUseCase
 @Inject
 constructor(
     val appointmentRepository: AppointmentRepository,
-    val authRepository: AuthRepository,
     val context: Application
 ) {
 
@@ -60,10 +59,6 @@ constructor(
                     else -> {
                         context.getString(R.string.something_went_wrong)
                     }
-                }
-
-                if (result.code == 401) {
-                    authRepository.logout()
                 }
 
                 emit(Resource.Error(message = message))

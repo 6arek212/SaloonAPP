@@ -18,8 +18,6 @@ class GetWorkingDatesUseCase
 @Inject
 constructor(
     private val context: Application,
-    private val authRepository: AuthRepository,
-    private val appointmentsRepository: AppointmentRepository,
     private val workerRepository: WorkerRepository
 ) {
 
@@ -39,9 +37,6 @@ constructor(
             is ApiResult.GenericError -> {
                 Log.d(TAG, "GenericError: ${result.errorMessage}")
                 val message = result.code.defaultErrorMessage(context = context)
-                if (result.code == 401) {
-                    authRepository.logout()
-                }
                 emit(Resource.Error(message = message))
             }
 

@@ -8,8 +8,9 @@
 
 ## Project Overview
 
-This is a client appointments app mainly for a barber shop managment .
+This is a client appointments app mainly for a barber shop management.
 
+</br>
 
 ## What I Used
 

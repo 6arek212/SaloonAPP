@@ -18,7 +18,7 @@ constructor(
     private val service: AppointmentService,
     private val mapper: AppointmentDtoMapper,
     private val userMapper: UserDtoMapper,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : AppointmentRepository {
 
     override suspend fun getAppointments(): ApiResult<List<Appointment>> {

@@ -22,7 +22,6 @@ class UnBookAppointmentUseCase
 @Inject
 constructor(
     val appointmentRepository: AppointmentRepository,
-    val authRepository: AuthRepository,
     val context: Application
 ) {
 
@@ -39,9 +38,6 @@ constructor(
 
             is ApiResult.GenericError -> {
                 val message = result.code.defaultErrorMessage(context = context)
-                if (result.code == 401) {
-                    authRepository.logout()
-                }
                 emit(Resource.Error(message = message))
             }
 

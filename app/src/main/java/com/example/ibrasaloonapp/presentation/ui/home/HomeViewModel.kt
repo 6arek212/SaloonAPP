@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Provider
 
 
 private const val TAG = "HomeViewModel"
@@ -26,8 +27,8 @@ class HomeViewModel
 @Inject
 constructor(
     private val context: Application,
-    private val getAppointmentUseCase: GetAppointmentUseCase,
-    private val getWorkersUseCase: GetWorkersUseCase
+    private val getAppointmentUseCase: Provider<GetAppointmentUseCase>,
+    private val getWorkersUseCase: Provider<GetWorkersUseCase>
 ) : BaseViewModel() {
 
     private val _state: MutableState<HomeState> = mutableStateOf(HomeState())
@@ -85,7 +86,7 @@ constructor(
 
 
     private suspend fun getWorkers() {
-        getWorkersUseCase().onEach {
+        getWorkersUseCase.get()().onEach {
             when (it) {
 
                 is Resource.Loading -> {
@@ -115,7 +116,7 @@ constructor(
 
 
     private suspend fun getAppointment() {
-        getAppointmentUseCase().onEach {
+        getAppointmentUseCase.get()().onEach {
             when (it) {
                 is Resource.Loading -> {
                     loading(it.value)

@@ -32,7 +32,7 @@ class UserRepositoryImpl
 constructor(
     private val userDtoMapper: UserDtoMapper,
     private val userService: UserService,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val authRepository: AuthRepository
 ) : UserRepository {
 

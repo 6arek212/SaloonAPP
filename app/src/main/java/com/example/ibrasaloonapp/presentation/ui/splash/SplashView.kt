@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.ibrasaloonapp.presentation.AuthEvent
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
@@ -44,6 +46,7 @@ import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.presentation.ui.login.LoginViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 private const val TAG = "SplashView"
@@ -55,9 +58,10 @@ fun SplashView(
 ) {
 
     val events = mainViewModel.uiEvents
-    val duration = 3000
+    val duration = 500
 
-    var startAnimation by remember {
+
+    var startAnimation by rememberSaveable {
         mutableStateOf(false)
     }
     val alphaAnim = animateFloatAsState(
@@ -67,18 +71,22 @@ fun SplashView(
     )
 
 
-    LaunchedEffect(key1 = mainViewModel.uiEvents) {
+    LaunchedEffect(Unit) {
         Log.d(TAG, "SplashView: launch effect")
-//        mainViewModel.onTriggerEvent(MainEvent.GetAuthData)
-
         startAnimation = true
+        delay(duration.toLong())
+
+        if (events.first() !is MainUIEvent.Nothing) {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(0)
+            }
+        }
 
         events.collect { event ->
             when (event) {
                 is MainUIEvent.AuthDataReady -> {
-//                    delay(duration.toLong())
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
+                        popUpTo(0)
                     }
                 }
             }

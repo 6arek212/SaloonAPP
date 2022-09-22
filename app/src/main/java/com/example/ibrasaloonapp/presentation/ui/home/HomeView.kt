@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -396,6 +397,32 @@ fun Appointment(
     appointment: Appointment?,
     navigateToBookAppointment: () -> Unit
 ) {
+    val context = LocalContext.current
+    var date by rememberSaveable {
+        mutableStateOf(appointment?.startTime)
+    }
+
+
+    LaunchedEffect(Unit) {
+        if (appointment == null)
+            return@LaunchedEffect
+
+        date = "${
+            stringDateFormat(
+                appointment.startTime,
+                TimePatterns.EEEE_MM_DD,
+                context
+            )
+        } " +
+                "${context.getString(R.string.at)} " +
+                stringDateFormat(
+                    appointment.startTime,
+                    TimePatterns.TIME_ONLY,
+                    context
+                )
+    }
+
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -417,19 +444,7 @@ fun Appointment(
                 Spacer(modifier = Modifier.padding(4.dp))
 
                 Text(
-                    text = "${
-                        stringDateFormat(
-                            appointment.startTime,
-                            TimePatterns.EEEE_MM_DD,
-                            LocalContext.current
-                        )
-                    } " +
-                            "${stringResource(id = R.string.at)} " +
-                            stringDateFormat(
-                                appointment.startTime,
-                                TimePatterns.TIME_ONLY,
-                                LocalContext.current
-                            ),
+                    text = date ?: "",
                     color = Color.White,
                     style = MaterialTheme.typography.body1
                 )
@@ -476,7 +491,10 @@ fun OurStaff(workers: List<User>) {
             horizontalArrangement = Arrangement.spacedBy(25.dp, Alignment.CenterHorizontally),
         ) {
             items(items = workers, key = { user -> user.id }) { worker ->
-                AnimationBox(enter = expandHorizontally() + fadeIn() , exit = fadeOut() + shrinkHorizontally()) {
+                AnimationBox(
+                    enter = expandHorizontally() + fadeIn(),
+                    exit = fadeOut() + shrinkHorizontally()
+                ) {
                     VerticalImageChip(
                         modifier = Modifier,
                         text = "${worker.firstName} ${worker.lastName}",

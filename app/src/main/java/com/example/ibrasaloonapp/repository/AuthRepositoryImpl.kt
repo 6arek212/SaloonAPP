@@ -199,10 +199,12 @@ constructor(
                 }
 
                 is ApiResult.GenericError -> {
+                    logout()
                     null
                 }
 
                 is ApiResult.NetworkError -> {
+                    logout()
                     null
                 }
             }

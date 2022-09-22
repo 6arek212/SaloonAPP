@@ -36,6 +36,7 @@ fun getDateAsString(): String {
     c.set(Calendar.SECOND, 0)
     c.set(Calendar.MILLISECOND, 0)
     val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault()).format(c.time)
+    Log.d(TAG, "getDateAsString: ${date}")
     return date
 }
 

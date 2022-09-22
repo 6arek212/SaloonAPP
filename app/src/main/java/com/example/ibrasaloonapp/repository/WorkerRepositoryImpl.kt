@@ -14,7 +14,7 @@ class WorkerRepositoryImpl
 constructor(
     private val userDtoMapper: UserDtoMapper,
     private val workerService: WorkerService,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : WorkerRepository {
 
     override suspend fun getWorkers(): ApiResult<List<User>> {

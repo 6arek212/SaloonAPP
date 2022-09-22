@@ -9,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -18,29 +19,29 @@ object ServiceModule {
     @Singleton
     @Provides
     fun provideAppointmentService(
-        retrofit: Retrofit
-    ) = lazy { retrofit.create(AppointmentService::class.java) }.value
+        retrofit: Provider<Retrofit>
+    ) = lazy { retrofit.get().create(AppointmentService::class.java) }.value
 
 
     @Singleton
     @Provides
     fun provideAuthService(
-        retrofit: Retrofit
-    ) = lazy { retrofit.create(AuthService::class.java) }.value
+        retrofit: Provider<Retrofit>
+    ) = lazy { retrofit.get().create(AuthService::class.java) }.value
 
 
     @Singleton
     @Provides
     fun provideWorkerService(
-        retrofit: Retrofit
-    ) = lazy { retrofit.create(WorkerService::class.java) }.value
+        retrofit: Provider<Retrofit>
+    ) = lazy { retrofit.get().create(WorkerService::class.java) }.value
 
 
     @Singleton
     @Provides
     fun provideUserService(
-        retrofit: Retrofit
-    ) = lazy { retrofit.create(UserService::class.java) }.value
+        retrofit: Provider<Retrofit>
+    ) = lazy { retrofit.get().create(UserService::class.java) }.value
 
 
 }
