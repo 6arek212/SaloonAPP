@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.network.ApiResult
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.MainUIEvent
@@ -12,6 +13,7 @@ import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.WorkerRepository
 import com.example.ibrasaloonapp.ui.defaultErrorMessage
 import com.example.trainingapp.network.NetworkErrors
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -26,7 +28,7 @@ constructor(
 ) {
 
 
-    suspend operator fun invoke() = flow {
+    suspend operator fun invoke(): Flow<Resource<Appointment>> = flow {
 
 
         emit(Resource.Loading(true))

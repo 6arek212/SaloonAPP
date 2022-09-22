@@ -8,13 +8,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.use.GetAppointmentUseCase
 import com.example.ibrasaloonapp.use.GetWorkersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
@@ -27,8 +27,8 @@ class HomeViewModel
 @Inject
 constructor(
     private val context: Application,
-    private val getAppointmentUseCase: Provider<GetAppointmentUseCase>,
-    private val getWorkersUseCase: Provider<GetWorkersUseCase>
+    private val getAppointmentUseCase: GetAppointmentUseCase,
+    private val getWorkersUseCase: GetWorkersUseCase
 ) : BaseViewModel() {
 
     private val _state: MutableState<HomeState> = mutableStateOf(HomeState())
@@ -85,8 +85,10 @@ constructor(
     }
 
 
+
     private suspend fun getWorkers() {
-        getWorkersUseCase.get()().onEach {
+
+        getWorkersUseCase().onEach {
             when (it) {
 
                 is Resource.Loading -> {
@@ -116,7 +118,7 @@ constructor(
 
 
     private suspend fun getAppointment() {
-        getAppointmentUseCase.get()().onEach {
+        getAppointmentUseCase().onEach {
             when (it) {
                 is Resource.Loading -> {
                     loading(it.value)
@@ -128,8 +130,6 @@ constructor(
                 is Resource.Success -> {
                     Log.d(TAG, "getAppointment:------------- ${it.data}")
                     _state.value = _state.value.copy(appointment = it.data)
-                    Log.d(TAG, "getAppointment: ${_state.value}")
-
                     getWorkers()
                 }
 
@@ -144,6 +144,5 @@ constructor(
             }
         }.launchIn(viewModelScope)
     }
-
 
 }
