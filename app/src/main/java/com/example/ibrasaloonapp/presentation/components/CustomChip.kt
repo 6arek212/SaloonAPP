@@ -37,7 +37,7 @@ fun CustomChip(
         ) {
         Box(
             modifier = Modifier
-                .padding(contentPaddingValues)
+//                .padding(contentPaddingValues)
         ) {
             Text(
                 modifier = Modifier.align(Alignment.Center),

@@ -5,26 +5,20 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
-import com.example.ibrasaloonapp.core.KeyValueWrapper
-import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.core.getDateAsString
-import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.use.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private const val TAG = "BookAppointmentViewMode"
@@ -38,7 +32,7 @@ constructor(
     private val getWorkersUseCase: GetWorkersUseCase,
     private val bookAppointmentUseCase: BookAppointmentUseCase,
     private val getAvailableAppointmentUseCase: GetAvailableAppointmentUseCase,
-    private val getServicesUseCase: GetServicesUseCase,
+    private val getWorkerServicesUseCase: GetWorkerServicesUseCase,
     private val getWorkingDatesUseCase: GetWorkingDatesUseCase,
 ) : BaseViewModel() {
 
@@ -121,6 +115,8 @@ constructor(
             }
         }
     }
+
+
 
     private suspend fun getWorkingDates() {
         val workerId = _state.value.selectedWorker?.id ?: return
@@ -222,7 +218,7 @@ constructor(
 
     private suspend fun getServices() {
         val workerId = _state.value.selectedWorker?.id ?: return
-        getServicesUseCase(workerId = workerId).onEach { data ->
+        getWorkerServicesUseCase(workerId = workerId).onEach { data ->
             when (data) {
                 is Resource.Loading -> {
                     loading(data.value)
@@ -249,12 +245,9 @@ constructor(
 
 
     private suspend fun book() {
-        val service = _state.value.selectedService?.key
-        val appointment = _state.value.selectedAppointment
+        val service = _state.value.selectedService?.id ?: return
+        val appointment = _state.value.selectedAppointment ?: return
         val userId = authRepository.getUserId() ?: return
-
-        if (appointment == null || service == null)
-            return
 
 
         bookAppointmentUseCase(

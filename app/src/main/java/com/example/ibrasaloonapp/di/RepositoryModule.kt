@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.example.ibrasaloonapp.network.model.AppointmentDtoMapper
 import com.example.ibrasaloonapp.network.model.AuthDataDtoMapper
+import com.example.ibrasaloonapp.network.model.ServiceDtoMapper
 import com.example.ibrasaloonapp.network.model.UserDtoMapper
 import com.example.ibrasaloonapp.network.services.AppointmentService
 import com.example.ibrasaloonapp.network.services.AuthService
@@ -26,9 +27,18 @@ object RepositoryModule {
     @Provides
     fun provideAppointmentMapper(
         customerMapper: UserDtoMapper,
-        application: Application
+        serviceDtoMapper: ServiceDtoMapper
     ): AppointmentDtoMapper {
-        return AppointmentDtoMapper(customerMapper = customerMapper, context = application)
+        return AppointmentDtoMapper(
+            customerMapper = customerMapper,
+            serviceDtoMapper = serviceDtoMapper
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideServiceMapper(application: Application): ServiceDtoMapper {
+        return ServiceDtoMapper(context = application)
     }
 
     @Singleton
@@ -79,11 +89,13 @@ object RepositoryModule {
     @Provides
     fun provideWorkerRepository(
         userDtoMapper: UserDtoMapper,
-        workerService: WorkerService
+        workerService: WorkerService,
+        serviceDtoMapper: ServiceDtoMapper
     ): WorkerRepository {
         return WorkerRepositoryImpl(
             userDtoMapper = userDtoMapper,
-            workerService = workerService
+            workerService = workerService,
+            serviceDtoMapper = serviceDtoMapper
         )
     }
 

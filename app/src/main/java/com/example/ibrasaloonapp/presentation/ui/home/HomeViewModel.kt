@@ -12,6 +12,7 @@ import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.use.GetAppointmentUseCase
+import com.example.ibrasaloonapp.use.GetWorkerServicesUseCase
 import com.example.ibrasaloonapp.use.GetWorkersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -28,7 +29,7 @@ class HomeViewModel
 constructor(
     private val context: Application,
     private val getAppointmentUseCase: GetAppointmentUseCase,
-    private val getWorkersUseCase: GetWorkersUseCase
+    private val getWorkersUseCase: GetWorkersUseCase,
 ) : BaseViewModel() {
 
     private val _state: MutableState<HomeState> = mutableStateOf(HomeState())

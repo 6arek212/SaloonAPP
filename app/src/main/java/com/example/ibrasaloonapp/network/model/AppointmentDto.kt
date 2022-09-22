@@ -15,7 +15,7 @@ data class AppointmentDto(
     val worker: UserDto,
 
     @SerializedName("service")
-    val service: String? = null,
+    val service: ServiceDto? = null,
 
     @SerializedName("start_time")
     val startTime: String,

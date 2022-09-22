@@ -28,6 +28,7 @@ import com.example.ibrasaloonapp.core.KeyValueWrapper
 import com.example.ibrasaloonapp.core.TimePatterns
 import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.Service
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
@@ -212,7 +213,7 @@ fun PickAppointment(
     selectedAppointment: Appointment?,
     availableAppointments: List<Appointment>,
     onTriggerEvent: (BookAppointmentEvent) -> Unit,
-    selectedService: KeyValueWrapper<String, String>?
+    selectedService: Service?
 ) {
     AnimatedVisibility(visible = selectedService != null) {
         Column() {
@@ -253,9 +254,9 @@ fun PickAppointment(
 @Composable
 fun PickService(
     selectedWorkingDate: String?,
-    services: List<KeyValueWrapper<String, String>>,
+    services: List<Service>,
     onTriggerEvent: (BookAppointmentEvent) -> Unit,
-    selectedService: KeyValueWrapper<String, String>?
+    selectedService: Service?
 ) {
     AnimatedVisibility(visible = selectedWorkingDate != null) {
 
@@ -273,12 +274,12 @@ fun PickService(
             ) {
                 items(items = services) { ser ->
                     CustomChip(
-                        text = ser.value,
+                        text = ser.title,
                         onClick = {
                             onTriggerEvent(
                                 BookAppointmentEvent.OnSelectedService(ser)
                             )
-                        }, isSelected = ser.key == selectedService?.key
+                        }, isSelected = ser.id == selectedService?.id
                     )
                 }
             }
@@ -368,7 +369,7 @@ private fun Workers(
 @Composable
 fun BookAppointmentConfirmation(
     pickedDate: String? = null,
-    service: KeyValueWrapper<String, String>? = null,
+    service: Service? = null,
     workerName: String? = null,
     onBook: () -> Unit,
     sheetState: BottomSheetState
@@ -434,7 +435,7 @@ fun BookAppointmentConfirmation(
                             )
                         }
                     }" +
-                    " ${stringResource(id = R.string.for_a)} ${service?.value}",
+                    " ${stringResource(id = R.string.for_a)} ${service?.title}",
             style = MaterialTheme.typography.h6,
             textAlign = TextAlign.Center
         )

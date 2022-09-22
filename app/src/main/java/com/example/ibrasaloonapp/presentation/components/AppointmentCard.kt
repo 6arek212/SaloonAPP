@@ -107,7 +107,7 @@ fun AppointmentCard(
 
 
                 Text(
-                    text = "${stringResource(id = R.string.for_a)} ${appointment.service?.value}",
+                    text = "${stringResource(id = R.string.for_a)} ${appointment.service?.title}",
                     style = MaterialTheme.typography.body1,
                     color = MaterialTheme.colors.onSurface
                 )

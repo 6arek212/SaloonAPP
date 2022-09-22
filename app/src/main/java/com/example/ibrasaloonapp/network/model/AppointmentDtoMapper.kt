@@ -14,35 +14,20 @@ const val Wax = "Wax"
 
 
 private const val TAG = "AppointmentDtoMapper"
+
 class AppointmentDtoMapper
 @Inject
 constructor(
-    private val context: Application,
-    private val customerMapper: UserDtoMapper
+    private val customerMapper: UserDtoMapper,
+    private val serviceDtoMapper: ServiceDtoMapper
 ) : DomainMapper<AppointmentDto, Appointment> {
 
     override fun mapToDomainModel(model: AppointmentDto): Appointment {
-
-        val service = model.service?.let {
-            when (it) {
-                HAIR_CUT -> {
-                    KeyValueWrapper(model.service, context.getString(R.string.hair_cut))
-                }
-
-                Wax -> {
-                    KeyValueWrapper(model.service, context.getString(R.string.wax))
-                }
-                else -> {
-                    KeyValueWrapper(it,it)
-                }
-            }
-        }
-
         return Appointment(
             id = model.id ?: "",
             customer = model.customer?.let { customerMapper.mapToDomainModel(it) },
             status = model.status,
-            service = service,
+            service = model.service?.let { serviceDtoMapper.mapToDomainModel(it) },
             startTime = model.startTime,
             endTime = model.endTime,
             worker = customerMapper.mapToDomainModel(model.worker)
@@ -54,7 +39,7 @@ constructor(
             id = domainModel.id,
             customer = domainModel.customer?.let { customerMapper.mapFromDomainModel(it) },
             status = domainModel.status,
-            service = domainModel.service?.value,
+            service = domainModel.service?.let { serviceDtoMapper.mapFromDomainModel(it) },
             startTime = domainModel.startTime,
             endTime = domainModel.endTime,
             worker = customerMapper.mapFromDomainModel(domainModel.worker)

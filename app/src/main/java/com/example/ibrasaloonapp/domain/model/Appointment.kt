@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 data class Appointment(
     val id: String,
-    val service: KeyValueWrapper<String, String>? = null,
+    val service: Service? = null,
     val startTime: String,
     val endTime: String,
     val status: String,
