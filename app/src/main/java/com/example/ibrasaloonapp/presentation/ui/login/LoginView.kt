@@ -27,6 +27,7 @@ import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.presentation.components.CommonOtp
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
+import com.example.ibrasaloonapp.presentation.components.ProgressButton
 import com.example.ibrasaloonapp.presentation.components.SubTitle
 import com.example.ibrasaloonapp.presentation.theme.Blue
 import com.example.ibrasaloonapp.presentation.ui.Screen
@@ -50,9 +51,6 @@ fun LoginView(
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    LaunchedEffect(Unit) {
-        viewModel.onTriggerEvent(LoginEvent.Reset)
-    }
 
     DefaultScreenUI(
         progressBarState = if (showCode) progress else ProgressBarState.Idle,
@@ -98,8 +96,9 @@ fun LoginView(
                     },
                     code = code,
                     moveFocus = focusManager::moveFocus,
-                    onRest = { viewModel.onTriggerEvent(LoginEvent.Reset) }
-
+                    onRest = { viewModel.onTriggerEvent(LoginEvent.Reset) },
+                    sendAgain = { viewModel.onTriggerEvent(LoginEvent.SendAuthVerification(true)) },
+                    isLoading = progress == ProgressBarState.Loading
                 )
             }
 
@@ -173,18 +172,16 @@ private fun PhoneSection(
         Spacer(modifier = Modifier.padding(vertical = 16.dp))
 
 
-        Bottom(
+        ProgressButton(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            progressBar = progress,
-            buttonText = stringResource(
-                id = R.string.login
-            ),
-            onClick = {
-                onTriggerEvent(LoginEvent.SendAuthVerification)
-            }
-        )
+                .fillMaxWidth(),
+            onClick = { onTriggerEvent(LoginEvent.SendAuthVerification(false)) },
+            color = MaterialTheme.colors.primary,
+            progressColor = MaterialTheme.colors.background,
+            loading = progress == ProgressBarState.Loading
+        ) {
+            Text(text = stringResource(id = R.string.login))
+        }
     }
 }
 
@@ -230,61 +227,6 @@ private fun TextFields(
     }
 }
 
-
-@Composable
-private fun Bottom(
-    onClick: () -> Unit,
-    progressBar: ProgressBarState = ProgressBarState.Idle,
-    modifier: Modifier,
-    buttonText: String
-) {
-    val loading = (progressBar is ProgressBarState.Loading)
-
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-
-        val (progress, button) = createRefs()
-
-
-        AnimatedVisibility(
-            modifier = Modifier.constrainAs(progress) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            },
-            visible = loading,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            CircularProgressIndicator(modifier = Modifier.size(36.dp))
-        }
-
-
-        AnimatedVisibility(
-            modifier = Modifier.constrainAs(button) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            },
-            visible = !loading, enter = fadeIn(), exit = fadeOut()
-        ) {
-            Button(
-                onClick = onClick,
-                shape = MaterialTheme.shapes.small,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.primary,
-                    contentColor = Color.White
-                ),
-                modifier = modifier,
-                contentPadding = PaddingValues(all = 16.dp),
-            ) {
-                Text(text = buttonText)
-            }
-        }
-
-
-    }
-
-}
 
 
 

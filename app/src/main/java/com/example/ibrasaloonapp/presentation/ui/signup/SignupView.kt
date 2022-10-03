@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
@@ -50,15 +51,6 @@ fun SignupView(
     mainViewModel: MainActivityViewModel
 ) {
 
-//    val duration = 1000
-//    var startAnimation by remember {
-//        mutableStateOf(false)
-//    }
-//    val alphaAnim = animateFloatAsState(
-//        targetValue = if (startAnimation) 1f else 0f, animationSpec = tween(
-//            durationMillis = duration
-//        )
-//    )
     val uiMessage = viewModel.uiState.value.uiMessage
     val progress = viewModel.uiState.value.progressBarState
 
@@ -83,6 +75,7 @@ fun SignupView(
         progressBarState = progress,
         onRemoveUIComponent = { viewModel.onTriggerEvent(SignupEvent.OnRemoveHeadFromQueue) }) {
         Signup(
+            isLoading = progress == ProgressBarState.Loading,
             pagesNumber = pagesNumber,
             showCode = showCode,
             page = page,
@@ -102,7 +95,14 @@ fun SignupView(
             onPhoneChange = { viewModel.onTriggerEvent(SignupEvent.OnPhoneChanged(it)) },
             onNextPage = { viewModel.onTriggerEvent(SignupEvent.NextPage) },
             onPrevPage = { viewModel.onTriggerEvent(SignupEvent.PrevPage) },
-            sendAuthVerification = { viewModel.onTriggerEvent(SignupEvent.SendAuthVerification) },
+            sendAuthVerification = { again ->
+                viewModel.onTriggerEvent(
+                    SignupEvent.SendAuthVerification(
+                        again
+                    )
+                )
+            },
+            restPhoneSection = { viewModel.onTriggerEvent(SignupEvent.RestPhoneSection) },
             onCodeDigitChanged = { place, str ->
                 viewModel.onTriggerEvent(
                     SignupEvent.OnCodeDigitChanged(
@@ -149,10 +149,12 @@ fun Signup(
     onPhoneChange: (String) -> Unit,
     onNextPage: () -> Unit,
     onPrevPage: () -> Unit,
-    sendAuthVerification: () -> Unit,
+    sendAuthVerification: (Boolean) -> Unit,
     onDone: () -> Unit,
     navigateToUploadImage: () -> Unit,
-    imageUrl: String?
+    restPhoneSection: () -> Unit,
+    imageUrl: String?,
+    isLoading: Boolean
 ) {
 
     val scrollState = rememberScrollState()
@@ -208,13 +210,14 @@ fun Signup(
                 modifier = Modifier.weight(1f),
                 moveFocus = focusManager::moveFocus,
                 onCodeDigitChanged = onCodeDigitChanged,
-                onRest = {},
+                onRest = restPhoneSection,
                 showCode = showCode,
                 phone = phone,
                 phoneError = phoneError,
                 onPhoneChange = onPhoneChange,
                 sendAuthVerification = sendAuthVerification,
-                verifyCode = verifyCode
+                verifyCode = verifyCode,
+                isLoading = isLoading
             )
 
 
@@ -245,7 +248,7 @@ fun Signup(
         Spacer(modifier = Modifier.padding(4.dp))
 
         Button(
-            contentPadding = PaddingValues(horizontal = 4.dp , vertical = 8.dp),
+            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
             modifier = Modifier.fillMaxWidth(),
             onClick = { if (page == pagesNumber) onDone() else onNextPage() }) {
             Text(
@@ -395,8 +398,9 @@ fun PhonePage(
     onCodeDigitChanged: (CodeDigitPlace, String) -> Unit,
     onRest: () -> Unit,
     showCode: Boolean,
-    sendAuthVerification: () -> Unit,
-    verifyCode: OPT4Digits
+    sendAuthVerification: (Boolean) -> Unit,
+    verifyCode: OPT4Digits,
+    isLoading: Boolean
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.Center) {
 
@@ -439,7 +443,7 @@ fun PhonePage(
 
                 Spacer(modifier = Modifier.padding(4.dp))
 
-                Button(onClick = { sendAuthVerification() }) {
+                Button(onClick = { sendAuthVerification(false) }) {
                     Text(text = stringResource(id = R.string.verify))
                 }
             }
@@ -452,7 +456,9 @@ fun PhonePage(
                 code = verifyCode,
                 moveFocus = moveFocus,
                 onRest = onRest,
-                showBackButton = true
+                showBackButton = true,
+                sendAgain = { sendAuthVerification(true) },
+                isLoading = isLoading
             )
         }
 
@@ -530,7 +536,10 @@ fun UploadImage(
             onClick = navigateToUploadImage,
             colors = ButtonDefaults.buttonColors(backgroundColor = Gray1)
         ) {
-            Text(text = stringResource(R.string.click_here), color = MaterialTheme.colors.onBackground)
+            Text(
+                text = stringResource(R.string.click_here),
+                color = MaterialTheme.colors.onBackground
+            )
         }
     }
 }

@@ -43,7 +43,6 @@ constructor(
                     if (!event.isAuthed) {
                         _state.value = _state.value.copy(
                             appointment = null,
-                            showLoginDialog = false,
                             refreshing = false
                         )
                         getWorkers()
@@ -52,14 +51,6 @@ constructor(
                     }
                 }
 
-
-                is HomeEvent.DismissLoginDialog -> {
-                    _state.value = _state.value.copy(showLoginDialog = false)
-                }
-
-                is HomeEvent.ShowLoginDialog -> {
-                    _state.value = _state.value.copy(showLoginDialog = true)
-                }
 
                 is HomeEvent.OnRemoveHeadFromQueue -> {
                     removeMessage()
@@ -71,7 +62,6 @@ constructor(
                         if (!event.isAuthed) {
                             _state.value = _state.value.copy(
                                 appointment = null,
-                                showLoginDialog = false,
                                 refreshing = false
                             )
                             getWorkers()

@@ -32,18 +32,16 @@ fun CommonOtp(
     moveFocus: (focusDirection: FocusDirection) -> Unit,
     onChangeFocus: (CodeDigitPlace, String) -> Unit,
     onRest: () -> Unit,
+    sendAgain: () -> Unit,
     code: OPT4Digits,
-    showBackButton: Boolean = true
+    showBackButton: Boolean = true,
+    isLoading: Boolean = false
 ) {
 
     LaunchedEffect(
         key1 = code.one,
     ) {
-        if (code.one.isNotEmpty() ) {
-            moveFocus(FocusDirection.Next)
-        }else{
-            moveFocus(FocusDirection.Left)
-        }
+        moveFocus(FocusDirection.Next)
     }
 
     LaunchedEffect(
@@ -51,7 +49,7 @@ fun CommonOtp(
     ) {
         if (code.two.isNotEmpty()) {
             moveFocus(FocusDirection.Next)
-        }else{
+        } else {
             moveFocus(FocusDirection.Left)
         }
     }
@@ -61,7 +59,7 @@ fun CommonOtp(
     ) {
         if (code.three.isNotEmpty()) {
             moveFocus(FocusDirection.Next)
-        }else{
+        } else {
             moveFocus(FocusDirection.Left)
         }
     }
@@ -71,7 +69,7 @@ fun CommonOtp(
     ) {
         if (code.four.isNotEmpty()) {
             moveFocus(FocusDirection.Next)
-        }else{
+        } else {
             moveFocus(FocusDirection.Left)
         }
     }
@@ -102,12 +100,10 @@ fun CommonOtp(
             Spacer(modifier = Modifier.padding(4.dp))
         }
         TimeCircularProgressBar(
-            animationDuration = 1000 * 60,
-            percentage = 1f,
             number = 60,
             color = Red,
-            animDelay = 500,
-            radius = 26.dp
+            radius = 26.dp,
+            timesUpCallback = onRest
         )
 
 
@@ -147,17 +143,20 @@ fun CommonOtp(
             Spacer(modifier = Modifier.padding(4.dp))
         }
 
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(id = R.string.didnt_receive_code),
                 style = MaterialTheme.typography.caption
             )
             Spacer(modifier = Modifier.padding(4.dp))
-            Text(
-                text = stringResource(id = R.string.requrest_again),
-                color = Blue,
-                style = MaterialTheme.typography.caption
-            )
+
+            TextButton(onClick = sendAgain, enabled = !isLoading) {
+                Text(
+                    text = stringResource(id = R.string.requrest_again),
+                    color = Blue,
+                    style = MaterialTheme.typography.caption
+                )
+            }
         }
     }
 }

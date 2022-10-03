@@ -10,7 +10,7 @@ sealed class LoginEvent {
     object OnRemoveHeadFromQueue : LoginEvent()
     object Reset : LoginEvent()
     class OnCodeDigitChanged(val codePlace: CodeDigitPlace, val value: String) : LoginEvent()
-    object SendAuthVerification : LoginEvent()
+    class SendAuthVerification(val sendAgain: Boolean) : LoginEvent()
     object Login : LoginEvent()
 
 }

@@ -9,6 +9,10 @@ sealed class UIComponent {
         val dialogEvent: DialogEvent? = null
     ) : UIComponent()
 
+    data class Snackbar(
+        val message: String,
+    ) : UIComponent()
+
     data class None(
         val message: String,
     ) : UIComponent()

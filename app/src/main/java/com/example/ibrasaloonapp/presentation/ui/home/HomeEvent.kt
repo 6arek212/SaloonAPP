@@ -8,8 +8,6 @@ sealed class HomeEvent {
     object GetWorkers : HomeEvent()
     class GetData(val isAuthed: Boolean) : HomeEvent()
     class Refresh(val isAuthed: Boolean) : HomeEvent()
-    object DismissLoginDialog : HomeEvent()
-    object ShowLoginDialog : HomeEvent()
     object OnRemoveHeadFromQueue : HomeEvent()
     object Rest : HomeEvent()
 

@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
 import com.example.ibrasaloonapp.presentation.components.CommonOtp
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
@@ -77,7 +78,13 @@ fun ChangePhoneNumberView(
             onPhoneChanged = { s ->
                 editProfileViewModel.onTriggerEvent(EditProfileEvent.OnPhoneChanged(s))
             },
-            sendAuthVerification = { editProfileViewModel.onTriggerEvent(EditProfileEvent.SendAuthVerification) },
+            sendAuthVerification = { again ->
+                editProfileViewModel.onTriggerEvent(
+                    EditProfileEvent.SendAuthVerification(
+                        again
+                    )
+                )
+            },
             onCodeDigitChanged = { place, v ->
                 editProfileViewModel.onTriggerEvent(
                     EditProfileEvent.OnCodeDigitChanged(
@@ -89,7 +96,8 @@ fun ChangePhoneNumberView(
             onRestCode = { editProfileViewModel.onTriggerEvent(EditProfileEvent.OnRestCode) },
             clearFocus = focusManager::clearFocus,
             moveFocus = focusManager::moveFocus,
-            close = navController::popBackStack
+            close = navController::popBackStack,
+            isLoading = progress == ProgressBarState.Loading
         )
     }
 
@@ -103,12 +111,13 @@ fun ChangePhoneNumber(
     phoneError: String?,
     code: OPT4Digits,
     onPhoneChanged: (String) -> Unit,
-    sendAuthVerification: () -> Unit,
+    sendAuthVerification: (Boolean) -> Unit,
     onCodeDigitChanged: (CodeDigitPlace, String) -> Unit,
     onRestCode: () -> Unit,
     moveFocus: (focusDirection: FocusDirection) -> Unit,
     clearFocus: () -> Unit,
-    close: () -> Unit
+    close: () -> Unit,
+    isLoading: Boolean
 ) {
     val scrollState = rememberScrollState()
     val interactionSource = remember { MutableInteractionSource() }
@@ -177,7 +186,7 @@ fun ChangePhoneNumber(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 4.dp),
-                    onClick = sendAuthVerification
+                    onClick = { sendAuthVerification(false) }
                 ) {
                     Text(text = stringResource(id = R.string.verify))
                 }
@@ -191,7 +200,9 @@ fun ChangePhoneNumber(
                 moveFocus = moveFocus,
                 onChangeFocus = onCodeDigitChanged,
                 onRest = onRestCode,
-                code = code
+                code = code,
+                sendAgain = { sendAuthVerification(true) },
+                isLoading = isLoading
             )
         }
     }
@@ -214,7 +225,8 @@ fun ChangePhoneNumberPreview() {
             phoneError = null,
             clearFocus = {},
             moveFocus = {},
-            close = {}
+            close = {},
+            isLoading = false
         )
     }
 }

@@ -10,22 +10,17 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -35,18 +30,13 @@ import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.core.navigateToWaze
 import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
-import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
-import com.example.ibrasaloonapp.presentation.MainEvent
-import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.example.ibrasaloonapp.presentation.ui.Screen
-import com.example.ibrasaloonapp.presentation.ui.login.LoginView
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.launch
 
 private const val TAG = "HomeView"
 
@@ -62,7 +52,6 @@ fun HomeView(
     val workers = viewModel.state.value.workers
     val refreshing = viewModel.state.value.refreshing
     val user = mainViewModel.state.value.authData?.user
-    val showLoginDialog = viewModel.state.value.showLoginDialog
     val uiMessage = viewModel.uiState.value.uiMessage
     val progress = viewModel.uiState.value.progressBarState
 
@@ -79,9 +68,9 @@ fun HomeView(
         Home(
             progress = progress == ProgressBarState.Loading,
             onRefresh = { viewModel.onTriggerEvent(HomeEvent.Refresh(isAuthed = user != null)) },
-            onDismissLoginDialog = { viewModel.onTriggerEvent(HomeEvent.DismissLoginDialog) },
-            onShowLoginDialog = { viewModel.onTriggerEvent(HomeEvent.ShowLoginDialog) },
-            navController = navController,
+            onNavigateToLogin = {
+                                navController.navigate(Screen.Login.route)
+            },
             navigateToBookAppointment = {
                 navController.navigate(Screen.BookAppointment.route) {
                     popUpTo(Screen.Home.route) {
@@ -96,7 +85,6 @@ fun HomeView(
             appointment = appointment,
             workers = workers,
             refreshing = refreshing,
-            showLoginDialog = showLoginDialog
         )
     }
 
@@ -110,14 +98,10 @@ fun Home(
     appointment: Appointment?,
     workers: List<User>,
     refreshing: Boolean,
-    showLoginDialog: Boolean,
     progress: Boolean,
     onRefresh: () -> Unit,
     navigateToBookAppointment: () -> Unit,
-    onDismissLoginDialog: () -> Unit,
-    onShowLoginDialog: () -> Unit,
-
-    navController: NavController
+    onNavigateToLogin: () -> Unit,
 ) {
 
     SwipeRefresh(
@@ -136,11 +120,8 @@ fun Home(
                 FrontLayer(
                     appointment = appointment,
                     workers = workers,
-                    navController = navController,
                     navigateToBookAppointment = navigateToBookAppointment,
-                    showLoginDialog = showLoginDialog,
-                    onDismissLoginDialog = onDismissLoginDialog,
-                    onShowLoginDialog = onShowLoginDialog,
+                    onShowLoginDialog = onNavigateToLogin,
                     user = user,
                     isLoading = progress
                 )
@@ -176,9 +157,6 @@ fun FrontLayer(
     appointment: Appointment?,
     workers: List<User>,
     navigateToBookAppointment: () -> Unit,
-    navController: NavController,
-    showLoginDialog: Boolean,
-    onDismissLoginDialog: () -> Unit,
     onShowLoginDialog: () -> Unit,
     user: User?,
 
@@ -198,15 +176,12 @@ fun FrontLayer(
         Header(
             appointment = appointment,
             navigateToBookAppointment = navigateToBookAppointment,
-            navController = navController,
-            showLoginDialog = showLoginDialog,
-            onDismissLoginDialog = onDismissLoginDialog,
             onShowLoginDialog = onShowLoginDialog,
             user = user,
             isLoading = isLoading
         )
 
-        Column(modifier = Modifier.padding(horizontal = 8.dp , vertical = 12.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)) {
 
             AnimatedVisibility(visible = workers.isNotEmpty()) {
                 Column() {
@@ -232,9 +207,6 @@ fun Header(
     modifier: Modifier = Modifier,
     appointment: Appointment?,
     navigateToBookAppointment: () -> Unit,
-    navController: NavController,
-    showLoginDialog: Boolean,
-    onDismissLoginDialog: () -> Unit,
     onShowLoginDialog: () -> Unit,
     user: User?,
 
@@ -318,26 +290,16 @@ fun Header(
         }
 
         AnimatedVisibility(visible = user == null && !isLoading) {
-            NotLoggedIn(
-                navController = navController,
-                showLoginDialog = showLoginDialog,
-                onDismissLoginDialog = onDismissLoginDialog,
-                onShowLoginDialog = onShowLoginDialog,
-            )
+            NotLoggedIn(onShowLoginDialog = onShowLoginDialog)
         }
     }
 
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NotLoggedIn(
-    onShowLoginDialog: () -> Unit,
-    onDismissLoginDialog: () -> Unit,
-
-    showLoginDialog: Boolean,
-    navController: NavController
+    onShowLoginDialog: () -> Unit
 ) {
 
     Column(
@@ -376,24 +338,6 @@ fun NotLoggedIn(
         )
 
     }
-
-
-    if (showLoginDialog)
-        Dialog(
-            properties = DialogProperties(usePlatformDefaultWidth = false),
-            onDismissRequest = onDismissLoginDialog,
-        ) {
-            Column(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.large)
-                    .fillMaxWidth()
-                    .fillMaxHeight(.7f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                LoginView(navController = navController)
-            }
-        }
 }
 
 
@@ -632,13 +576,10 @@ fun HomePreview() {
             appointment = null,
             workers = listOf(),
             refreshing = false,
-            showLoginDialog = false,
             progress = false,
             onRefresh = { /*TODO*/ },
             navigateToBookAppointment = { /*TODO*/ },
-            onDismissLoginDialog = { /*TODO*/ },
-            onShowLoginDialog = { /*TODO*/ },
-            navController = rememberNavController()
+            onNavigateToLogin = { /*TODO*/ },
         )
     }
 

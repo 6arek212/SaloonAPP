@@ -5,14 +5,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +21,7 @@ import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.theme.Green
 import com.example.ibrasaloonapp.presentation.theme.Red
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 /**
@@ -46,6 +41,27 @@ fun DefaultScreenUI(
     content: @Composable () -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+
+    LaunchedEffect(key1 = uiComponent) {
+        Log.d(TAG, "DefaultScreenUI: uicomponent changed")
+        when (uiComponent) {
+            is UIComponent.Snackbar -> {
+                coroutineScope.launch {
+                    val result = scaffoldState.snackbarHostState.showSnackbar(
+                        message = uiComponent.message,
+                    )
+
+                    when(result){
+                        SnackbarResult.Dismissed -> {
+                            onRemoveUIComponent()
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Scaffold(
         modifier = modifier.statusBarsPadding(),

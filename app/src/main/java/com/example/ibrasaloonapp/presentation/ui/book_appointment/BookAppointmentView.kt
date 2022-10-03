@@ -74,7 +74,6 @@ fun BookAppointmentView(
 
 
 
-
     LaunchedEffect(Unit) {
         launch {
             events.collect { event ->

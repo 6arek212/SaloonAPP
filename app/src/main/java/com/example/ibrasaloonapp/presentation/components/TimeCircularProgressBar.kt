@@ -31,14 +31,11 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun TimeCircularProgressBar(
     modifier: Modifier = Modifier,
-    percentage: Float,
-    number: Int,
+    number: Int = 60,
     radius: Dp = 40.dp,
     color: Color = Color.Green,
     strokeWidth: Dp = 4.dp,
-    animationDuration: Int = 1000,
-    animDelay: Int = 0,
-    timesUpCallback: () -> Unit = {}
+    timesUpCallback: () -> Unit
 ) {
 
     val ticks = remember { mutableStateOf(0) }
@@ -60,7 +57,7 @@ fun TimeCircularProgressBar(
 //    }
 
 
-    Column() {
+    Column(modifier = modifier) {
         Box(modifier = Modifier.size(radius * 2f), contentAlignment = Alignment.Center) {
             Canvas(modifier = Modifier.size(radius * 2f)) {
                 drawArc(

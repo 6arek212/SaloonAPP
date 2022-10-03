@@ -89,7 +89,12 @@ constructor(
                     )
                 }
 
+                is SignupEvent.RestPhoneSection -> {
+                    _state.value = _state.value.copy(verifyCode = OPT4Digits(""), showCode = false)
+                }
+
                 is SignupEvent.OnCodeDigitChanged -> {
+                    removeMessage()
                     when (event.codePlace) {
                         CodeDigitPlace.ONE -> {
                             val code = _state.value.verifyCode.copy(one = event.value)
@@ -124,7 +129,7 @@ constructor(
                 }
 
                 is SignupEvent.SendAuthVerification -> {
-                    sendAuthVerification()
+                    sendAuthVerification(event.sendAgain)
                 }
 
                 is SignupEvent.OnRemoveHeadFromQueue -> {
@@ -208,7 +213,7 @@ constructor(
     }
 
 
-    private suspend fun sendAuthVerification() {
+    private suspend fun sendAuthVerification(sendAgain:Boolean) {
         val phone = _state.value.phone
         val phoneValidate = validatePhoneNumber.execute(phone)
 
@@ -235,6 +240,8 @@ constructor(
                         _state.value = _state.value.copy(showCode = true)
                         verifyId = vId
                     }
+                    if (sendAgain)
+                        sendMessage(UIComponent.Snackbar(message = context.getString(R.string.sent_again)))
                 }
 
                 is Resource.Error -> {

@@ -83,7 +83,7 @@
     <string name="yes">כן</string>
     <string name="no">לא</string>
     <string name="user_with_this_number_already_exists">" קיים משתמש עם מספר זה"</string>
-    <string name="try_again_after_some_time">נסית הרבה פעמים , חקה כמה דקות</string>
+    <string name="try_again_after_some_time">נסית הרבה פעמים , חכה כמה דקות</string>
     <string name="you_must_verify_phone_first">עליך לאשר מספר הטלפון</string>
     <string name="the_filed_cant_be_blank">ה%s לא יכול להיות ריק</string>
     <string name="the_filed_cant_be_longer_than">ה%s לא יכול להיות גדול מ %d אותיות</string>

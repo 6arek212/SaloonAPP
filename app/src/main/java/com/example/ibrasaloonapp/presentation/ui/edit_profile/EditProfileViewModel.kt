@@ -109,6 +109,7 @@ constructor(
 
                 is EditProfileEvent.OnCodeDigitChanged -> {
                     Log.d(TAG, "onTriggerEvent: oncode change")
+                    removeMessage()
                     when (event.codePlace) {
                         CodeDigitPlace.ONE -> {
                             val code = _state.value.code.copy(one = event.value)
@@ -139,13 +140,13 @@ constructor(
                 }
 
                 is EditProfileEvent.SendAuthVerification -> {
-                    sendAuthVerification()
+                    sendAuthVerification(event.sendAgain)
                 }
             }
         }
     }
 
-    private suspend fun sendAuthVerification() {
+    private suspend fun sendAuthVerification(sendAgain: Boolean) {
         val phone = _state.value.phone
         val phoneValidate = validatePhoneNumber.execute(phone)
 
@@ -172,6 +173,8 @@ constructor(
                         _state.value = _state.value.copy(showCode = true)
                         verifyId = vId
                     }
+                    if (sendAgain)
+                        sendMessage(UIComponent.Snackbar(message = context.getString(R.string.sent_again)))
                 }
 
                 is Resource.Error -> {
@@ -228,7 +231,6 @@ constructor(
                             description = it.message
                         )
                     )
-                    rest()
                 }
             }
         }.launchIn(viewModelScope)

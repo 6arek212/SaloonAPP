@@ -1,8 +1,8 @@
 package com.example.ibrasaloonapp.presentation.ui
 
 import android.util.Log
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
@@ -16,8 +16,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -89,6 +94,11 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
 
                     is MainUIEvent.LoggedIn -> {
                         Log.d(TAG, "Navigation: LoggedIn")
+                        navController.navigate(Screen.Home.route){
+                            popUpTo(Screen.Home.route)
+                            launchSingleTop = true
+                            restoreState = true
+                        }
 
                     }
 
@@ -210,14 +220,29 @@ fun NavGraphBuilder.splash(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun NavGraphBuilder.login(
     navController: NavController,
 ) {
-    composable(
+    dialog(
         route = Screen.Login.route,
-        arguments = emptyList()
+        arguments = emptyList(),
+        dialogProperties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = false
+        )
     ) {
-        LoginView(navController = navController)
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 4.dp)
+                .clip(MaterialTheme.shapes.large)
+                .fillMaxWidth()
+                .fillMaxHeight(.7f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            LoginView(navController = navController)
+        }
     }
 }
 
