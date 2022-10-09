@@ -34,7 +34,13 @@ fun ImageChip(
     onClick: () -> Unit,
     isSelected: Boolean,
     url: String? = null,
-    imageSize: Dp = 45.dp
+    imageSize: Dp = 45.dp,
+    chipPadding: PaddingValues = PaddingValues(
+        start = 24.dp,
+        top = 6.dp,
+        end = 8.dp,
+        bottom = 6.dp
+    )
 ) {
 
 
@@ -55,12 +61,7 @@ fun ImageChip(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.Bottom),
-            contentPaddingValues = PaddingValues(
-                start = 24.dp,
-                top = 6.dp,
-                end = 8.dp,
-                bottom = 6.dp
-            ),
+            contentPaddingValues = chipPadding,
             text = text,
             onClick = onClick,
             isSelected = isSelected

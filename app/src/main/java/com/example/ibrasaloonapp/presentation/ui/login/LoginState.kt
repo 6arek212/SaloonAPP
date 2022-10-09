@@ -9,6 +9,7 @@ data class LoginState(
     val phone: String = "",
     val phoneError: String? = null,
     val verifyCode: OPT4Digits = OPT4Digits("", "", "", ""),
-    val showCode: Boolean = false
+    val showCode: Boolean = false,
+    val isLoggedIn: Boolean = false
 ) {
 }

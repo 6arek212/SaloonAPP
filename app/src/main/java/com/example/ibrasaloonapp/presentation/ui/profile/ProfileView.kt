@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BorderColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -39,8 +40,8 @@ fun ProfileView(
     mainViewModel: MainActivityViewModel
 ) {
     val user = mainViewModel.state.value.authData?.user
-    val progress = viewModel.uiState.value.progressBarState
-    val uiMessage = viewModel.uiState.value.uiMessage
+    val progress = viewModel.uiState.collectAsState().value.progressBarState
+    val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
 
     Log.d(TAG, "ProfileView: ${user}")
 

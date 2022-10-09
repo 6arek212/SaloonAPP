@@ -51,7 +51,12 @@ constructor(
         }
     }
 
-    override suspend fun getUsers(data: LoginDataDto): ApiResult<List<User>> {
+    override suspend fun getUsers(
+        search: String?,
+        sort: Int?,
+        pageSize: Int?,
+        currentPage: Int?,
+    ): ApiResult<List<User>> {
         return safeApiCall(dispatcher) {
             userDtoMapper.toDomainList(userService.getUsers().users)
         }

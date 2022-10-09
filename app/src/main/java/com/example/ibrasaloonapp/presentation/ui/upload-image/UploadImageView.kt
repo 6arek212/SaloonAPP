@@ -48,11 +48,11 @@ fun UploadImageView(
     mainActivityViewModel: MainActivityViewModel,
     viewModel: UploadImageViewModel = hiltViewModel(),
 ) {
-    val progress = viewModel.uiState.value.progressBarState
+    val progress = viewModel.uiState.collectAsState().value.progressBarState
     val buttonVisible = viewModel.uploadState.value.buttonVisible
     val selectedImageUri = viewModel.uploadState.value.imageUri
     val selectedImageUrl = mainActivityViewModel.state.value.authData?.user?.image
-    val uiMessage = viewModel.uiState.value.uiMessage
+    val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
     val events = viewModel.events
 
     LaunchedEffect(Unit) {

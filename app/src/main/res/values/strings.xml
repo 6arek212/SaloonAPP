@@ -106,6 +106,19 @@
     <string name="hair_cut_and_face_cut">Hair Cut And Face Cut</string>
     <string name="find_us">Find Us</string>
     <string name="sent_again">sent again</string>
+    <string name="held_by_worker">Held by worker</string>
+    <string name="not_booked">Not Booked</string>
+    <string name="search">Search</string>
+    <string name="show_all">Show All</string>
+    <string name="free">Free</string>
+    <string name="hold">Hold</string>
+    <string name="create">Create</string>
+    <string name="end_time">end time</string>
+    <string name="start_time">start time</string>
+    <string name="create_appointment">Create Appointment</string>
+    <string name="worker_page">Worker Page</string>
+    <string name="status">Status</string>
+    <string name="customers">Customers</string>
 
 
 </resources>

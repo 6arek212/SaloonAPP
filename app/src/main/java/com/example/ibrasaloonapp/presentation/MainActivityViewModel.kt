@@ -2,14 +2,19 @@ package com.example.ibrasaloonapp.presentation
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.domain.model.MenuItem
 import com.example.ibrasaloonapp.network.utils.ConnectivityObserver
+import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -72,20 +77,83 @@ constructor(
                 is MainEvent.RemoveMessage -> {
                     removeMessage()
                 }
-
             }
         }
     }
 
 
+    fun getDrawerItems(): List<MenuItem> {
+        val list = ArrayList<MenuItem>()
+        list.add(
+            MenuItem(
+                id = Screen.Home.route,
+                title = context.getString(R.string.home),
+                contentDescription = "Go to home",
+                icon = Icons.Filled.Home
+            )
+        )
+        list.add(
+            MenuItem(
+                id = Screen.AppointmentsList.route,
+                title = context.getString(R.string.appointments),
+                contentDescription = "Go to appointments",
+                icon = Icons.Filled.BookOnline
+            )
+        )
+        list.add(
+            MenuItem(
+                id = Screen.Profile.route,
+                title = context.getString(R.string.profile),
+                contentDescription = "Go to profile",
+                icon = Icons.Filled.AccountBox
+            )
+        )
 
+        if (_state.value.workerMode) {
+            list.add(
+                MenuItem(
+                    id = Screen.WorkerAppointmentsList.route,
+                    title = context.getString(R.string.worker_page),
+                    contentDescription = "Worker Page",
+                    icon = Icons.Filled.WorkOutline
+                )
+            )
+
+
+            list.add(
+                MenuItem(
+                    id = Screen.WorkerAppointmentsList.route,
+                    title = context.getString(R.string.customers),
+                    contentDescription = "Customers Page",
+                    icon = Icons.Filled.Diversity3
+                )
+            )
+        }
+
+        list.add(
+            MenuItem(
+                id = "logout",
+                title = context.getString(R.string.logut),
+                contentDescription = "logout",
+                icon = Icons.Filled.ExitToApp
+            )
+        )
+
+
+        return list
+    }
 
     private suspend fun checkAuth() {
         val authData = authRepository.getCacheAuthData(updateStatus = true)
         if (authData != null) {
-            _state.value = state.value.copy(isLoggedIn = true, authData = authData)
+            val isWorkerMode = authData.user.role == "barber"
+
+            Log.d(TAG, "checkAuth: - ---  ${authData.user.role} ${isWorkerMode} ")
+
+            _state.value =
+                state.value.copy(isLoggedIn = true, authData = authData, workerMode = isWorkerMode)
         } else {
-            _state.value = AuthState(isLoggedIn = false, authData = null)
+            _state.value = AuthState(isLoggedIn = false, authData = null, workerMode = false)
         }
         _uiEvents.emit(MainUIEvent.AuthDataReady)
         Log.d(TAG, "checkAuth: emit(MainUIEvent.AuthDataReady)")
@@ -105,7 +173,8 @@ constructor(
                         Log.d(TAG, "observeAuthStatus: Login ${data.authData}")
                         _state.value = state.value.copy(
                             isLoggedIn = true,
-                            authData = data.authData
+                            authData = data.authData,
+                            workerMode = data.authData.user.role == "barber"
                         )
                         _uiEvents.emit(MainUIEvent.LoggedIn)
                     }

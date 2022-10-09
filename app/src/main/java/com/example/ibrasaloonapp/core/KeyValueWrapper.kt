@@ -1,8 +1,10 @@
 package com.example.ibrasaloonapp.core
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 
-data class KeyValueWrapper<T, K>(
-    val key: T,
-    var value: K
-)
+@Parcelize
+data class KeyValueWrapper(
+    val key: String,
+    var value: String):Parcelable

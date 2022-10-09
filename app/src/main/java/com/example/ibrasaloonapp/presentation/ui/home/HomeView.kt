@@ -52,8 +52,8 @@ fun HomeView(
     val workers = viewModel.state.value.workers
     val refreshing = viewModel.state.value.refreshing
     val user = mainViewModel.state.value.authData?.user
-    val uiMessage = viewModel.uiState.value.uiMessage
-    val progress = viewModel.uiState.value.progressBarState
+    val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
+    val progress = viewModel.uiState.collectAsState().value.progressBarState
 
     LaunchedEffect(key1 = isLoggedIn) {
         viewModel.onTriggerEvent(HomeEvent.GetData(isAuthed = isLoggedIn))

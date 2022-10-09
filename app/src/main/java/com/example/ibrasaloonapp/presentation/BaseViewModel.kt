@@ -12,15 +12,15 @@ import com.example.ibrasaloonapp.core.domain.Queue
 import com.example.ibrasaloonapp.core.domain.UIComponent
 import com.example.ibrasaloonapp.presentation.ui.UIState
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
 private const val TAG = "BaseViewModel"
 
 open class BaseViewModel : ViewModel() {
-    private val _uiState: MutableState<UIState> = mutableStateOf(UIState())
-    val uiState: State<UIState> = _uiState
+    private val _uiState: MutableStateFlow<UIState> = MutableStateFlow(UIState())
+    val uiState = _uiState.asStateFlow()
 
 
     protected fun loading(state: Boolean) {
@@ -39,7 +39,6 @@ open class BaseViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(network = state)
         }
     }
-
 
 
     protected fun sendMessage(uiComponent: UIComponent) {

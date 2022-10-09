@@ -20,6 +20,64 @@ constructor(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : AppointmentRepository {
 
+
+    override suspend fun deleteAppointment(appointmentId: String): ApiResult<String> {
+        return safeApiCall(dispatcher) {
+            service.deleteAppointment(appointmentId = appointmentId).message
+        }
+    }
+
+    override suspend fun getWorkerAppointments(
+        search: String?,
+        status: String?,
+        startTime: String?,
+        endTime: String?,
+        pageSize: Int?,
+        currentPage: Int?,
+        workerId: String?
+    ): ApiResult<List<Appointment>> {
+        return safeApiCall(dispatcher) {
+            mapper.toDomainList(
+                service.getWorkerAppointments(
+                    search,
+                    startTime,
+                    endTime,
+                    pageSize,
+                    currentPage,
+                    workerId,
+                    status = status
+                ).appointments
+            )
+        }
+    }
+
+
+    override suspend fun createAppointment(appointmentData: CreateAppointmentDto): ApiResult<Appointment> {
+        return safeApiCall(dispatcher) {
+            mapper.mapToDomainModel(
+                service.createAppointment(
+                    data = appointmentData
+                ).appointment
+            )
+        }
+    }
+
+    override suspend fun updateAppointmentStatus(
+        id: String,
+        status: String
+    ): ApiResult<Appointment> {
+        return safeApiCall(dispatcher) {
+            mapper.mapToDomainModel(
+                service.updateAppointmentStatus(
+                    UpdateAppointmentStatusDto(
+                        appointmentId = id,
+                        status = status
+                    )
+                ).appointment
+            )
+        }
+    }
+
     override suspend fun getAppointments(): ApiResult<List<Appointment>> {
         return safeApiCall(dispatcher) {
             mapper.toDomainList(service.getUserAppointments().appointments)

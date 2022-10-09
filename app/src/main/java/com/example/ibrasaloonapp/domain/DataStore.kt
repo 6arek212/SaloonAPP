@@ -22,6 +22,7 @@ val USER_LAST_NAME = stringPreferencesKey("user_last_name")
 val USER_IMAGE = stringPreferencesKey("user_image")
 val PHONE = stringPreferencesKey("phone")
 val EXPIRES_IN = intPreferencesKey("expiresIn")
+val ROLE = stringPreferencesKey("role")
 
 
 fun MutablePreferences.insertAuthData(authData: AuthData) {
@@ -33,9 +34,8 @@ fun MutablePreferences.insertAuthData(authData: AuthData) {
     this[USER_IMAGE] = authData.user.image ?: ""
     this[PHONE] = authData.user.phone
     this[EXPIRES_IN] = authData.expiresIn
+    this[ROLE] = authData.user.role
 }
-
-
 
 
 fun MutablePreferences.insertUser(user: User) {
@@ -44,8 +44,8 @@ fun MutablePreferences.insertUser(user: User) {
     this[USER_LAST_NAME] = user.lastName
     this[USER_IMAGE] = user.image ?: ""
     this[PHONE] = user.phone
+    this[ROLE] = user.role
 }
-
 
 
 fun MutablePreferences.clearAuthData() {
@@ -57,6 +57,7 @@ fun MutablePreferences.clearAuthData() {
     this[PHONE] = ""
     this[EXPIRES_IN] = 0
     this[USER_IMAGE] = ""
+    this[ROLE] = ""
 }
 
 
@@ -70,7 +71,7 @@ fun Preferences.getAuthData(): AuthData? {
             firstName = this[USER_FIRST_NAME] ?: "",
             lastName = this[USER_LAST_NAME] ?: "",
             phone = this[PHONE] ?: "",
-            role = "",
+            role = this[ROLE] ?: "",
             image = if (this[USER_IMAGE].isNullOrBlank()) null else this[USER_IMAGE]
         ),
         token = this[TOKEN] ?: "",

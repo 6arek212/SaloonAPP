@@ -11,11 +11,8 @@ import androidx.compose.material.icons.filled.BookOnline
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -51,6 +48,9 @@ import com.example.ibrasaloonapp.presentation.ui.signup.SignupViewModel
 import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
 import com.example.ibrasaloonapp.presentation.ui.upload.IMAGE_KEY
 import com.example.ibrasaloonapp.presentation.ui.upload.UploadImageView
+import com.example.ibrasaloonapp.presentation.ui.worker_appointments.CreateAppointmentView
+import com.example.ibrasaloonapp.presentation.ui.worker_appointments.WorkerAppointmentsList
+import com.example.ibrasaloonapp.presentation.ui.worker_appointments.WorkerAppointmentsListViewModel
 import kotlinx.coroutines.launch
 
 private const val TAG = "Navigation"
@@ -61,11 +61,15 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
     val navController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val workerMode = mainViewModel.state.value.workerMode
     val user = mainViewModel.state.value.authData?.user
-    val uiMessage = mainViewModel.uiState.value.uiMessage
-    val networkStatus = mainViewModel.uiState.value.network
+    val uiMessage = mainViewModel.uiState.collectAsState().value.uiMessage
+    val networkStatus = mainViewModel.uiState.collectAsState().value.network
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
+    var drawerItems: List<MenuItem> by remember {
+        mutableStateOf(listOf())
+    }
     Log.d(TAG, "Navigation: ${currentDestination}")
 
     val events = mainViewModel.uiEvents
@@ -94,12 +98,12 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
 
                     is MainUIEvent.LoggedIn -> {
                         Log.d(TAG, "Navigation: LoggedIn")
-                        navController.navigate(Screen.Home.route){
-                            popUpTo(Screen.Home.route)
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-
+//                        if (currentDestination != Screen.Signup.route)
+//                            navController.navigate(Screen.Home.route) {
+//                                popUpTo(Screen.Home.route)
+//                                launchSingleTop = true
+//                                restoreState = true
+//                            }
                     }
 
                     is MainUIEvent.AuthDataReady -> {
@@ -110,35 +114,10 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
         }
     }
 
-
-    val drawerItems = listOf(
-        MenuItem(
-            id = Screen.Home.route,
-            title = stringResource(id = R.string.home),
-            contentDescription = "Go to home",
-            icon = Icons.Filled.Home
-        ),
-        MenuItem(
-            id = Screen.AppointmentsList.route,
-            title = stringResource(id = R.string.appointments),
-            contentDescription = "Go to appointments",
-            icon = Icons.Filled.BookOnline
-        ),
-        MenuItem(
-            id = Screen.Profile.route,
-            title = stringResource(id = R.string.profile),
-            contentDescription = "Go to profile",
-            icon = Icons.Filled.AccountBox
-        ),
-        MenuItem(
-            id = "logout",
-            title = stringResource(id = R.string.logut),
-            contentDescription = "logout",
-            icon = Icons.Filled.ExitToApp
-        )
-    )
-
-
+    LaunchedEffect(key1 = workerMode) {
+        Log.d(TAG, "Navigation: ${workerMode}")
+        drawerItems = mainViewModel.getDrawerItems()
+    }
 
 
     DefaultScreenUI(
@@ -168,9 +147,16 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                     if (item.id != "logout") {
                         Log.d(TAG, "Navigation: drawerItem ${item.id}")
                         navController.navigate(item.id) {
-                            popUpTo(Screen.Home.route) {
-                                saveState = true
+                            if (workerMode) {
+                                popUpTo(Screen.WorkerAppointmentsList.route) {
+                                    saveState = true
+                                }
+                            } else {
+                                popUpTo(Screen.Home.route) {
+                                    saveState = true
+                                }
                             }
+
                             launchSingleTop = true
                             restoreState = true
                         }
@@ -193,10 +179,13 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 startDestination = Screen.Splash.route
             ) {
                 splash(navController = navController, mainViewModel = mainViewModel)
-                login(navController = navController)
+                login(navController = navController, mainViewModel = mainViewModel)
                 signup(navController = navController, mainViewModel = mainViewModel)
                 home(navController = navController, mainViewModel = mainViewModel)
                 appointmentList(navController = navController, mainViewModel = mainViewModel)
+                workerAppointmentList(navController = navController, mainViewModel = mainViewModel)
+                customersList(navController = navController, mainViewModel = mainViewModel)
+                createAppointment(navController = navController, mainViewModel = mainViewModel)
                 bookAppointment(navController = navController, mainViewModel = mainViewModel)
 
                 uploadImage(navController = navController, mainViewModel = mainViewModel)
@@ -223,6 +212,7 @@ fun NavGraphBuilder.splash(
 @OptIn(ExperimentalComposeUiApi::class)
 fun NavGraphBuilder.login(
     navController: NavController,
+    mainViewModel: MainActivityViewModel
 ) {
     dialog(
         route = Screen.Login.route,
@@ -241,7 +231,7 @@ fun NavGraphBuilder.login(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            LoginView(navController = navController)
+            LoginView(navController = navController, mainViewModel = mainViewModel)
         }
     }
 }
@@ -300,6 +290,56 @@ fun NavGraphBuilder.appointmentList(
         arguments = emptyList()
     ) {
         AppointmentListView(navController = navController, mainViewModel = mainViewModel)
+    }
+}
+
+
+fun NavGraphBuilder.workerAppointmentList(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel
+) {
+    composable(
+        route = Screen.WorkerAppointmentsList.route,
+        arguments = emptyList()
+    ) {
+        WorkerAppointmentsList(
+            navigateToCreateAppointment = { navController.navigate(Screen.CreateAppointment.route) },
+            mainViewModel = mainViewModel
+        )
+    }
+}
+
+
+fun NavGraphBuilder.customersList(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel
+) {
+    composable(
+        route = Screen.CustomersList.route,
+        arguments = emptyList()
+    ) {
+
+    }
+}
+
+
+
+fun NavGraphBuilder.createAppointment(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel
+) {
+    dialog(
+        route = Screen.CreateAppointment.route,
+        arguments = emptyList(),
+        dialogProperties = DialogProperties(
+//            usePlatformDefaultWidth = false
+        )
+    ) { backStackEntry ->
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry(Screen.WorkerAppointmentsList.route)
+        }
+        val viewModel = hiltViewModel<WorkerAppointmentsListViewModel>(parentEntry)
+        CreateAppointmentView(viewModel = viewModel)
     }
 }
 

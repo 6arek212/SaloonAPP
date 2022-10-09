@@ -51,8 +51,8 @@ fun SignupView(
     mainViewModel: MainActivityViewModel
 ) {
 
-    val uiMessage = viewModel.uiState.value.uiMessage
-    val progress = viewModel.uiState.value.progressBarState
+    val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
+    val progress = viewModel.uiState.collectAsState().value.progressBarState
 
     val image = mainViewModel.state.value.authData?.user?.image
     val showCode = viewModel.state.value.showCode

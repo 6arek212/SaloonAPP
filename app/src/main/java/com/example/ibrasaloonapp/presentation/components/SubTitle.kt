@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -17,7 +18,12 @@ import com.example.ibrasaloonapp.presentation.theme.Gray2
 
 
 @Composable
-fun SubTitle(modifier: Modifier = Modifier, text: String) {
+fun SubTitle(
+    modifier: Modifier = Modifier,
+    text: String,
+    textColor: Color = MaterialTheme.colors.onBackground,
+    underLine: Boolean = true
+) {
 
     ConstraintLayout(modifier = modifier) {
         val (textRef, div) = createRefs()
@@ -28,23 +34,24 @@ fun SubTitle(modifier: Modifier = Modifier, text: String) {
                 top.linkTo(parent.top)
             },
             text = text,
-            color = MaterialTheme.colors.onBackground,
+            color = textColor,
             style = MaterialTheme.typography.h3
         )
 
-        Divider(
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .height(2.dp)
-                .clip(MaterialTheme.shapes.large)
-                .background(Gray2)
-                .constrainAs(div) {
-                    start.linkTo(textRef.start)
-                    end.linkTo(textRef.end)
-                    top.linkTo(textRef.bottom)
-                    width = Dimension.fillToConstraints
-                }
-        )
+        if (underLine)
+            Divider(
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .height(2.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .background(Gray2)
+                    .constrainAs(div) {
+                        start.linkTo(textRef.start)
+                        end.linkTo(textRef.end)
+                        top.linkTo(textRef.bottom)
+                        width = Dimension.fillToConstraints
+                    }
+            )
     }
 
 

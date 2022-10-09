@@ -57,6 +57,7 @@ fun SplashView(
     mainViewModel: MainActivityViewModel
 ) {
 
+    val workerMode = mainViewModel.state.value.workerMode
     val events = mainViewModel.uiEvents
     val duration = 500
 
@@ -71,22 +72,34 @@ fun SplashView(
     )
 
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(key1 = workerMode) {
         Log.d(TAG, "SplashView: launch effect")
         startAnimation = true
         delay(duration.toLong())
 
         if (events.first() !is MainUIEvent.Nothing) {
-            navController.navigate(Screen.Home.route) {
-                popUpTo(0)
+            if (workerMode) {
+                navController.navigate(Screen.WorkerAppointmentsList.route) {
+                    popUpTo(0)
+                }
+            } else {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(0)
+                }
             }
         }
 
         events.collect { event ->
             when (event) {
                 is MainUIEvent.AuthDataReady -> {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(0)
+                    if (workerMode) {
+                        navController.navigate(Screen.WorkerAppointmentsList.route) {
+                            popUpTo(0)
+                        }
+                    } else {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(0)
+                        }
                     }
                 }
             }

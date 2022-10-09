@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +51,8 @@ fun EditProfileView(
     val firstNameError = viewModel.state.value.firstNameError
     val lastNameError = viewModel.state.value.lastNameError
     val phone = mainViewModel.state.value.authData?.user?.phone
-    val progress = viewModel.uiState.value.progressBarState
-    val uiMessage = viewModel.uiState.value.uiMessage
+    val progress = viewModel.uiState.collectAsState().value.progressBarState
+    val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
 
 
     val interactionSource = remember { MutableInteractionSource() }

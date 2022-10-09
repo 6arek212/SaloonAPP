@@ -17,9 +17,11 @@ fun <T> T.AnimationBox(
         }
     }
 
+
+
     AnimatedVisibility(
         visibleState = state,
         enter = enter,
-        exit = exit
+//        exit = exit
     ) { content() }
 }

@@ -4,8 +4,8 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
-sealed class Nav(val route: String){
-    object SignupNav:Nav(route = "signupNav")
+sealed class Nav(val route: String) {
+    object SignupNav : Nav(route = "signupNav")
 }
 
 
@@ -36,11 +36,25 @@ sealed class Screen(val route: String, val arguments: List<NamedNavArgument>) {
         arguments = emptyList()
     )
 
+    object WorkerAppointmentsList : Screen(
+        route = "WorkerAppointmentsList",
+        arguments = emptyList()
+    )
+
+    object CustomersList : Screen(
+        route = "CustomersList",
+        arguments = emptyList()
+    )
+
+    object CreateAppointment : Screen(
+        route = "CreateAppointment",
+        arguments = emptyList()
+    )
+
     object BookAppointment : Screen(
         route = "BookAppointment",
         arguments = emptyList()
     )
-
 
 
     object UploadImage : Screen(

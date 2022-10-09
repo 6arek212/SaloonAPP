@@ -71,7 +71,6 @@ fun DefaultScreenUI(
 
         Box(
             modifier = Modifier
-                .background(MaterialTheme.colors.background)
                 .fillMaxSize()
                 .padding(padding)
         ) {

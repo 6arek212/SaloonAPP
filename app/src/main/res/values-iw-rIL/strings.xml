@@ -105,5 +105,17 @@
     <string name="hair_cut_and_face_cut">תספורת + זקן</string>
     <string name="find_us">מצא אותנו</string>
     <string name="sent_again">נשלח שוב</string>
+    <string name="held_by_worker">נשמר ע\"י העובד</string>
+    <string name="not_booked">לא הוזמן</string>
+    <string name="search">חיפוש</string>
+    <string name="show_all">הצג הכל</string>
+    <string name="free">זמין להזמנה</string>
+    <string name="hold">שמור</string>
+    <string name="create">צור</string>
+    <string name="end_time">זמן סיום</string>
+    <string name="start_time">זמן התחלה</string>
+    <string name="create_appointment">צור תור</string>
+    <string name="worker_page">דף עובד</string>
+    <string name="status">מצב</string>
 
 </resources>

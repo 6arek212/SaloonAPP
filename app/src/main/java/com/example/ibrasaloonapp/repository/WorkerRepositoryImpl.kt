@@ -3,6 +3,7 @@ package com.example.ibrasaloonapp.repository
 import com.example.ibrasaloonapp.domain.model.Service
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.network.ApiResult
+import com.example.ibrasaloonapp.network.model.AddServiceDto
 import com.example.ibrasaloonapp.network.model.ServiceDtoMapper
 import com.example.ibrasaloonapp.network.model.UserDtoMapper
 import com.example.ibrasaloonapp.network.services.WorkerService
@@ -23,6 +24,24 @@ constructor(
     override suspend fun getWorkers(): ApiResult<List<User>> {
         return safeApiCall(dispatcher) {
             userDtoMapper.toDomainList(workerService.getWorkers().workers)
+        }
+    }
+
+    override suspend fun addService(data: AddServiceDto): ApiResult<Service> {
+        return safeApiCall(dispatcher) {
+            serviceDtoMapper.mapToDomainModel(
+                workerService.addService(
+                    data = data
+                ).service
+            )
+        }
+    }
+
+    override suspend fun deleteService(serviceId: String): ApiResult<String> {
+        return safeApiCall(dispatcher) {
+            workerService.deleteService(
+                serviceId = serviceId
+            ).message
         }
     }
 

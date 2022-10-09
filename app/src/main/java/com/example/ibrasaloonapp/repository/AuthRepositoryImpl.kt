@@ -32,10 +32,10 @@ constructor(
 
     private var user: User? = null
 
+
     override suspend fun getAuthFlow(): StateFlow<AuthEvent> {
         return authData
     }
-
 
     override fun getUserId(): String? {
         return user?.id
@@ -68,6 +68,7 @@ constructor(
                 return null
             }
             user = it.user
+            Log.d(TAG, "getCacheAuthData: ${user}")
 
             if (updateStatus) {
                 _authData.emit(AuthEvent.Login(it))

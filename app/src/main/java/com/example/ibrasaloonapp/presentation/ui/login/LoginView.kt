@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.domain.model.AuthData
+import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.components.CommonOtp
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.ProgressButton
@@ -37,19 +38,40 @@ import kotlinx.coroutines.launch
 fun LoginView(
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel(),
+    mainViewModel: MainActivityViewModel
 ) {
 
     val phone = viewModel.state.value.phone
     val phoneError = viewModel.state.value.phoneError
     val code = viewModel.state.value.verifyCode
-    val progress = viewModel.uiState.value.progressBarState
-    val uiMessage = viewModel.uiState.value.uiMessage
+    val progress = viewModel.uiState.collectAsState().value.progressBarState
+    val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
     val showCode = viewModel.state.value.showCode
+    val isLoggedIn = viewModel.state.value.isLoggedIn
+    val workerMode = mainViewModel.state.value.workerMode
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
 
     val interactionSource = remember { MutableInteractionSource() }
+
+    LaunchedEffect(key1 = viewModel.state.value.isLoggedIn) {
+        if (isLoggedIn) {
+            if (workerMode) {
+                navController.navigate(Screen.WorkerAppointmentsList.route) {
+                    popUpTo(Screen.Home.route)
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            } else {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Home.route)
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        }
+    }
 
 
     DefaultScreenUI(
@@ -60,6 +82,7 @@ fun LoginView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colors.background)
                 .padding(16.dp)
                 .verticalScroll(scrollState)
                 .clickable(

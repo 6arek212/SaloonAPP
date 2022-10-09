@@ -6,5 +6,6 @@ import com.example.ibrasaloonapp.domain.model.User
 data class AuthState(
     var isLoggedIn: Boolean = false,
     val authData: AuthData? = null,
+    val workerMode: Boolean = false,
 ) {
 }

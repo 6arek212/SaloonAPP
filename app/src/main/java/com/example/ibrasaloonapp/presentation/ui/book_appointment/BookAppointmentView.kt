@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 
 import androidx.compose.ui.Alignment
@@ -60,8 +61,8 @@ fun BookAppointmentView(
     val selectedAppointment = viewModel.state.value.selectedAppointment
     val selectedService = viewModel.state.value.selectedService
 
-    val progressBar = viewModel.uiState.value.progressBarState
-    val uiMessage = viewModel.uiState.value.uiMessage
+    val progressBar = viewModel.uiState.collectAsState().value.progressBarState
+    val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
 
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
