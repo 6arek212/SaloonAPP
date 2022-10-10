@@ -34,6 +34,7 @@ import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
+import com.example.ibrasaloonapp.presentation.ui.customerList.CustomersView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.ChangePhoneNumberView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileViewModel
@@ -319,7 +320,7 @@ fun NavGraphBuilder.customersList(
         route = Screen.CustomersList.route,
         arguments = emptyList()
     ) {
-
+        CustomersView()
     }
 }
 

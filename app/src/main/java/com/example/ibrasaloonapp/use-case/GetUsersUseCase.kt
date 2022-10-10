@@ -25,10 +25,10 @@ constructor(
 ) {
 
     suspend operator fun invoke(
-        search: String?,
-        sort: Int?,
-        pageSize: Int?,
-        currentPage: Int?,
+        search: String? = null,
+        sort: Int? = null,
+        pageSize: Int? = null,
+        currentPage: Int? = null,
     ) = flow {
 
         emit(Resource.Loading(true))
