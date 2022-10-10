@@ -185,6 +185,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 appointmentList(navController = navController, mainViewModel = mainViewModel)
                 workerAppointmentList(navController = navController, mainViewModel = mainViewModel)
                 customersList(navController = navController, mainViewModel = mainViewModel)
+                servicesList(navController = navController, mainViewModel = mainViewModel)
                 createAppointment(navController = navController, mainViewModel = mainViewModel)
                 bookAppointment(navController = navController, mainViewModel = mainViewModel)
 
@@ -322,6 +323,18 @@ fun NavGraphBuilder.customersList(
     }
 }
 
+
+fun NavGraphBuilder.servicesList(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel
+) {
+    composable(
+        route = Screen.ServicesList.route,
+        arguments = emptyList()
+    ) {
+
+    }
+}
 
 
 fun NavGraphBuilder.createAppointment(

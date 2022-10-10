@@ -74,7 +74,7 @@ fun CreateAppointmentView(viewModel: WorkerAppointmentsListViewModel) {
     val mMinute = mCalendar[Calendar.MINUTE]
 
 
-    // Creating a TimePicker dialod
+    // Creating a TimePicker dialog
     val startTimePickerDialog = TimePickerDialog(
         LocalContext.current,
         { _, hour: Int, min: Int ->
@@ -82,6 +82,7 @@ fun CreateAppointmentView(viewModel: WorkerAppointmentsListViewModel) {
             startMin = addPrecedingZero(min)
         }, mHour, mMinute, true
     )
+
 
     val endTimePickerDialog = TimePickerDialog(
         LocalContext.current,

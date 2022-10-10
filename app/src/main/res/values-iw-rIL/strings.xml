@@ -117,5 +117,7 @@
     <string name="create_appointment">צור תור</string>
     <string name="worker_page">דף עובד</string>
     <string name="status">מצב</string>
+    <string name="customers">לקוחות</string>
+    <string name="services">שירותים</string>
 
 </resources>

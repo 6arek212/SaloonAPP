@@ -119,6 +119,7 @@
     <string name="worker_page">Worker Page</string>
     <string name="status">Status</string>
     <string name="customers">Customers</string>
+    <string name="services">Services</string>
 
 
 </resources>

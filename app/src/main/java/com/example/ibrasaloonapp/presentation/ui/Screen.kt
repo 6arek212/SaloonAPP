@@ -46,6 +46,12 @@ sealed class Screen(val route: String, val arguments: List<NamedNavArgument>) {
         arguments = emptyList()
     )
 
+    object ServicesList : Screen(
+        route = "ServicesList",
+        arguments = emptyList()
+    )
+
+
     object CreateAppointment : Screen(
         route = "CreateAppointment",
         arguments = emptyList()
