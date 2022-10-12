@@ -2,9 +2,11 @@ package com.example.ibrasaloonapp.di
 
 import android.content.Context
 import com.example.ibrasaloonapp.core.Logger
+import com.example.ibrasaloonapp.core.UIMessagesController
 import com.example.ibrasaloonapp.presentation.BaseApplication
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
@@ -32,5 +34,5 @@ object AppModule {
         )
     }
 
-
 }
+

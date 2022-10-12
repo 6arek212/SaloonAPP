@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.DialogEvent
@@ -16,9 +15,7 @@ import com.example.ibrasaloonapp.domain.model.MenuItem
 import com.example.ibrasaloonapp.network.utils.ConnectivityObserver
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.repository.AuthRepository
-import com.example.ibrasaloonapp.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,6 +42,7 @@ constructor(
         onTriggerEvent(MainEvent.GetAuthData)
         observeNetwork()
         observeAuthStatus()
+        observeUIMessages()
     }
 
 
@@ -75,7 +73,7 @@ constructor(
                 }
 
                 is MainEvent.RemoveMessage -> {
-                    removeMessage()
+                    _state.value = _state.value.copy(uiMessage = null)
                 }
             }
         }
@@ -122,7 +120,7 @@ constructor(
 
             list.add(
                 MenuItem(
-                    id = Screen.CustomersList.route,
+                    id = Screen.UsersList.route,
                     title = context.getString(R.string.customers),
                     contentDescription = "Customers Page",
                     icon = Icons.Filled.Diversity3
@@ -151,6 +149,18 @@ constructor(
 
 
         return list
+    }
+
+
+    private fun observeUIMessages() {
+        viewModelScope.launch {
+            uiMessagesController.message.collect { uiComponent ->
+                Log.d(TAG, "observeUIMessages: $uiComponent")
+                uiComponent?.let {
+                    _state.value = _state.value.copy(uiMessage = uiComponent)
+                }
+            }
+        }
     }
 
     private suspend fun checkAuth() {

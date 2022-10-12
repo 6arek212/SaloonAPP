@@ -4,6 +4,8 @@ import com.example.ibrasaloonapp.network.model.UserDto
 
 data class UsersResponse(
     val message: String,
-    val users: List<UserDto>
+    val users: List<UserDto>,
+    val count: Int,
+    val newUsersCount: Int
 ) {
 }

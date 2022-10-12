@@ -15,7 +15,12 @@ import retrofit2.http.*
 interface UserService {
 
     @GET("users")
-    suspend fun getUsers(): UsersResponse
+    suspend fun getUsers(
+        @Query("search") search: String? = null,
+        @Query("pageSize") pageSize: Int? = null,
+        @Query("currentPage") currentPage: Int? = null,
+        @Query("sort") sort: Int? = null
+    ): UsersResponse
 
 
     @GET("users/{userId}")

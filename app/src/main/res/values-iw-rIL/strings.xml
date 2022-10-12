@@ -119,5 +119,9 @@
     <string name="status">מצב</string>
     <string name="customers">לקוחות</string>
     <string name="services">שירותים</string>
+    <string name="barber">עובד</string>
+    <string name="customer">לקוח</string>
+    <string name="call">התקשר</string>
+    <string name="paid">שולם</string>
 
 </resources>

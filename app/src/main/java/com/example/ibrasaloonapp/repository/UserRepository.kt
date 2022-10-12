@@ -12,9 +12,9 @@ interface UserRepository {
         sort: Int? = null,
         pageSize: Int? = null,
         currentPage: Int? = null,
-    ): ApiResult<List<User>>
+    ): ApiResult<Triple<List<User>, Int, Int>>
 
-    suspend fun getUser(userId: String): ApiResult<User>
+    suspend fun getUser(userId: String): ApiResult<Triple<User, Int, Double>>
     suspend fun updateUser(userDto: UserUpdateDto, userId: String): ApiResult<User>
     suspend fun deleteUser(userId: String): ApiResult<String>
     suspend fun uploadImage(inputStream: InputStream, fileType: String): ApiResult<String>

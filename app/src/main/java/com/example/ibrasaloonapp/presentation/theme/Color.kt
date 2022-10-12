@@ -36,6 +36,7 @@ val BlackLight1 = Color(0xFF6B6B6B)
 val Black1 = Color(0xFF222222)
 val Black2 = Color(0xFF1D1B1B)
 val Black4 = Color(0xFF6E6E6E)
+val Black = Color(0xFF000000)
 
 val textBlack = Color(0xFF525568)
 

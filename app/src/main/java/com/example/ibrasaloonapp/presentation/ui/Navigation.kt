@@ -1,15 +1,9 @@
 package com.example.ibrasaloonapp.presentation.ui
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.BookOnline
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -17,16 +11,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
-import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.domain.model.MenuItem
+import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
@@ -34,7 +27,9 @@ import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
-import com.example.ibrasaloonapp.presentation.ui.customerList.CustomersView
+import com.example.ibrasaloonapp.presentation.ui.customer_list.CustomersView
+import com.example.ibrasaloonapp.presentation.ui.customer_list.CustomersViewModel
+import com.example.ibrasaloonapp.presentation.ui.customer_list.UserDetails
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.ChangePhoneNumberView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileViewModel
@@ -43,12 +38,11 @@ import com.example.ibrasaloonapp.presentation.ui.login.LoginView
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileEvent
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileView
 import com.example.ibrasaloonapp.presentation.ui.profile.ProfileViewModel
-import com.example.ibrasaloonapp.presentation.ui.signup.SignupEvent
 import com.example.ibrasaloonapp.presentation.ui.signup.SignupView
-import com.example.ibrasaloonapp.presentation.ui.signup.SignupViewModel
 import com.example.ibrasaloonapp.presentation.ui.splash.SplashView
 import com.example.ibrasaloonapp.presentation.ui.upload.IMAGE_KEY
 import com.example.ibrasaloonapp.presentation.ui.upload.UploadImageView
+import com.example.ibrasaloonapp.presentation.ui.user_details.UserDetailsViewModel
 import com.example.ibrasaloonapp.presentation.ui.worker_appointments.CreateAppointmentView
 import com.example.ibrasaloonapp.presentation.ui.worker_appointments.WorkerAppointmentsList
 import com.example.ibrasaloonapp.presentation.ui.worker_appointments.WorkerAppointmentsListViewModel
@@ -64,7 +58,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
     val scope = rememberCoroutineScope()
     val workerMode = mainViewModel.state.value.workerMode
     val user = mainViewModel.state.value.authData?.user
-    val uiMessage = mainViewModel.uiState.collectAsState().value.uiMessage
+    val uiMessage = mainViewModel.state.value.uiMessage
     val networkStatus = mainViewModel.uiState.collectAsState().value.network
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
@@ -186,6 +180,7 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 appointmentList(navController = navController, mainViewModel = mainViewModel)
                 workerAppointmentList(navController = navController, mainViewModel = mainViewModel)
                 customersList(navController = navController, mainViewModel = mainViewModel)
+                userDetails(navController = navController, mainViewModel = mainViewModel)
                 servicesList(navController = navController, mainViewModel = mainViewModel)
                 createAppointment(navController = navController, mainViewModel = mainViewModel)
                 bookAppointment(navController = navController, mainViewModel = mainViewModel)
@@ -317,10 +312,26 @@ fun NavGraphBuilder.customersList(
     mainViewModel: MainActivityViewModel
 ) {
     composable(
-        route = Screen.CustomersList.route,
+        route = Screen.UsersList.route,
         arguments = emptyList()
-    ) {
-        CustomersView()
+    ) { backStackEntry ->
+        CustomersView(navigateToUserDetails = { user ->
+            navController.navigate(Screen.UserDetails.route + "/${user.id}")
+            navController.currentBackStackEntry?.arguments?.putParcelable("user", user)
+        })
+    }
+}
+
+fun NavGraphBuilder.userDetails(
+    navController: NavController,
+    mainViewModel: MainActivityViewModel
+) {
+    composable(
+        route = Screen.UserDetails.route + "/{userId}",
+        arguments = Screen.UserDetails.arguments
+    ) { backstackEntry ->
+        val viewModel: UserDetailsViewModel = hiltViewModel(backstackEntry)
+        UserDetails(viewModel = viewModel)
     }
 }
 

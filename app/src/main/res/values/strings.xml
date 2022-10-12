@@ -120,6 +120,10 @@
     <string name="status">Status</string>
     <string name="customers">Customers</string>
     <string name="services">Services</string>
+    <string name="barber">barber</string>
+    <string name="customer">customer</string>
+    <string name="call">call</string>
+    <string name="paid">Paid</string>
 
 
 </resources>

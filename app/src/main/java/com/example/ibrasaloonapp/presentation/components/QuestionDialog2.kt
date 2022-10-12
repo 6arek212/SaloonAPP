@@ -56,7 +56,7 @@ fun QuestionDialog2(
         startAnimation = true
     }
 
-    Box(modifier = Modifier.width(280.dp)) {
+    Box(modifier = modifier.width(280.dp)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -72,61 +72,61 @@ fun QuestionDialog2(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "are u sure?",
+                        text = title,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         color = Color.Black
                     )
                     Text(
-                        text = "stringResource(id = R.string.text_dialog_exit_description)",
+                        text = description,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Center,
                         color = Color.Black
                     )
                 }
-                Divider(color = Gray1)
-                Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable {
-                                // dismiss dialog
-//                                navController.popBackStack()
-                            }
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.no),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                if (actionButtons) {
+                    Divider(color = Gray1)
+                    Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable {
+                                    onDismiss()
+                                }
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = buttonNegativeText,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(1.dp)
+                                .background(Gray1),
                         )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(1.dp)
-                            .background(Gray1),
-                    )
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable {
-                                // go back to home other screen
-
-                            }
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.yes),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = Color.Black
-                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable {
+                                    onConfirm()
+                                }
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = buttonConfirmText,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = Color.Black
+                            )
+                        }
                     }
                 }
             }

@@ -172,12 +172,14 @@ constructor(
         }
 
         if (!isVerified) {
-            sendMessage(
-                UIComponent.Dialog(
-                    title = context.getString(R.string.error),
-                    description = context.getString(R.string.you_must_verify_phone_first)
+            viewModelScope.launch {
+                sendMessage(
+                    UIComponent.Dialog(
+                        title = context.getString(R.string.error),
+                        description = context.getString(R.string.you_must_verify_phone_first)
+                    )
                 )
-            )
+            }
             return false
         }
 
@@ -213,7 +215,7 @@ constructor(
     }
 
 
-    private suspend fun sendAuthVerification(sendAgain:Boolean) {
+    private suspend fun sendAuthVerification(sendAgain: Boolean) {
         val phone = _state.value.phone
         val phoneValidate = validatePhoneNumber.execute(phone)
 

@@ -3,6 +3,7 @@ package com.example.ibrasaloonapp.presentation.ui
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.ibrasaloonapp.domain.model.User
 
 sealed class Nav(val route: String) {
     object SignupNav : Nav(route = "signupNav")
@@ -41,8 +42,13 @@ sealed class Screen(val route: String, val arguments: List<NamedNavArgument>) {
         arguments = emptyList()
     )
 
-    object CustomersList : Screen(
-        route = "CustomersList",
+    object UsersList : Screen(
+        route = "UsersList",
+        arguments = emptyList()
+    )
+
+    object UserDetails : Screen(
+        route = "UserDetails",
         arguments = emptyList()
     )
 

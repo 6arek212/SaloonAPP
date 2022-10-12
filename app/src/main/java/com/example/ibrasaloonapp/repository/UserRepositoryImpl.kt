@@ -56,17 +56,25 @@ constructor(
         sort: Int?,
         pageSize: Int?,
         currentPage: Int?,
-    ): ApiResult<List<User>> {
+    ): ApiResult<Triple<List<User>, Int, Int>> {
         return safeApiCall(dispatcher) {
-            userDtoMapper.toDomainList(userService.getUsers().users)
+            val result = userService.getUsers(
+                search = search,
+                sort = sort,
+                pageSize = pageSize,
+                currentPage = currentPage
+            )
+            val users = userDtoMapper.toDomainList(result.users)
+            Triple(users, result.count, result.newUsersCount)
         }
     }
 
-    override suspend fun getUser(userId: String): ApiResult<User> {
+    override suspend fun getUser(userId: String): ApiResult<Triple<User, Int, Double>> {
         return safeApiCall(dispatcher) {
-            val user = userDtoMapper.mapToDomainModel(userService.getUser(userId = userId).user)
+            val result = userService.getUser(userId = userId)
+            val user = userDtoMapper.mapToDomainModel(result.user)
             authRepository.updateUserData(user = user)
-            user
+            Triple(user, result.appointmentCount, result.paid)
         }
     }
 

@@ -4,6 +4,8 @@ import com.example.ibrasaloonapp.network.model.UserDto
 
 data class UserResponse(
     val message: String,
-    val user: UserDto
+    val user: UserDto,
+    val appointmentCount: Int,
+    val paid: Double
 ) {
 }

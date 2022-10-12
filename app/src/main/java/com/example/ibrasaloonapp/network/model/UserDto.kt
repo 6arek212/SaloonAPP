@@ -19,7 +19,10 @@ data class UserDto(
     val role: String,
 
     @SerializedName("image")
-    val image: String? = null
+    val image: String? = null,
+
+    @SerializedName("superUser")
+    val superUser: Boolean? = null
 
 ) {
 }
