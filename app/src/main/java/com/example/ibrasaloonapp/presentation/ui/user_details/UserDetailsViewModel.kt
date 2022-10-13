@@ -49,15 +49,18 @@ constructor(
                 lastName = it.lastName,
                 phone = it.phone,
                 role = role,
-                image = it.image
+                image = it.image,
+                superUser = it.superUser
             )
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
+    private var userId: String? = null
 
     init {
         Log.d(TAG, " ProfileViewModel ")
         val userId = savedState.get<String>("userId")
+        this.userId = userId
         userId?.let {
             onTriggerEvent(UserDetailsEvent.GetUser(userId))
         }
@@ -70,6 +73,14 @@ constructor(
                     getUser(event.userId)
                 }
 
+                is UserDetailsEvent.Refresh -> {
+                    userId?.let {
+                        _state.value = _state.value.copy(refresh = true)
+                        getUser(it)
+                        _state.value = _state.value.copy(refresh = false)
+                    }
+                }
+
                 is UserDetailsEvent.BlockDialogVisibility -> {
                     _state.value = _state.value.copy(showBlockDialog = event.visible)
                 }
@@ -80,7 +91,7 @@ constructor(
 
     private suspend fun getUser(userId: String) {
 
-        getUserUseCase(userId).onEach {
+        getUserUseCase(userId).collect {
             when (it) {
                 is Resource.Loading -> {
                     loading(it.value)
@@ -104,7 +115,7 @@ constructor(
                     )
                 }
             }
-        }.launchIn(viewModelScope)
+        }
     }
 
 

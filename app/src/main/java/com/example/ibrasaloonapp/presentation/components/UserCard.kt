@@ -74,12 +74,13 @@ fun UserCard(user: User, onClick: () -> Unit) {
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (user.superUser != null && user.superUser) {
+                    val painter = rememberAsyncImagePainter(R.drawable.crown)
                     Image(
                         modifier = Modifier
                             .size(20.dp)
                             .clip(CircleShape)
                             .zIndex(1f),
-                        painter = painterResource(id = R.drawable.crown),
+                        painter = painter,
                         contentDescription = "crown"
                     )
                 }

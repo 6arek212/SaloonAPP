@@ -124,6 +124,16 @@
     <string name="customer">customer</string>
     <string name="call">call</string>
     <string name="paid">Paid</string>
+    <string name="users">Users</string>
+    <string name="block">Block</string>
+    <string name="manage_services">Manage You\'r Services</string>
+    <string name="add_service">Add Service</string>
+    <string name="massage">Massage</string>
+    <string name="price">Price</string>
+    <string name="add">Add</string>
+    <string name="price_must_not_be_empty">Price must not be empty</string>
+    <string name="must_pick_service">You must pick a service</string>
+    <string name="you_already_have_this_service">You already have this service</string>
 
 
 </resources>

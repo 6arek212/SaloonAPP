@@ -6,7 +6,7 @@ data class UserDetailsState(
     val user: User? = null,
     val appointmentCount: Int? = null,
     val paid: Double? = null,
-    val showBlockDialog: Boolean = false
-
+    val showBlockDialog: Boolean = false,
+    val refresh: Boolean = false
 ) {
 }

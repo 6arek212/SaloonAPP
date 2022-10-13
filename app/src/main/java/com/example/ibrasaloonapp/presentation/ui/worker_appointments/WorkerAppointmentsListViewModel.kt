@@ -8,14 +8,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
+import com.example.ibrasaloonapp.domain.model.Service
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.network.model.CreateAppointmentDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.repository.AuthRepository
-import com.example.ibrasaloonapp.use.CreateAppointmentsUseCase
-import com.example.ibrasaloonapp.use.DeleteAppointmentsUseCase
-import com.example.ibrasaloonapp.use.GetWorkerAppointmentsUseCase
-import com.example.ibrasaloonapp.use.UpdateAppointmentStatus
+import com.example.ibrasaloonapp.use.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +48,10 @@ constructor(
     val getWorkerAppointmentsUseCase: GetWorkerAppointmentsUseCase,
     val updateAppointmentStatusUseCase: UpdateAppointmentStatus,
     val createAppointmentsUseCase: CreateAppointmentsUseCase,
-    val deleteAppointmentsUseCase: DeleteAppointmentsUseCase
+    val deleteAppointmentsUseCase: DeleteAppointmentsUseCase,
+    val getWorkerServicesUseCase: GetWorkerServicesUseCase,
+    val addServiceUseCase: AddServiceUseCase,
+    val deleteServiceUseCase: DeleteServiceUseCase
 ) : BaseViewModel() {
 
     private val _state: MutableState<WorkerAppointmentsListState> =
@@ -70,6 +71,17 @@ constructor(
         viewModelScope.launch {
 
             when (event) {
+                is WorkerAppointmentsListEvent.GetServices -> {
+                    getServices()
+                }
+                is WorkerAppointmentsListEvent.DeleteService -> {
+                    deleteService(serviceId = event.serviceId, index = event.index)
+                }
+
+                is WorkerAppointmentsListEvent.AddService -> {
+                    addService(title = event.title, priceString = event.price)
+                }
+
                 is WorkerAppointmentsListEvent.ShowStatusDialog -> {
                     _state.value = _state.value.copy(updateStatusDialogVisibility = true)
                     appointmentToUpdateId = event.id
@@ -380,5 +392,108 @@ constructor(
         }
     }
 
+
+    private suspend fun getServices() {
+        val userId = authRepository.getUserId() ?: return
+
+        getWorkerServicesUseCase(workerId = userId).collect { result ->
+            when (result) {
+                is Resource.Loading -> {
+                    loading(result.value)
+                }
+
+                is Resource.Success -> {
+                    Log.d(TAG, "getServices: ${result.data}")
+                    result.data?.let {
+                        _state.value = _state.value.copy(services = it)
+                    }
+                }
+
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Snackbar(message = result.message)
+                    )
+                }
+            }
+        }
+    }
+
+
+    private suspend fun deleteService(serviceId: String, index: Int) {
+
+        deleteServiceUseCase(serviceId = serviceId).collect { result ->
+            when (result) {
+                is Resource.Loading -> {
+                    loading(result.value)
+                }
+
+                is Resource.Success -> {
+                    Log.d(TAG, "deleteService: ${result.data}")
+                    result.data?.let {
+                        val list = _state.value.services
+                        val newList = ArrayList(list)
+                        newList.removeAt(index)
+                        _state.value = _state.value.copy(services = newList)
+                    }
+                }
+
+                is Resource.Error -> {
+                    sendMessage(
+                        UIComponent.Snackbar(message = result.message)
+                    )
+                }
+            }
+        }
+
+    }
+
+
+    private suspend fun addService(title: String, priceString: String) {
+
+        try {
+            val userId = authRepository.getUserId() ?: return
+            if (title.isBlank()) {
+                return sendMessage(
+                    UIComponent.Snackbar(message = context.getString(R.string.must_pick_service))
+                )
+            }
+            val price = priceString.toDouble()
+
+
+
+            addServiceUseCase(
+                workerId = userId,
+                title = title,
+                price = price
+            ).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        loading(result.value)
+                    }
+
+                    is Resource.Success -> {
+                        Log.d(TAG, "addService: ${result.data}")
+                        result.data?.let {
+                            val list = _state.value.services
+                            val newList = ArrayList(list)
+                            newList.add(it)
+                            _state.value = _state.value.copy(services = newList)
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        sendMessage(
+                            UIComponent.Snackbar(message = result.message)
+                        )
+                    }
+                }
+            }
+        } catch (e: NumberFormatException) {
+            sendMessage(
+                UIComponent.Snackbar(message = context.getString(R.string.price_must_not_be_empty))
+            )
+        }
+
+    }
 
 }

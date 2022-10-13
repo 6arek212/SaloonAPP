@@ -21,6 +21,7 @@ constructor(
             "Wax" -> context.getString(R.string.wax)
             "Face Cut" -> context.getString(R.string.face_cut)
             "Hair Cut + Face Cut" -> context.getString(R.string.hair_cut_and_face_cut)
+            "Massage" -> context.getString(R.string.massage)
             else -> model.title
         }
 

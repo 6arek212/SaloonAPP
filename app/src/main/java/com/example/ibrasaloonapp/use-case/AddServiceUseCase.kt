@@ -10,6 +10,7 @@ import com.example.ibrasaloonapp.network.model.AddServiceDto
 import com.example.ibrasaloonapp.network.services.WorkerService
 import com.example.ibrasaloonapp.repository.WorkerRepository
 import com.example.ibrasaloonapp.ui.defaultErrorMessage
+import com.example.trainingapp.network.NetworkErrors.ERROR_400
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -24,7 +25,7 @@ constructor(
     val context: Application
 ) {
 
-    suspend operator fun invoke(workerId: String, title: String, price: Float) = flow {
+    suspend operator fun invoke(workerId: String, title: String, price: Double) = flow {
         emit(Resource.Loading(true))
 
 
@@ -44,7 +45,10 @@ constructor(
 
             is ApiResult.GenericError -> {
                 Log.d(TAG, " ${result.errorMessage}")
-                val message = result.code.defaultErrorMessage(context = context)
+                var message = result.code.defaultErrorMessage(context = context)
+                if (result.code == ERROR_400){
+                    message = context.getString(R.string.you_already_have_this_service)
+                }
                 emit(Resource.Error(message = message))
             }
 

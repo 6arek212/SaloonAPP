@@ -70,25 +70,25 @@ fun BookAppointmentView(
     val events = viewModel.events
 
 
-    val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
-    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
-
-
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded }
+    )
 
     LaunchedEffect(Unit) {
         launch {
             events.collect { event ->
                 when (event) {
                     is BookAppointmentUIEvent.ExpandSheet -> {
-                        sheetState.expand()
+                        sheetState.show()
                     }
 
                     is BookAppointmentUIEvent.HideSheet -> {
-                        sheetState.collapse()
+                        sheetState.hide()
                     }
 
                     is BookAppointmentUIEvent.OnBookAppointment -> {
-                        sheetState.collapse()
+                        sheetState.hide()
                         popBackStack(event.appointment)
                     }
                 }
@@ -99,7 +99,7 @@ fun BookAppointmentView(
     Scaffold(
         topBar = {
             HomeAppBar()
-        }
+        },
     ) {
 
         DefaultScreenUI(
@@ -108,14 +108,12 @@ fun BookAppointmentView(
             progressBarState = progressBar,
             onRemoveUIComponent = { viewModel.onTriggerEvent(BookAppointmentEvent.OnRemoveHeadFromQueue) }) {
 
-            BottomSheetScaffold(
+            ModalBottomSheetLayout(
                 modifier = Modifier.fillMaxSize(),
-                backgroundColor = Gray2,
                 sheetBackgroundColor = White,
-                sheetGesturesEnabled = false,
-                scaffoldState = scaffoldState,
                 sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
                 sheetElevation = 16.dp,
+                sheetState = sheetState,
                 sheetContent = {
                     BookAppointmentConfirmation(
                         pickedDate = selectedAppointment?.startTime,
@@ -125,11 +123,11 @@ fun BookAppointmentView(
                         sheetState = sheetState
                     )
                 }) {
-
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
+                        .background(Gray2)
                         .padding(
                             top = 8.dp,
                             bottom = BottomSheetScaffoldDefaults.SheetPeekHeight + 16.dp
@@ -178,13 +176,10 @@ fun BookAppointmentView(
                         onTriggerEvent = viewModel::onTriggerEvent,
                         selectedService = selectedService
                     )
-
                 }
-
-
             }
-
         }
+
     }
 }
 
@@ -275,7 +270,7 @@ fun PickService(
                 items(items = services) { ser ->
                     HeaderChip(
                         text = ser.title,
-                        headerText = "${ser.price}₪" ,
+                        headerText = "${ser.price}₪",
                         onClick = {
                             onTriggerEvent(
                                 BookAppointmentEvent.OnSelectedService(ser)
@@ -374,7 +369,7 @@ fun BookAppointmentConfirmation(
     service: Service? = null,
     workerName: String? = null,
     onBook: () -> Unit,
-    sheetState: BottomSheetState
+    sheetState: ModalBottomSheetState
 ) {
     val scope = rememberCoroutineScope()
 
@@ -399,7 +394,7 @@ fun BookAppointmentConfirmation(
                 style = MaterialTheme.typography.h4
             )
             IconButton(modifier = Modifier.align(Alignment.CenterVertically), onClick = {
-                scope.launch { sheetState.collapse() }
+                scope.launch { sheetState.hide() }
             }) {
                 Icon(imageVector = Icons.Filled.Close, contentDescription = "CLOSE")
             }

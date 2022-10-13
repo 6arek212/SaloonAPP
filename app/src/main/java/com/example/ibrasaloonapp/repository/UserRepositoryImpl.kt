@@ -72,6 +72,7 @@ constructor(
     override suspend fun getUser(userId: String): ApiResult<Triple<User, Int, Double>> {
         return safeApiCall(dispatcher) {
             val result = userService.getUser(userId = userId)
+            Log.d(TAG, "getUser: $result")
             val user = userDtoMapper.mapToDomainModel(result.user)
             authRepository.updateUserData(user = user)
             Triple(user, result.appointmentCount, result.paid)

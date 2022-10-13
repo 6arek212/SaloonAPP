@@ -1,8 +1,10 @@
 package com.example.ibrasaloonapp.presentation.ui.worker_appointments
 
 import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.Service
 
 data class WorkerAppointmentsListState(
+    val services: List<Service> = listOf(),
     val appointments: List<Appointment> = listOf(),
     val selectedDate: DayCardData? = null,
     val dateRange: DateRange? = null,

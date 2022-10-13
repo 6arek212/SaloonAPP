@@ -8,5 +8,5 @@ data class ServiceDto(
     @SerializedName("title")
     val title: String,
     @SerializedName("price")
-    val price: Int,
+    val price: Double,
 )

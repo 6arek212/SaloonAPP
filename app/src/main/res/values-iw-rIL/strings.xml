@@ -123,5 +123,15 @@
     <string name="customer">לקוח</string>
     <string name="call">התקשר</string>
     <string name="paid">שולם</string>
+    <string name="users">משתמשים</string>
+    <string name="block">חסום</string>
+    <string name="manage_services">נהל השירותים שלך</string>
+    <string name="add_service">הוסף שירות</string>
+    <string name="massage">מסאג\'</string>
+    <string name="price">מחיר</string>
+    <string name="add">הוסף</string>
+    <string name="price_must_not_be_empty">המחיר לא יכול להיות ריק</string>
+    <string name="must_pick_service">חייב לבחור שירות</string>
+    <string name="you_already_have_this_service">שירות זה כבר קיים</string>
 
 </resources>

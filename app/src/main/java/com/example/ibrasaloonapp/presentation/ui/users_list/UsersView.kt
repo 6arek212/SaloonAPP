@@ -1,4 +1,4 @@
-package com.example.ibrasaloonapp.presentation.ui.customer_list
+package com.example.ibrasaloonapp.presentation.ui.users_list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,21 +23,25 @@ import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.components.StatsCard
 import com.example.ibrasaloonapp.presentation.theme.*
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
-fun CustomersView(
-    viewModel: CustomersViewModel = hiltViewModel(),
+fun UsersView(
+    viewModel: UsersViewModel = hiltViewModel(),
     navigateToUserDetails: (User) -> Unit
 ) {
     val users = viewModel.state.value.users
     val usersCount = viewModel.state.value.usersCount
     val newUsersCount = viewModel.state.value.newUsersCount
     val search = viewModel.state.value.search
+    val refresh = viewModel.state.value.refresh
+    val swipeState = rememberSwipeRefreshState(isRefreshing = refresh)
 
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
-        viewModel.onTriggerEvent(CustomersListEvent.GetCustomersList)
+        viewModel.onTriggerEvent(UsersListEvent.GetUsersList)
     }
 
     Column(
@@ -58,7 +62,7 @@ fun CustomersView(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = {
                     viewModel.onTriggerEvent(
-                        CustomersListEvent.GetCustomersList
+                        UsersListEvent.GetUsersList
                     )
                     focusManager.clearFocus()
                 }),
@@ -70,13 +74,13 @@ fun CustomersView(
                 },
                 onValueChange = { s ->
                     viewModel.onTriggerEvent(
-                        CustomersListEvent.OnSearchChanged(s)
+                        UsersListEvent.OnSearchChanged(s)
                     )
                 })
 
             Button(onClick = {
                 viewModel.onTriggerEvent(
-                    CustomersListEvent.GetCustomersList
+                    UsersListEvent.GetUsersList
                 )
                 focusManager.clearFocus()
             }) {
@@ -84,41 +88,47 @@ fun CustomersView(
             }
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
 
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                ) {
-                    StatsCard(
-                        modifier = Modifier.weight(1f),
-                        title = "Users",
-                        value = "$usersCount",
-                        visible = newUsersCount != null,
-                        leadingIcon = ImageVector.vectorResource(id = R.drawable.graph),
-                        cardColor = Orange
-                    )
+        SwipeRefresh(
+            state = swipeState,
+            onRefresh = { viewModel.onTriggerEvent(UsersListEvent.Refresh) }) {
 
-                    Spacer(modifier = Modifier.padding(8.dp))
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
 
-                    StatsCard(
-                        title = "New Users",
-                        value = "$newUsersCount",
-                        visible = newUsersCount != null,
-                        leadingIcon = ImageVector.vectorResource(id = R.drawable.diagram),
-                        cardColor = GrayBlue
-                    )
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        StatsCard(
+                            modifier = Modifier.weight(1f),
+                            title = "Users",
+                            value = "$usersCount",
+                            visible = newUsersCount != null,
+                            leadingIcon = ImageVector.vectorResource(id = R.drawable.graph),
+                            cardColor = Orange
+                        )
+
+                        Spacer(modifier = Modifier.padding(8.dp))
+
+                        StatsCard(
+                            title = "New Users",
+                            value = "$newUsersCount",
+                            visible = newUsersCount != null,
+                            leadingIcon = ImageVector.vectorResource(id = R.drawable.diagram),
+                            cardColor = GrayBlue
+                        )
+                    }
                 }
-            }
 
-            itemsIndexed(items = users) { index, item ->
-                UserCard(user = item, onClick = { navigateToUserDetails(item) })
+                itemsIndexed(items = users) { index, item ->
+                    UserCard(user = item, onClick = { navigateToUserDetails(item) })
+                }
             }
         }
     }

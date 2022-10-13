@@ -121,19 +121,9 @@ constructor(
             list.add(
                 MenuItem(
                     id = Screen.UsersList.route,
-                    title = context.getString(R.string.customers),
-                    contentDescription = "Customers Page",
+                    title = context.getString(R.string.users),
+                    contentDescription = "Users Page",
                     icon = Icons.Filled.Diversity3
-                )
-            )
-
-
-            list.add(
-                MenuItem(
-                    id = Screen.ServicesList.route,
-                    title = context.getString(R.string.services),
-                    contentDescription = "Services Page",
-                    icon = Icons.Filled.DesignServices
                 )
             )
         }

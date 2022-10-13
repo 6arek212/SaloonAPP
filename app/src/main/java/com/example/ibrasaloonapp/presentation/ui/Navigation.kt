@@ -19,7 +19,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.*
 import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.domain.model.MenuItem
-import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
@@ -27,9 +26,8 @@ import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.appointment_list.AppointmentListView
 import com.example.ibrasaloonapp.presentation.ui.book_appointment.BookAppointmentView
-import com.example.ibrasaloonapp.presentation.ui.customer_list.CustomersView
-import com.example.ibrasaloonapp.presentation.ui.customer_list.CustomersViewModel
-import com.example.ibrasaloonapp.presentation.ui.customer_list.UserDetails
+import com.example.ibrasaloonapp.presentation.ui.users_list.UsersView
+import com.example.ibrasaloonapp.presentation.ui.users_list.UserDetails
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.ChangePhoneNumberView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileView
 import com.example.ibrasaloonapp.presentation.ui.edit_profile.EditProfileViewModel
@@ -181,7 +179,6 @@ fun Navigation(modifier: Modifier = Modifier, mainViewModel: MainActivityViewMod
                 workerAppointmentList(navController = navController, mainViewModel = mainViewModel)
                 customersList(navController = navController, mainViewModel = mainViewModel)
                 userDetails(navController = navController, mainViewModel = mainViewModel)
-                servicesList(navController = navController, mainViewModel = mainViewModel)
                 createAppointment(navController = navController, mainViewModel = mainViewModel)
                 bookAppointment(navController = navController, mainViewModel = mainViewModel)
 
@@ -315,7 +312,7 @@ fun NavGraphBuilder.customersList(
         route = Screen.UsersList.route,
         arguments = emptyList()
     ) { backStackEntry ->
-        CustomersView(navigateToUserDetails = { user ->
+        UsersView(navigateToUserDetails = { user ->
             navController.navigate(Screen.UserDetails.route + "/${user.id}")
             navController.currentBackStackEntry?.arguments?.putParcelable("user", user)
         })
@@ -331,22 +328,12 @@ fun NavGraphBuilder.userDetails(
         arguments = Screen.UserDetails.arguments
     ) { backstackEntry ->
         val viewModel: UserDetailsViewModel = hiltViewModel(backstackEntry)
-        UserDetails(viewModel = viewModel)
+        UserDetails(viewModel = viewModel, popBackStack = { navController.popBackStack() })
     }
 }
 
 
-fun NavGraphBuilder.servicesList(
-    navController: NavController,
-    mainViewModel: MainActivityViewModel
-) {
-    composable(
-        route = Screen.ServicesList.route,
-        arguments = emptyList()
-    ) {
 
-    }
-}
 
 
 fun NavGraphBuilder.createAppointment(

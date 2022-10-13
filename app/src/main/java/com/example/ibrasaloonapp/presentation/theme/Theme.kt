@@ -27,9 +27,9 @@ private val LightColorPalette = lightColors(
     secondary = PurpleLite,
     onSecondary = Black1,
     error = Red,
-    background = Gray2,
+    background = Gray1,
     onBackground = Black1,
-    surface = Gray1,
+    surface = Gray2,
     onSurface = Black2,
     secondaryVariant = Black2
 )

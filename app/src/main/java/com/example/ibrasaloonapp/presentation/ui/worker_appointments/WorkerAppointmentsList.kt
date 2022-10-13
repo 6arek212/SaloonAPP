@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowLeft
 import androidx.compose.material.icons.outlined.ArrowRight
+import androidx.compose.material.icons.outlined.DesignServices
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -34,12 +34,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.Appointment
+import com.example.ibrasaloonapp.domain.model.Service
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
+import com.example.ibrasaloonapp.presentation.ui.services.ServicesSheetContent
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -60,10 +63,20 @@ fun WorkerAppointmentsList(
     val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
     val filter = viewModel.state.value.filter
     val user = mainViewModel.state.value.authData?.user
+    val services = viewModel.state.value.services
 
     LaunchedEffect(Unit) {
         viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetAppointments)
     }
+
+
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded }
+    )
+
+
 
     DefaultScreenUI(
         uiComponent = uiMessage,
@@ -96,56 +109,97 @@ fun WorkerAppointmentsList(
                     }
                 }
             )
-
-            BackdropScaffold(
-                scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
-                backLayerBackgroundColor = MaterialTheme.colors.primary,
-                frontLayerBackgroundColor = MaterialTheme.colors.background,
-                frontLayerShape = MaterialTheme.shapes.large,
-                frontLayerScrimColor = Color.Unspecified,
-                appBar = {
-                    HomeAppBar()
-                },
-                backLayerContent = {
-                    BackLayer(
-                        user = user,
-                        filter = filter,
-                        dates = dates,
-                        selectedDate = selectedDate,
-                        dateRange = dateRange,
-                        search = search,
-                        onSearchChange = { str ->
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                sheetContent = {
+                    ServicesSheetContent(
+                        services = services,
+                        onAddingService = { title, price ->
                             viewModel.onTriggerEvent(
-                                WorkerAppointmentsListEvent.OnSearchChange(str)
+                                WorkerAppointmentsListEvent.AddService(title, price)
                             )
                         },
-                        onSelectedDate = { item ->
-                            viewModel.onTriggerEvent(WorkerAppointmentsListEvent.OnSelectedDate(item))
-                        },
-                        decreaseWeekRange = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.DecreaseWeekRange) },
-                        increaseWeekRange = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.IncreaseWeekRange) },
-                        onSearch = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.Search) },
-                        changeFilter = { filter ->
-                            viewModel.onTriggerEvent(
-                                WorkerAppointmentsListEvent.ChangeFilter(filter)
-                            )
-                        },
-                    )
-                },
-                frontLayerContent = {
-                    FrontLayer(
-                        appointments = appointments,
-                        showStatusDialog = { id, index ->
-                            viewModel.onTriggerEvent(
-                                WorkerAppointmentsListEvent.ShowStatusDialog(
-                                    id = id,
-                                    index = index
+                        onDeleteService = { serviceId, index ->
+                            serviceId?.let {
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.DeleteService(
+                                        serviceId = serviceId,
+                                        index = index
+                                    )
                                 )
-                            )
-                        },
-                        navigateToCreateAppointment = navigateToCreateAppointment
+                            }
+                        }
                     )
-                })
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
+
+                BackdropScaffold(
+                    scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
+                    backLayerBackgroundColor = MaterialTheme.colors.primary,
+                    frontLayerBackgroundColor = MaterialTheme.colors.background,
+                    frontLayerShape = MaterialTheme.shapes.large,
+                    frontLayerScrimColor = Color.Unspecified,
+                    appBar = {
+                        HomeAppBar()
+                    },
+                    backLayerContent = {
+                        BackLayer(
+                            user = user,
+                            filter = filter,
+                            dates = dates,
+                            selectedDate = selectedDate,
+                            dateRange = dateRange,
+                            search = search,
+                            onSearchChange = { str ->
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.OnSearchChange(str)
+                                )
+                            },
+                            onSelectedDate = { item ->
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.OnSelectedDate(
+                                        item
+                                    )
+                                )
+                            },
+                            decreaseWeekRange = {
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.DecreaseWeekRange
+                                )
+                            },
+                            increaseWeekRange = {
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.IncreaseWeekRange
+                                )
+                            },
+                            onSearch = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.Search) },
+                            changeFilter = { filter ->
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.ChangeFilter(filter)
+                                )
+                            },
+                            showServicesBottomSheet = {
+                                viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
+                                scope.launch { sheetState.show() }
+                            }
+                        )
+                    },
+                    frontLayerContent = {
+                        FrontLayer(
+                            appointments = appointments,
+                            showStatusDialog = { id, index ->
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.ShowStatusDialog(
+                                        id = id,
+                                        index = index
+                                    )
+                                )
+                            },
+                            navigateToCreateAppointment = navigateToCreateAppointment
+                        )
+                    })
+            }
         }
     }
 
@@ -180,19 +234,32 @@ private fun BackLayer(
     onSelectedDate: (DayCardData) -> Unit,
     onSearchChange: (String) -> Unit,
     onSearch: () -> Unit,
-    changeFilter: (AppointmentFilter) -> Unit
+    changeFilter: (AppointmentFilter) -> Unit,
+    showServicesBottomSheet: () -> Unit
 ) {
 
     Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
         if (user != null)
-            ImageChip(
-                modifier = Modifier.align(Alignment.Start),
-                text = "${user.firstName} ${user.lastName}",
-                onClick = { /*TODO*/ },
-                isSelected = false,
-                url = user.image
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                ImageChip(
+                    modifier = Modifier,
+                    text = "${user.firstName} ${user.lastName}",
+                    onClick = { /*TODO*/ },
+                    isSelected = false,
+                    url = user.image
+                )
+
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                IconButton(onClick = showServicesBottomSheet) {
+                    Icon(
+                        imageVector = Icons.Outlined.DesignServices,
+                        contentDescription = "services"
+                    )
+                }
+
+            }
 
         Spacer(modifier = Modifier.padding(8.dp))
 
@@ -336,7 +403,7 @@ private fun BackLayer(
 private fun FrontLayer(
     appointments: List<Appointment>,
     showStatusDialog: (String, Int) -> Unit,
-    navigateToCreateAppointment: () -> Unit
+    navigateToCreateAppointment: () -> Unit,
 ) {
 
     Box() {

@@ -1,6 +1,12 @@
 package com.example.ibrasaloonapp.presentation.ui.worker_appointments
 
+
 sealed class WorkerAppointmentsListEvent {
+
+    class AddService(val title: String, val price: String) : WorkerAppointmentsListEvent()
+    class DeleteService(val serviceId: String, val index: Int) : WorkerAppointmentsListEvent()
+    object GetServices : WorkerAppointmentsListEvent()
+
 
     object Search : WorkerAppointmentsListEvent()
     class OnSearchChange(val search: String) : WorkerAppointmentsListEvent()
