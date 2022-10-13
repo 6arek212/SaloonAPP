@@ -22,7 +22,10 @@ data class UserDto(
     val image: String? = null,
 
     @SerializedName("superUser")
-    val superUser: Boolean? = null
+    val superUser: Boolean? = null,
+
+    @SerializedName("isBlocked")
+    val isBlocked: Boolean
 
 ) {
 }

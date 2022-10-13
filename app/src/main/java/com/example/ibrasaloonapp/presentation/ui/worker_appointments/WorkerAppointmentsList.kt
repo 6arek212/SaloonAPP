@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.presentation.ui.worker_appointments
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -77,6 +78,9 @@ fun WorkerAppointmentsList(
     )
 
 
+    BackHandler(sheetState.isVisible) {
+        scope.launch { sheetState.hide() }
+    }
 
     DefaultScreenUI(
         uiComponent = uiMessage,

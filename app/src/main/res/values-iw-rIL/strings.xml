@@ -119,7 +119,7 @@
     <string name="status">מצב</string>
     <string name="customers">לקוחות</string>
     <string name="services">שירותים</string>
-    <string name="barber">עובד</string>
+    <string name="barber">ספר</string>
     <string name="customer">לקוח</string>
     <string name="call">התקשר</string>
     <string name="paid">שולם</string>
@@ -133,5 +133,13 @@
     <string name="price_must_not_be_empty">המחיר לא יכול להיות ריק</string>
     <string name="must_pick_service">חייב לבחור שירות</string>
     <string name="you_already_have_this_service">שירות זה כבר קיים</string>
+    <string name="mart_as_barber">סמן כספר</string>
+    <string name="mart_as_customer">סמן כלקוח</string>
+    <string name="are_you_sure">אתה בטוח?</string>
+    <string name="you_want_to_mark">לסמן</string>
+    <string name="as">כ</string>
+    <string name="you_want_to_block">לחסום</string>
+    <string name="unblock">בטל חסימה</string>
+    <string name="you_want_to_unblock">לבטל חסימת</string>
 
 </resources>

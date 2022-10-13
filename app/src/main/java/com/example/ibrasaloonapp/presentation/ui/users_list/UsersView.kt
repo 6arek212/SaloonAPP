@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
@@ -21,6 +22,7 @@ import com.example.ibrasaloonapp.presentation.components.SubTitle
 import com.example.ibrasaloonapp.presentation.components.UserCard
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.User
+import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.StatsCard
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -36,6 +38,7 @@ fun UsersView(
     val newUsersCount = viewModel.state.value.newUsersCount
     val search = viewModel.state.value.search
     val refresh = viewModel.state.value.refresh
+    val progress = viewModel.uiState.collectAsState().value.progressBarState
     val swipeState = rememberSwipeRefreshState(isRefreshing = refresh)
 
     val focusManager = LocalFocusManager.current
@@ -44,90 +47,93 @@ fun UsersView(
         viewModel.onTriggerEvent(UsersListEvent.GetUsersList)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Gray1)
-    ) {
+    DefaultScreenUI(progressBarState = progress, onRemoveUIComponent = { /*TODO*/ }) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Gray1)
+        ) {
 
 
-        SubTitle(text = stringResource(id = R.string.customers))
+            SubTitle(text = stringResource(id = R.string.customers))
 
-        Spacer(modifier = Modifier.padding(6.dp))
+            Spacer(modifier = Modifier.padding(6.dp))
 
-        Row(modifier = Modifier.wrapContentWidth()) {
-            TextField(
-                modifier = Modifier,
-                value = search,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {
+            Row(modifier = Modifier.wrapContentWidth()) {
+                TextField(
+                    modifier = Modifier,
+                    value = search,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = {
+                        viewModel.onTriggerEvent(
+                            UsersListEvent.GetUsersList
+                        )
+                        focusManager.clearFocus()
+                    }),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.search_normal_1),
+                            contentDescription = "search"
+                        )
+                    },
+                    onValueChange = { s ->
+                        viewModel.onTriggerEvent(
+                            UsersListEvent.OnSearchChanged(s)
+                        )
+                    })
+
+                Button(onClick = {
                     viewModel.onTriggerEvent(
                         UsersListEvent.GetUsersList
                     )
                     focusManager.clearFocus()
-                }),
-                leadingIcon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.search_normal_1),
-                        contentDescription = "search"
-                    )
-                },
-                onValueChange = { s ->
-                    viewModel.onTriggerEvent(
-                        UsersListEvent.OnSearchChanged(s)
-                    )
-                })
-
-            Button(onClick = {
-                viewModel.onTriggerEvent(
-                    UsersListEvent.GetUsersList
-                )
-                focusManager.clearFocus()
-            }) {
-                Text(text = "Search")
-            }
-        }
-
-
-        SwipeRefresh(
-            state = swipeState,
-            onRefresh = { viewModel.onTriggerEvent(UsersListEvent.Refresh) }) {
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                    ) {
-                        StatsCard(
-                            modifier = Modifier.weight(1f),
-                            title = "Users",
-                            value = "$usersCount",
-                            visible = newUsersCount != null,
-                            leadingIcon = ImageVector.vectorResource(id = R.drawable.graph),
-                            cardColor = Orange
-                        )
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        StatsCard(
-                            title = "New Users",
-                            value = "$newUsersCount",
-                            visible = newUsersCount != null,
-                            leadingIcon = ImageVector.vectorResource(id = R.drawable.diagram),
-                            cardColor = GrayBlue
-                        )
-                    }
+                }) {
+                    Text(text = "Search")
                 }
+            }
 
-                itemsIndexed(items = users) { index, item ->
-                    UserCard(user = item, onClick = { navigateToUserDetails(item) })
+
+            SwipeRefresh(
+                state = swipeState,
+                onRefresh = { viewModel.onTriggerEvent(UsersListEvent.Refresh) }) {
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            StatsCard(
+                                modifier = Modifier.weight(1f),
+                                title = "Users",
+                                value = "$usersCount",
+                                visible = newUsersCount != null,
+                                leadingIcon = ImageVector.vectorResource(id = R.drawable.graph),
+                                cardColor = Orange
+                            )
+
+                            Spacer(modifier = Modifier.padding(8.dp))
+
+                            StatsCard(
+                                title = "New Users",
+                                value = "$newUsersCount",
+                                visible = newUsersCount != null,
+                                leadingIcon = ImageVector.vectorResource(id = R.drawable.diagram),
+                                cardColor = GrayBlue
+                            )
+                        }
+                    }
+
+                    itemsIndexed(items = users) { index, item ->
+                        UserCard(user = item, onClick = { navigateToUserDetails(item) })
+                    }
                 }
             }
         }

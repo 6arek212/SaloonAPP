@@ -5,6 +5,7 @@ sealed class UserDetailsEvent {
 
     object Refresh : UserDetailsEvent()
     class GetUser(val userId: String) : UserDetailsEvent()
-    class BlockDialogVisibility(val visible: Boolean) : UserDetailsEvent()
+    class MarkAsBarber(val value: Boolean) : UserDetailsEvent()
+    class Block(val value: Boolean) : UserDetailsEvent()
 
 }

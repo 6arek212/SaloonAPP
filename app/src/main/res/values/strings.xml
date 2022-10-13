@@ -134,6 +134,14 @@
     <string name="price_must_not_be_empty">Price must not be empty</string>
     <string name="must_pick_service">You must pick a service</string>
     <string name="you_already_have_this_service">You already have this service</string>
+    <string name="mart_as_barber">Mark As Barber</string>
+    <string name="mart_as_customer">Mark as customer</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="you_want_to_mark">You want to mark</string>
+    <string name="as">as</string>
+    <string name="you_want_to_block">You want to block</string>
+    <string name="unblock">UnBlock</string>
+    <string name="you_want_to_unblock">You want to unblock</string>
 
 
 </resources>

@@ -2,10 +2,7 @@ package com.example.ibrasaloonapp.ui
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.ibrasaloonapp.domain.model.AuthData
 import com.example.ibrasaloonapp.domain.model.User
@@ -23,6 +20,7 @@ val USER_IMAGE = stringPreferencesKey("user_image")
 val PHONE = stringPreferencesKey("phone")
 val EXPIRES_IN = intPreferencesKey("expiresIn")
 val ROLE = stringPreferencesKey("role")
+val IS_BLOCKED = booleanPreferencesKey("false")
 
 
 fun MutablePreferences.insertAuthData(authData: AuthData) {
@@ -35,6 +33,7 @@ fun MutablePreferences.insertAuthData(authData: AuthData) {
     this[PHONE] = authData.user.phone
     this[EXPIRES_IN] = authData.expiresIn
     this[ROLE] = authData.user.role
+    this[IS_BLOCKED] = authData.user.isBlocked
 }
 
 
@@ -45,6 +44,7 @@ fun MutablePreferences.insertUser(user: User) {
     this[USER_IMAGE] = user.image ?: ""
     this[PHONE] = user.phone
     this[ROLE] = user.role
+    this[IS_BLOCKED] = user.isBlocked
 }
 
 
@@ -58,6 +58,7 @@ fun MutablePreferences.clearAuthData() {
     this[EXPIRES_IN] = 0
     this[USER_IMAGE] = ""
     this[ROLE] = ""
+    this[IS_BLOCKED] = false
 }
 
 
@@ -72,7 +73,8 @@ fun Preferences.getAuthData(): AuthData? {
             lastName = this[USER_LAST_NAME] ?: "",
             phone = this[PHONE] ?: "",
             role = this[ROLE] ?: "",
-            image = if (this[USER_IMAGE].isNullOrBlank()) null else this[USER_IMAGE]
+            image = if (this[USER_IMAGE].isNullOrBlank()) null else this[USER_IMAGE],
+            isBlocked = this[IS_BLOCKED] ?: false
         ),
         token = this[TOKEN] ?: "",
         refreshToken = this[REFRESH_TOKEN] ?: "",

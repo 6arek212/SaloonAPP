@@ -92,7 +92,7 @@ fun QuestionDialog(
                 verticalArrangement = Arrangement.Center
             ) {
 
-                Column (modifier = Modifier.align(Alignment.Start)){
+                Column(modifier = Modifier.align(Alignment.Start)) {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.h5,
@@ -116,7 +116,10 @@ fun QuestionDialog(
 
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = onConfirm,
+                        onClick = {
+                            onConfirm()
+                            onDismiss()
+                        },
                         shape = MaterialTheme.shapes.small,
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor =

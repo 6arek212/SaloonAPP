@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.SupervisedUserCircle
 import androidx.compose.material.icons.outlined.Work
 import androidx.compose.runtime.Composable
@@ -115,12 +116,24 @@ fun UserCard(user: User, onClick: () -> Unit) {
                 Spacer(modifier = Modifier.padding(2.dp))
 
 
-                if (user.role == "customer") {
-                    Icon(imageVector = Icons.Outlined.SupervisedUserCircle, contentDescription = "customer")
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    if (user.role == "customer") {
+                        Icon(
+                            imageVector = Icons.Outlined.SupervisedUserCircle,
+                            contentDescription = "customer"
+                        )
+                    } else {
+                        Icon(imageVector = Icons.Outlined.Work, contentDescription = "worker")
+                    }
+
+                    if (user.isBlocked) {
+                        Icon(imageVector = Icons.Outlined.Block, contentDescription = "blocked")
+                    }
                 }
-                else {
-                    Icon(imageVector = Icons.Outlined.Work, contentDescription = "worker")
-                }
+
             }
 
 

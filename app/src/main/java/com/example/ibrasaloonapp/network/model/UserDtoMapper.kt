@@ -14,7 +14,8 @@ class UserDtoMapper : DomainMapper<UserDto, User> {
             phone = model.phone,
             role = model.role,
             image = model.image,
-            superUser = model.superUser
+            superUser = model.superUser,
+            isBlocked = model.isBlocked
         )
     }
 
@@ -26,7 +27,8 @@ class UserDtoMapper : DomainMapper<UserDto, User> {
             phone = domainModel.phone,
             role = domainModel.role,
             image = domainModel.image,
-            superUser = domainModel.superUser
+            superUser = domainModel.superUser,
+            isBlocked = domainModel.isBlocked
         )
     }
 

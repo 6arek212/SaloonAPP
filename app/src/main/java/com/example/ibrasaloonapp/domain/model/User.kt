@@ -12,5 +12,6 @@ data class User(
     val phone: String,
     val role: String,
     val image: String? = null,
-    val superUser: Boolean? = null
+    val superUser: Boolean? = null,
+    val isBlocked: Boolean = false
 ) : Parcelable
