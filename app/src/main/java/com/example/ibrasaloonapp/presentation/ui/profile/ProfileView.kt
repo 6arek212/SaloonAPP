@@ -43,7 +43,6 @@ fun ProfileView(
     val progress = viewModel.uiState.collectAsState().value.progressBarState
     val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
 
-    Log.d(TAG, "ProfileView: ${user}")
 
     user?.let {
 
@@ -56,7 +55,7 @@ fun ProfileView(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colors.background),
+                    .background(Gray2),
             ) {
 
 
@@ -88,17 +87,6 @@ fun ProfileView(
                     url = user.image,
                     imageSize = 200.dp,
                 )
-
-
-                Text(
-                    modifier = Modifier
-                        .padding(8.dp),
-                    text = "${user.firstName} ${user.lastName}",
-                    style = MaterialTheme.typography.h4,
-                    color = White
-                )
-
-
             }
         }
 

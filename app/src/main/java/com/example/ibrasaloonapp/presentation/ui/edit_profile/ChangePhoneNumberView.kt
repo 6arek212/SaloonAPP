@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,10 +30,7 @@ import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
-import com.example.ibrasaloonapp.presentation.components.CommonOtp
-import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
-import com.example.ibrasaloonapp.presentation.components.ProgressButton
-import com.example.ibrasaloonapp.presentation.components.SubTitle
+import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.AppTheme
 import com.example.ibrasaloonapp.presentation.ui.login.CodeDigitPlace
 import com.example.ibrasaloonapp.presentation.ui.upload.EditProfileUIEvent
@@ -48,8 +46,8 @@ fun ChangePhoneNumberView(
     val phoneError = editProfileViewModel.state.value.phoneError
     val code = editProfileViewModel.state.value.code
     val showCode = editProfileViewModel.state.value.showCode
-    val progress = editProfileViewModel.uiState.value.progressBarState
-    val message = editProfileViewModel.uiState.value.uiMessage
+    val progress = editProfileViewModel.uiState.collectAsState().value.progressBarState
+    val message = editProfileViewModel.uiState.collectAsState().value.uiMessage
     val events = editProfileViewModel.events
     val focusManager = LocalFocusManager.current
 
@@ -135,9 +133,7 @@ fun ChangePhoneNumber(
     ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = close) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "back arrow")
-            }
+            BackButton(onClick = close)
 
             Spacer(modifier = Modifier.padding(4.dp))
 

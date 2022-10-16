@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 private const val TAG = "GetAppointmentsUseCase"
 
-class CreateAppointmentsUseCase
+class CreateRangeAppointmentsUseCase
 @Inject
 constructor(
     private val context: Application,
@@ -33,7 +33,7 @@ constructor(
 
             emit(Resource.Loading(true))
 
-            val result = appointmentsRepository.createAppointment(appointmentData = appointmentData)
+            val result = appointmentsRepository.createRangeAppointments(appointmentsData = appointmentData)
 
             when (result) {
                 is ApiResult.Success -> {

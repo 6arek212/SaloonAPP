@@ -13,7 +13,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.ibrasaloonapp.presentation.theme.GrayBlue
 import com.example.ibrasaloonapp.presentation.theme.White
 
@@ -27,7 +29,7 @@ fun StatsCard(
     leadingIcon: ImageVector,
     contentDescription: String = title,
     textColor: Color = White,
-    cardColor: Color = GrayBlue
+    cardColor: Color = GrayBlue,
 ) {
 
     AnimatedVisibility(
@@ -50,7 +52,7 @@ fun StatsCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = title, color = textColor, style = MaterialTheme.typography.h6)
-                Text(text = value, color = textColor, style = MaterialTheme.typography.h5)
+                Text(text = value, color = textColor, style = MaterialTheme.typography.h4 )
             }
         }
 

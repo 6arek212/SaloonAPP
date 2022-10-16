@@ -47,8 +47,9 @@ fun UserDetails(viewModel: UserDetailsViewModel, popBackStack: () -> Unit) {
     val appointmentCount = viewModel.state.value.appointmentCount
     val paid = viewModel.state.value.paid
     val refresh = viewModel.state.value.refresh
+    val progress = viewModel.uiState.collectAsState().value.progressBarState
 
-    if (user != null)
+    DefaultScreenUI(progressBarState = progress, onRemoveUIComponent = { /*TODO*/ }) {
         UserDetailsView(
             refresh = refresh,
             user = user,
@@ -65,13 +66,14 @@ fun UserDetails(viewModel: UserDetailsViewModel, popBackStack: () -> Unit) {
                 viewModel.onTriggerEvent(UserDetailsEvent.MarkAsBarber(asBarber))
             }
         )
+    }
 }
 
 
 @Composable
 fun UserDetailsView(
     refresh: Boolean,
-    user: User,
+    user: User?,
     paid: Double?,
     appointmentCount: Int?,
     popBackStack: () -> Unit,
@@ -80,7 +82,6 @@ fun UserDetailsView(
     onBlock: (Boolean) -> Unit,
 ) {
 
-    Log.d(TAG, "UserDetailsView: ${user.role} ${user.role == "customer"}")
     var blockDialogVisibility by rememberSaveable {
         mutableStateOf(false)
     }
@@ -116,7 +117,7 @@ fun UserDetailsView(
                         .align(Alignment.Start), onClick = popBackStack, tint = White
                 )
 
-                if (user.superUser != null && user.superUser) {
+                if (user?.superUser != null && user.superUser) {
                     val painter = rememberAsyncImagePainter(R.drawable.crown)
                     Image(
                         modifier = Modifier
@@ -128,10 +129,13 @@ fun UserDetailsView(
 
                 VerticalImageChip(
                     imageSize = 160.dp,
-                    url = user.image,
-                    text = if (user.role == "customer") stringResource(id = R.string.customer) else stringResource(
-                        id = R.string.barber
-                    ),
+                    url = user?.image,
+                    text =
+                    if (user != null)
+                        if (user.role == "customer") stringResource(id = R.string.customer) else stringResource(
+                            id = R.string.barber
+                        )
+                    else "",
                     onClick = {},
                     isSelected = false
                 )
@@ -140,24 +144,26 @@ fun UserDetailsView(
 
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (user.role == "customer") {
-                        Icon(
-                            imageVector = Icons.Outlined.SupervisedUserCircle,
-                            contentDescription = "customer",
-                            tint = White
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Outlined.Work,
-                            contentDescription = "worker",
-                            tint = White
-                        )
+                    if (user != null) {
+                        if (user.role == "customer") {
+                            Icon(
+                                imageVector = Icons.Outlined.SupervisedUserCircle,
+                                contentDescription = "customer",
+                                tint = White
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Outlined.Work,
+                                contentDescription = "worker",
+                                tint = White
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.padding(4.dp))
 
                     Text(
-                        text = "${user.firstName} ${user.lastName}",
+                        text = if (user != null) "${user.firstName} ${user.lastName}" else "",
                         style = MaterialTheme.typography.h4,
                         color = MaterialTheme.colors.onPrimary
                     )
@@ -202,44 +208,46 @@ fun UserDetailsView(
 
             Spacer(modifier = Modifier.padding(16.dp))
 
-            OptionsCards(
-                user = user,
-                onChangeMarkAsDialogVisibility = { markAsDialogVisibility = it },
-                onBlockDialogVisibility = { blockDialogVisibility = it },
-            )
+            if (user != null)
+                OptionsCards(
+                    user = user,
+                    onChangeMarkAsDialogVisibility = { markAsDialogVisibility = it },
+                    onBlockDialogVisibility = { blockDialogVisibility = it },
+                )
         }
     }
+    if (user != null) {
+        if (blockDialogVisibility) {
+            QuestionDialog(
+                title = stringResource(R.string.are_you_sure),
+                description = if (user.isBlocked) {
+                    stringResource(id = R.string.you_want_to_unblock)
+                } else {
+                    stringResource(id = R.string.you_want_to_block)
+                } +
+                        " ${user.firstName} ${user.lastName}",
+                actionButtons = true,
+                onConfirm = { onBlock(!user.isBlocked) },
+                onDismiss = { blockDialogVisibility = false })
+        }
 
-    if (blockDialogVisibility) {
-        QuestionDialog(
-            title = stringResource(R.string.are_you_sure),
-            description = if (user.isBlocked) {
-                stringResource(id = R.string.you_want_to_unblock)
-            } else {
-                stringResource(id = R.string.you_want_to_block)
-            } +
-                    " ${user.firstName} ${user.lastName}",
-            actionButtons = true,
-            onConfirm = { onBlock(!user.isBlocked) },
-            onDismiss = { blockDialogVisibility = false })
-    }
 
-
-    if (markAsDialogVisibility) {
-        QuestionDialog(
-            title = stringResource(R.string.are_you_sure),
-            description = "${stringResource(id = R.string.you_want_to_mark)} ${user.firstName} ${user.lastName} ${
-                stringResource(
-                    id = R.string.`as`
-                )
-            } - " + if (user.role == "customer") stringResource(
-                R.string.barber
-            ) else stringResource(
-                R.string.customer
-            ),
-            actionButtons = true,
-            onConfirm = { markAsBarber(user.role == "customer") },
-            onDismiss = { markAsDialogVisibility = false })
+        if (markAsDialogVisibility) {
+            QuestionDialog(
+                title = stringResource(R.string.are_you_sure),
+                description = "${stringResource(id = R.string.you_want_to_mark)} ${user.firstName} ${user.lastName} ${
+                    stringResource(
+                        id = R.string.`as`
+                    )
+                } - " + if (user.role == "customer") stringResource(
+                    R.string.barber
+                ) else stringResource(
+                    R.string.customer
+                ),
+                actionButtons = true,
+                onConfirm = { markAsBarber(user.role == "customer") },
+                onDismiss = { markAsDialogVisibility = false })
+        }
     }
 }
 

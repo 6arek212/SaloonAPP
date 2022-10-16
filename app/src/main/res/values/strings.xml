@@ -142,6 +142,11 @@
     <string name="you_want_to_block">You want to block</string>
     <string name="unblock">UnBlock</string>
     <string name="you_want_to_unblock">You want to unblock</string>
+    <string name="new_users">New Users</string>
+    <string name="interval">Interval</string>
+    <string name="range">Range</string>
+    <string name="single">Single</string>
+    <string name="end_time_bigger_than_start_time">The end time must be bigger than the start time</string>
 
 
 </resources>

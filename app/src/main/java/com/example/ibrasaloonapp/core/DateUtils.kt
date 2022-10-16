@@ -6,6 +6,8 @@ import android.util.Log
 import com.example.ibrasaloonapp.R
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -83,6 +85,12 @@ enum class TimePatterns(val value: String) {
 }
 
 
+fun parseDate(str: String): String {
+    val time = ZonedDateTime.parse(str)
+    time.toLocalDateTime()
+
+    return time.format(DateTimeFormatter.ISO_WEEK_DATE)
+}
 
 
 fun stringDateFormat(

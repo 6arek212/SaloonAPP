@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.network.services
 
+import android.os.Message
 import com.example.ibrasaloonapp.network.model.*
 import com.example.ibrasaloonapp.network.responses.*
 import retrofit2.http.*
@@ -15,7 +16,7 @@ interface AppointmentService {
         @Query("currentPage") currentPage: Int? = null,
         @Query("workerId") workerId: String? = null,
         @Query("status") status: String? = null
-    ): AppointmentsUserListResponse
+    ): AppointmentsResponse
 
 
     @PATCH("appointments/update-status")
@@ -25,11 +26,14 @@ interface AppointmentService {
     @POST("appointments")
     suspend fun createAppointment(@Body data: CreateAppointmentDto): UpdateAppointmentResponse
 
+    @POST("appointments/range-appointments")
+    suspend fun createRangeAppointments(@Body data: CreateAppointmentDto): MessageResponse
+
     @DELETE("appointments/{appointmentId}")
     suspend fun deleteAppointment(@Path("appointmentId") appointmentId: String): MessageResponse
 
     @GET("appointments/user-appointments")
-    suspend fun getUserAppointments(): AppointmentsUserListResponse
+    suspend fun getUserAppointments(): AppointmentsResponse
 
     @GET("appointments/user-appointment")
     suspend fun getAppointment(): AppointmentResponse

@@ -24,6 +24,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalUnit
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -47,11 +48,12 @@ constructor(
     val authRepository: AuthRepository,
     val getWorkerAppointmentsUseCase: GetWorkerAppointmentsUseCase,
     val updateAppointmentStatusUseCase: UpdateAppointmentStatus,
-    val createAppointmentsUseCase: CreateAppointmentsUseCase,
+    val createAppointmentsUseCase: CreateAppointmentUseCase,
     val deleteAppointmentsUseCase: DeleteAppointmentsUseCase,
     val getWorkerServicesUseCase: GetWorkerServicesUseCase,
     val addServiceUseCase: AddServiceUseCase,
-    val deleteServiceUseCase: DeleteServiceUseCase
+    val deleteServiceUseCase: DeleteServiceUseCase,
+    val createRangeAppointmentsUseCase: CreateRangeAppointmentsUseCase
 ) : BaseViewModel() {
 
     private val _state: MutableState<WorkerAppointmentsListState> =
@@ -132,6 +134,17 @@ constructor(
                     )
                 }
 
+                is WorkerAppointmentsListEvent.CreateRangeAppointments -> {
+                    createRangeAppointments(
+                        startHour = event.startHour,
+                        startMin = event.startMin,
+                        endHour = event.endHour,
+                        endMin = event.endMin,
+                        status = event.status,
+                        interval = event.interval
+                    )
+                }
+
                 is WorkerAppointmentsListEvent.OnSelectedDate -> {
                     _state.value = _state.value.copy(selectedDate = event.date)
                     getWorkerAppointments()
@@ -156,6 +169,73 @@ constructor(
                     _state.value = _state.value.copy(isRefreshing = false)
                 }
             }
+        }
+    }
+
+    private suspend fun createRangeAppointments(
+        startHour: String,
+        startMin: String,
+        endHour: String,
+        endMin: String,
+        status: String?,
+        interval: String
+    ) {
+
+        val workerId = authRepository.getUserId() ?: return
+        val selectedDate = _state.value.selectedDate ?: return
+        val fullDate =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault())
+        var startDate = ZonedDateTime.parse(selectedDate.startDate, fullDate)
+        startDate = startDate.withHour(startHour.toInt())
+        startDate = startDate.withMinute(startMin.toInt())
+        startDate = startDate.withSecond(0)
+
+        var endDate = ZonedDateTime.parse(selectedDate.startDate, fullDate)
+        endDate = endDate.withHour(endHour.toInt())
+        endDate = endDate.withMinute(endMin.toInt())
+        endDate = endDate.withSecond(0)
+
+        if (endDate.isBefore(startDate)) {
+            return sendMessage(UIComponent.Snackbar(message = context.getString(R.string.end_time_bigger_than_start_time)))
+        }
+
+
+        val startDateTime = startDate.format(fullDate)
+        val endDateTime = endDate.format(fullDate)
+
+        Log.d(TAG, "createAppointment: $startDate    $endDate ")
+
+        try {
+
+            val data = CreateAppointmentDto(
+                workerId = workerId,
+                startTime = startDateTime,
+                endTime = endDateTime,
+                status = status,
+                interval = interval.toInt()
+            )
+
+            createRangeAppointmentsUseCase(appointmentData = data).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        loading(result.value)
+                    }
+
+                    is Resource.Success -> {
+                        Log.d(TAG, "getWorkerAppointments: ${result.data}")
+                        onTriggerEvent(WorkerAppointmentsListEvent.GetAppointments)
+                        sendMessage(
+                            UIComponent.Snackbar(message = "Appointments Created")
+                        )
+                    }
+
+                    is Resource.Error -> {
+                        sendMessage(UIComponent.Snackbar(message = result.message))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+
         }
     }
 
@@ -203,49 +283,58 @@ constructor(
         }
 
 
-        val workerId = authRepository.getUserId() ?: return
-        val selectedDate = _state.value.selectedDate ?: return
-        val fullDate = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault())
-        var startDate = ZonedDateTime.parse(selectedDate.startDate, fullDate)
-        startDate = startDate.withHour(startHour.toInt())
-        startDate = startDate.withMinute(startMin.toInt())
-        startDate = startDate.withSecond(0)
+        try {
+            val workerId = authRepository.getUserId() ?: return
+            val selectedDate = _state.value.selectedDate ?: return
+            val fullDate =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault())
+            var startDate = ZonedDateTime.parse(selectedDate.startDate, fullDate)
+            startDate = startDate.withHour(startHour.toInt())
+            startDate = startDate.withMinute(startMin.toInt())
+            startDate = startDate.withSecond(0)
 
-        var endDate = ZonedDateTime.parse(selectedDate.startDate, fullDate)
-        endDate = endDate.withHour(endHour.toInt())
-        endDate = endDate.withMinute(endMin.toInt())
-        endDate = endDate.withSecond(0)
+            var endDate = ZonedDateTime.parse(selectedDate.startDate, fullDate)
+            endDate = endDate.withHour(endHour.toInt())
+            endDate = endDate.withMinute(endMin.toInt())
+            endDate = endDate.withSecond(0)
 
-        val startDateTime = startDate.format(fullDate)
-        val endDateTime = endDate.format(fullDate)
+            if (endDate.isBefore(startDate)) {
+                return sendMessage(UIComponent.Snackbar(message = context.getString(R.string.end_time_bigger_than_start_time)))
+            }
 
-        Log.d(TAG, "createAppointment: $startDate    $endDate ")
+            val startDateTime = startDate.format(fullDate)
+            val endDateTime = endDate.format(fullDate)
 
-        val data = CreateAppointmentDto(
-            workerId = workerId,
-            startTime = startDateTime,
-            endTime = endDateTime,
-            status = status
-        )
+            Log.d(TAG, "createAppointment: $startDate    $endDate ")
 
-        createAppointmentsUseCase(appointmentData = data).collect { result ->
-            when (result) {
-                is Resource.Loading -> {
-                    loading(result.value)
-                }
+            val data = CreateAppointmentDto(
+                workerId = workerId,
+                startTime = startDateTime,
+                endTime = endDateTime,
+                status = status
+            )
 
-                is Resource.Success -> {
-                    Log.d(TAG, "getWorkerAppointments: ${result.data}")
-                    onTriggerEvent(WorkerAppointmentsListEvent.GetAppointments)
-                    sendMessage(
-                        UIComponent.Snackbar(message = "Appointment Created")
-                    )
-                }
+            createAppointmentsUseCase(appointmentData = data).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        loading(result.value)
+                    }
 
-                is Resource.Error -> {
-                    sendMessage(UIComponent.Snackbar(message = result.message))
+                    is Resource.Success -> {
+                        Log.d(TAG, "getWorkerAppointments: ${result.data}")
+                        onTriggerEvent(WorkerAppointmentsListEvent.GetAppointments)
+                        sendMessage(
+                            UIComponent.Snackbar(message = "Appointment Created")
+                        )
+                    }
+
+                    is Resource.Error -> {
+                        sendMessage(UIComponent.Snackbar(message = result.message))
+                    }
                 }
             }
+        } catch (e: Exception) {
+
         }
     }
 

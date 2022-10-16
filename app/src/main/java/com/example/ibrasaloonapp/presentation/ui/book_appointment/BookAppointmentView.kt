@@ -1,5 +1,6 @@
 package com.example.ibrasaloonapp.presentation.ui.book_appointment
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -68,12 +69,16 @@ fun BookAppointmentView(
     val scrollState = rememberScrollState()
 
     val events = viewModel.events
-
+    val scope = rememberCoroutineScope()
 
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded }
     )
+
+    BackHandler(sheetState.isVisible) {
+        scope.launch { sheetState.hide() }
+    }
 
     LaunchedEffect(Unit) {
         launch {

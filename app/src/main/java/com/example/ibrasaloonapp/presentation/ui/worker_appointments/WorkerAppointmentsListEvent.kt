@@ -28,6 +28,16 @@ sealed class WorkerAppointmentsListEvent {
     ) :
         WorkerAppointmentsListEvent()
 
+    class CreateRangeAppointments(
+        val startHour: String,
+        val startMin: String,
+        val endHour: String,
+        val endMin: String,
+        val interval: String,
+        val status: String? = null
+    ) :
+        WorkerAppointmentsListEvent()
+
     object DismissUIMessage : WorkerAppointmentsListEvent()
     object DeleteAppointment : WorkerAppointmentsListEvent()
 

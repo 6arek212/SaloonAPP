@@ -62,6 +62,15 @@ constructor(
         }
     }
 
+
+    override suspend fun createRangeAppointments(appointmentsData: CreateAppointmentDto): ApiResult<String> {
+        return safeApiCall(dispatcher) {
+                service.createRangeAppointments(
+                    data = appointmentsData
+                ).message
+        }
+    }
+
     override suspend fun updateAppointmentStatus(
         id: String,
         status: String

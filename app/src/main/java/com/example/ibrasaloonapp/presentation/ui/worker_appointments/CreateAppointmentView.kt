@@ -1,9 +1,12 @@
 package com.example.ibrasaloonapp.presentation.ui.worker_appointments
 
 import android.app.TimePickerDialog
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -49,6 +52,15 @@ fun CreateAppointmentView(viewModel: WorkerAppointmentsListViewModel) {
         Icons.Filled.ArrowDropUp //it requires androidx.compose.material:material-icons-extended
     else
         Icons.Filled.ArrowDropDown
+
+
+    var isRangeAppointment by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    var interval by rememberSaveable {
+        mutableStateOf("")
+    }
 
     var startHour by rememberSaveable {
         mutableStateOf("")
@@ -118,6 +130,43 @@ fun CreateAppointmentView(viewModel: WorkerAppointmentsListViewModel) {
                             .padding(8.dp)
                     )
 
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            6.dp,
+                            Alignment.CenterHorizontally
+                        ),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = isRangeAppointment,
+                                onClick = { isRangeAppointment = true })
+                            Text(
+                                text = stringResource(R.string.range),
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = !isRangeAppointment,
+                                onClick = { isRangeAppointment = false })
+                            Text(
+                                text = stringResource(R.string.single),
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                    }
+
+
+                    Spacer(
+                        modifier = Modifier
+                            .padding(4.dp)
+                    )
+
                     OutlinedTextField(
                         label = {
                             Text(text = stringResource(R.string.start_time))
@@ -165,6 +214,33 @@ fun CreateAppointmentView(viewModel: WorkerAppointmentsListViewModel) {
 
                     Spacer(modifier = Modifier.padding(4.dp))
 
+                    AnimatedVisibility(visible = isRangeAppointment) {
+                        Column {
+
+                            OutlinedTextField(
+                                label = {
+                                    Text(text = stringResource(R.string.interval))
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Next
+                                ),
+                                onValueChange = { s ->
+                                    interval = s
+                                },
+                                value = interval,
+                                singleLine = true,
+                                leadingIcon = {
+                                    Icon(Icons.Filled.Timer, stringResource(R.string.interval))
+                                },
+                                textStyle = MaterialTheme.typography.body2,
+                            )
+
+                            Spacer(modifier = Modifier.padding(4.dp))
+                        }
+                    }
+
+
                     Box {
 
                         OutlinedTextField(
@@ -211,7 +287,8 @@ fun CreateAppointmentView(viewModel: WorkerAppointmentsListViewModel) {
                             }
 
                             DropdownMenuItem(onClick = {
-                                statusSelected = KeyValueWrapper("hold", context.getString(R.string.hold))
+                                statusSelected =
+                                    KeyValueWrapper("hold", context.getString(R.string.hold))
                                 showStatusMenu = false
                             }) {
                                 Text(
@@ -228,17 +305,34 @@ fun CreateAppointmentView(viewModel: WorkerAppointmentsListViewModel) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            viewModel.onTriggerEvent(
-                                WorkerAppointmentsListEvent.CreateAppointment(
-                                    startHour = startHour,
-                                    startMin = startMin,
-                                    endHour = endHour,
-                                    endMin = endMin,
-                                    status = statusSelected.key
+                            if (isRangeAppointment) {
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.CreateRangeAppointments(
+                                        startHour = startHour,
+                                        startMin = startMin,
+                                        endHour = endHour,
+                                        endMin = endMin,
+                                        status = statusSelected.key,
+                                        interval = interval
+                                    )
                                 )
-                            )
+                            } else {
+                                viewModel.onTriggerEvent(
+                                    WorkerAppointmentsListEvent.CreateAppointment(
+                                        startHour = startHour,
+                                        startMin = startMin,
+                                        endHour = endHour,
+                                        endMin = endMin,
+                                        status = statusSelected.key
+                                    )
+                                )
+                            }
+
                         }) {
-                        Text(text = stringResource(R.string.create), style = MaterialTheme.typography.body2)
+                        Text(
+                            text = stringResource(R.string.create),
+                            style = MaterialTheme.typography.body2
+                        )
                     }
                 }
             }

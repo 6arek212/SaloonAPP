@@ -29,6 +29,7 @@ import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.MainEvent
 import com.example.ibrasaloonapp.presentation.MainUIEvent
+import com.example.ibrasaloonapp.presentation.components.BackButton
 import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.theme.Gray2
 import com.example.ibrasaloonapp.presentation.ui.Screen
@@ -76,13 +77,7 @@ fun EditProfileView(
         ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "back arrow"
-                    )
-                }
+                BackButton(onClick = { navController.popBackStack() })
 
                 Spacer(modifier = Modifier.padding(4.dp))
 

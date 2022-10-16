@@ -141,5 +141,10 @@
     <string name="you_want_to_block">לחסום</string>
     <string name="unblock">בטל חסימה</string>
     <string name="you_want_to_unblock">לבטל חסימת</string>
+    <string name="new_users">משתמשים חדשים</string>
+    <string name="interval">אורך</string>
+    <string name="range">טווח</string>
+    <string name="single">בודד</string>
+    <string name="end_time_bigger_than_start_time">זמן סיום צריך להיות גדול מזמן ההתחלה</string>
 
 </resources>

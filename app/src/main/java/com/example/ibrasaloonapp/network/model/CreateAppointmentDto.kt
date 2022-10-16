@@ -14,5 +14,8 @@ data class CreateAppointmentDto(
 
     @SerializedName("status")
     val status: String? = null,
+
+    @SerializedName("interval")
+    val interval: Int? = null,
 ) {
 }

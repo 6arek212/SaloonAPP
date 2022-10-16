@@ -40,6 +40,8 @@ interface AppointmentRepository {
 
     suspend fun createAppointment(appointmentData: CreateAppointmentDto): ApiResult<Appointment>
 
+    suspend fun createRangeAppointments(appointmentsData: CreateAppointmentDto): ApiResult<String>
+
     suspend fun deleteAppointment(appointmentId: String): ApiResult<String>
 
 }

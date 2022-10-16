@@ -60,7 +60,7 @@ fun DrawerBody(
                     .padding(bottom = 8.dp),
                 elevation = 0.dp,
                 shape = MaterialTheme.shapes.small,
-                color = MaterialTheme.colors.background,
+                color = Gray2,
                 border = BorderStroke(1.dp, Gray1)
             ) {
                 Row(
