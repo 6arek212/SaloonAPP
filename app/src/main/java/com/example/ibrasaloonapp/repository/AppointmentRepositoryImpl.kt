@@ -14,7 +14,7 @@ private const val TAG = "AppointmentRepositoryIm"
 class AppointmentRepositoryImpl
 @Inject
 constructor(
-    private val service: AppointmentService,
+    private val appointmentsService: AppointmentService,
     private val mapper: AppointmentDtoMapper,
     private val userMapper: UserDtoMapper,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
@@ -23,7 +23,7 @@ constructor(
 
     override suspend fun deleteAppointment(appointmentId: String): ApiResult<String> {
         return safeApiCall(dispatcher) {
-            service.deleteAppointment(appointmentId = appointmentId).message
+            appointmentsService.deleteAppointment(appointmentId = appointmentId).message
         }
     }
 
@@ -38,7 +38,7 @@ constructor(
     ): ApiResult<List<Appointment>> {
         return safeApiCall(dispatcher) {
             mapper.toDomainList(
-                service.getWorkerAppointments(
+                appointmentsService.getWorkerAppointments(
                     search,
                     startTime,
                     endTime,
@@ -55,7 +55,7 @@ constructor(
     override suspend fun createAppointment(appointmentData: CreateAppointmentDto): ApiResult<Appointment> {
         return safeApiCall(dispatcher) {
             mapper.mapToDomainModel(
-                service.createAppointment(
+                appointmentsService.createAppointment(
                     data = appointmentData
                 ).appointment
             )
@@ -65,22 +65,24 @@ constructor(
 
     override suspend fun createRangeAppointments(appointmentsData: CreateAppointmentDto): ApiResult<String> {
         return safeApiCall(dispatcher) {
-                service.createRangeAppointments(
-                    data = appointmentsData
-                ).message
+            appointmentsService.createRangeAppointments(
+                data = appointmentsData
+            ).message
         }
     }
 
     override suspend fun updateAppointmentStatus(
         id: String,
-        status: String
+        status: String,
+        service: String?
     ): ApiResult<Appointment> {
         return safeApiCall(dispatcher) {
             mapper.mapToDomainModel(
-                service.updateAppointmentStatus(
+                appointmentsService.updateAppointmentStatus(
                     UpdateAppointmentStatusDto(
                         appointmentId = id,
-                        status = status
+                        status = status,
+                        service = service
                     )
                 ).appointment
             )
@@ -89,7 +91,7 @@ constructor(
 
     override suspend fun getAppointments(): ApiResult<List<Appointment>> {
         return safeApiCall(dispatcher) {
-            mapper.toDomainList(service.getUserAppointments().appointments)
+            mapper.toDomainList(appointmentsService.getUserAppointments().appointments)
         }
     }
 
@@ -98,7 +100,7 @@ constructor(
     ): ApiResult<Appointment> {
         return safeApiCall(dispatcher = dispatcher) {
             mapper.mapToDomainModel(
-                service.bookAppointment(
+                appointmentsService.bookAppointment(
                     data = appointment
                 ).appointment
             )
@@ -107,13 +109,13 @@ constructor(
 
     override suspend fun unbookAppointment(id: String): ApiResult<String> {
         return safeApiCall(dispatcher = dispatcher) {
-            service.unbookAppointment(UnBookDto(id)).message
+            appointmentsService.unbookAppointment(UnBookDto(id)).message
         }
     }
 
     override suspend fun getAppointment(): ApiResult<Appointment?> {
         return safeApiCall(dispatcher = dispatcher) {
-            service.getAppointment().appointment?.let {
+            appointmentsService.getAppointment().appointment?.let {
                 mapper.mapToDomainModel(it)
             }
         }
@@ -127,7 +129,7 @@ constructor(
     ): ApiResult<List<Appointment>> {
         return safeApiCall(dispatcher = dispatcher) {
             mapper.toDomainList(
-                service.getAvailableAppointments(
+                appointmentsService.getAvailableAppointments(
                     workingDate = workingDate,
                     fromDate = fromDate,
                     workerId = workerId

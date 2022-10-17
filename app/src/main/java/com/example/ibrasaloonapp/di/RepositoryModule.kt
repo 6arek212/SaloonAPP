@@ -62,7 +62,7 @@ object RepositoryModule {
         userMapper: UserDtoMapper
     ): AppointmentRepository {
         return AppointmentRepositoryImpl(
-            service = service,
+            appointmentsService = service,
             mapper = appointmentDtoMapper,
             userMapper = userMapper
         )

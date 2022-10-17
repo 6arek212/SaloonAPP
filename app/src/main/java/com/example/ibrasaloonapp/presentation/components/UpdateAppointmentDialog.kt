@@ -15,7 +15,7 @@ import com.example.ibrasaloonapp.presentation.theme.Black2
 
 
 sealed class UpdateAppointmentEvent {
-    class UpdateStatus(val status: String) : UpdateAppointmentEvent()
+    class UpdateStatus(val status: String, val service: String? = null) : UpdateAppointmentEvent()
     object DeleteAppointment : UpdateAppointmentEvent()
 }
 

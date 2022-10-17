@@ -146,5 +146,7 @@
     <string name="range">טווח</string>
     <string name="single">בודד</string>
     <string name="end_time_bigger_than_start_time">זמן סיום צריך להיות גדול מזמן ההתחלה</string>
+    <string name="delete_appointment">מחק תור</string>
+    <string name="appointment_options">הגדרות תור</string>
 
 </resources>

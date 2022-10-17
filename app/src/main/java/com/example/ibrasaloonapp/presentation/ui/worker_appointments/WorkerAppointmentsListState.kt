@@ -12,8 +12,10 @@ data class WorkerAppointmentsListState(
     val isRefreshing: Boolean = false,
     val filter: AppointmentFilter = AppointmentFilter.ShowAll,
     val dates: List<DayCardData> = listOf(),
-    val updateStatusDialogVisibility: Boolean = false
+    val appointmentForUpdate: Appointment? = null,
 )
 
 
 data class DateRange(val from: String, val to: String, val monthString: String)
+
+

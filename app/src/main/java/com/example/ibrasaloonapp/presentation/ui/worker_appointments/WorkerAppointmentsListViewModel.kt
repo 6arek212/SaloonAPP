@@ -8,23 +8,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.UIComponent
-import com.example.ibrasaloonapp.domain.model.Service
 import com.example.ibrasaloonapp.network.Resource
 import com.example.ibrasaloonapp.network.model.CreateAppointmentDto
 import com.example.ibrasaloonapp.presentation.BaseViewModel
 import com.example.ibrasaloonapp.repository.AuthRepository
 import com.example.ibrasaloonapp.use.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalUnit
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -84,20 +79,14 @@ constructor(
                     addService(title = event.title, priceString = event.price)
                 }
 
-                is WorkerAppointmentsListEvent.ShowStatusDialog -> {
-                    _state.value = _state.value.copy(updateStatusDialogVisibility = true)
+                is WorkerAppointmentsListEvent.UpdateAppointmentId -> {
                     appointmentToUpdateId = event.id
                     appointmentToUpdateIndex = event.index
-                }
-
-                is WorkerAppointmentsListEvent.DismissStatusDialog -> {
-                    _state.value = _state.value.copy(updateStatusDialogVisibility = false)
-                    appointmentToUpdateId = null
-                    appointmentToUpdateIndex = null
+                    _state.value = _state.value.copy(appointmentForUpdate = _state.value.appointments[event.index])
                 }
 
                 is WorkerAppointmentsListEvent.UpdateAppointmentStatus -> {
-                    updateAppointmentStatus(event.status)
+                    updateAppointmentStatus(event.status, event.service)
                 }
 
                 is WorkerAppointmentsListEvent.DismissUIMessage -> {
@@ -243,7 +232,6 @@ constructor(
         val id = appointmentToUpdateId ?: return
         val index = appointmentToUpdateIndex ?: return
 
-        _state.value = _state.value.copy(updateStatusDialogVisibility = false)
         deleteAppointmentsUseCase(appointmentId = id).collect { result ->
             when (result) {
                 is Resource.Loading -> {
@@ -409,12 +397,15 @@ constructor(
     }
 
 
-    private suspend fun updateAppointmentStatus(status: String) {
+    private suspend fun updateAppointmentStatus(status: String, service: String? = null) {
         val id = appointmentToUpdateId ?: return
         val index = appointmentToUpdateIndex ?: return
 
-        _state.value = _state.value.copy(updateStatusDialogVisibility = false)
-        updateAppointmentStatusUseCase(appointmentId = id, status = status).collect { result ->
+        updateAppointmentStatusUseCase(
+            appointmentId = id,
+            status = status,
+            service = service
+        ).collect { result ->
             when (result) {
                 is Resource.Loading -> {
                     loading(result.value)

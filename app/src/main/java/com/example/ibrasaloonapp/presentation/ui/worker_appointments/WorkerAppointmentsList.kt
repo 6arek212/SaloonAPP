@@ -35,11 +35,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.Appointment
-import com.example.ibrasaloonapp.domain.model.Service
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
+import com.example.ibrasaloonapp.presentation.ui.services.AppointmentOptions
 import com.example.ibrasaloonapp.presentation.ui.services.ServicesSheetContent
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -59,12 +59,12 @@ fun WorkerAppointmentsList(
     val selectedDate = viewModel.state.value.selectedDate
     val dateRange = viewModel.state.value.dateRange
     val search = viewModel.state.value.search
-    val dialogVisibility = viewModel.state.value.updateStatusDialogVisibility
     val progress = viewModel.uiState.collectAsState().value.progressBarState
     val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
     val filter = viewModel.state.value.filter
     val user = mainViewModel.state.value.authData?.user
     val services = viewModel.state.value.services
+    val appointmentForUpdate = viewModel.state.value.appointmentForUpdate
 
     LaunchedEffect(Unit) {
         viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetAppointments)
@@ -72,14 +72,18 @@ fun WorkerAppointmentsList(
 
 
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(
+    val servicesSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded }
+    )
+    val appointmentOptionsSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded }
     )
 
-
-    BackHandler(sheetState.isVisible) {
-        scope.launch { sheetState.hide() }
+    BackHandler(servicesSheetState.isVisible) {
+        scope.launch { appointmentOptionsSheetState.hide() }
+        scope.launch { servicesSheetState.hide() }
     }
 
     DefaultScreenUI(
@@ -90,119 +94,131 @@ fun WorkerAppointmentsList(
             state = rememberSwipeRefreshState(isRefreshing),
             onRefresh = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.Refresh) }
         ) {
-            OptionDialog(
-                isVisible = dialogVisibility,
-                onDismiss = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.DismissStatusDialog) },
-                onUpdate = { option ->
 
-                    when (option) {
-
-                        is UpdateAppointmentEvent.DeleteAppointment -> {
-                            viewModel.onTriggerEvent(
-                                WorkerAppointmentsListEvent.DeleteAppointment
-                            )
-                        }
-
-                        is UpdateAppointmentEvent.UpdateStatus -> {
-                            viewModel.onTriggerEvent(
-                                WorkerAppointmentsListEvent.UpdateAppointmentStatus(
-                                    status = option.status
-                                )
-                            )
-                        }
-                    }
-                }
-            )
             ModalBottomSheetLayout(
-                sheetState = sheetState,
+                sheetState = appointmentOptionsSheetState,
                 sheetContent = {
-                    ServicesSheetContent(
+                    AppointmentOptions(
+                        appointment = appointmentForUpdate,
                         services = services,
-                        onAddingService = { title, price ->
-                            viewModel.onTriggerEvent(
-                                WorkerAppointmentsListEvent.AddService(title, price)
-                            )
-                        },
-                        onDeleteService = { serviceId, index ->
-                            serviceId?.let {
-                                viewModel.onTriggerEvent(
-                                    WorkerAppointmentsListEvent.DeleteService(
-                                        serviceId = serviceId,
-                                        index = index
+                        onUpdate = { option ->
+                            when (option) {
+                                is UpdateAppointmentEvent.DeleteAppointment -> {
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.DeleteAppointment
                                     )
-                                )
+                                }
+
+                                is UpdateAppointmentEvent.UpdateStatus -> {
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.UpdateAppointmentStatus(
+                                            status = option.status,
+                                            service = option.service
+                                        )
+                                    )
+                                }
                             }
-                        }
-                    )
+                            scope.launch {
+                                appointmentOptionsSheetState.hide()
+                            }
+                        })
                 },
                 modifier = Modifier.fillMaxSize()
             ) {
 
-                BackdropScaffold(
-                    scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
-                    backLayerBackgroundColor = MaterialTheme.colors.primary,
-                    frontLayerBackgroundColor = MaterialTheme.colors.background,
-                    frontLayerShape = MaterialTheme.shapes.large,
-                    frontLayerScrimColor = Color.Unspecified,
-                    appBar = {
-                        HomeAppBar()
-                    },
-                    backLayerContent = {
-                        BackLayer(
-                            user = user,
-                            filter = filter,
-                            dates = dates,
-                            selectedDate = selectedDate,
-                            dateRange = dateRange,
-                            search = search,
-                            onSearchChange = { str ->
+                ModalBottomSheetLayout(
+                    sheetState = servicesSheetState,
+                    sheetContent = {
+                        ServicesSheetContent(
+                            services = services,
+                            onAddingService = { title, price ->
                                 viewModel.onTriggerEvent(
-                                    WorkerAppointmentsListEvent.OnSearchChange(str)
+                                    WorkerAppointmentsListEvent.AddService(title, price)
                                 )
                             },
-                            onSelectedDate = { item ->
-                                viewModel.onTriggerEvent(
-                                    WorkerAppointmentsListEvent.OnSelectedDate(
-                                        item
+                            onDeleteService = { serviceId, index ->
+                                serviceId?.let {
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.DeleteService(
+                                            serviceId = serviceId,
+                                            index = index
+                                        )
                                     )
-                                )
-                            },
-                            decreaseWeekRange = {
-                                viewModel.onTriggerEvent(
-                                    WorkerAppointmentsListEvent.DecreaseWeekRange
-                                )
-                            },
-                            increaseWeekRange = {
-                                viewModel.onTriggerEvent(
-                                    WorkerAppointmentsListEvent.IncreaseWeekRange
-                                )
-                            },
-                            onSearch = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.Search) },
-                            changeFilter = { filter ->
-                                viewModel.onTriggerEvent(
-                                    WorkerAppointmentsListEvent.ChangeFilter(filter)
-                                )
-                            },
-                            showServicesBottomSheet = {
-                                viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
-                                scope.launch { sheetState.show() }
+                                }
                             }
                         )
                     },
-                    frontLayerContent = {
-                        FrontLayer(
-                            appointments = appointments,
-                            showStatusDialog = { id, index ->
-                                viewModel.onTriggerEvent(
-                                    WorkerAppointmentsListEvent.ShowStatusDialog(
-                                        id = id,
-                                        index = index
+                    modifier = Modifier.fillMaxSize()
+                ) {
+
+                    BackdropScaffold(
+                        scaffoldState = rememberBackdropScaffoldState(BackdropValue.Revealed),
+                        backLayerBackgroundColor = MaterialTheme.colors.primary,
+                        frontLayerBackgroundColor = MaterialTheme.colors.background,
+                        frontLayerShape = MaterialTheme.shapes.large,
+                        frontLayerScrimColor = Color.Unspecified,
+                        appBar = {
+                            HomeAppBar()
+                        },
+                        backLayerContent = {
+                            BackLayer(
+                                user = user,
+                                filter = filter,
+                                dates = dates,
+                                selectedDate = selectedDate,
+                                dateRange = dateRange,
+                                search = search,
+                                onSearchChange = { str ->
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.OnSearchChange(str)
                                     )
-                                )
-                            },
-                            navigateToCreateAppointment = navigateToCreateAppointment
-                        )
-                    })
+                                },
+                                onSelectedDate = { item ->
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.OnSelectedDate(
+                                            item
+                                        )
+                                    )
+                                },
+                                decreaseWeekRange = {
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.DecreaseWeekRange
+                                    )
+                                },
+                                increaseWeekRange = {
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.IncreaseWeekRange
+                                    )
+                                },
+                                onSearch = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.Search) },
+                                changeFilter = { filter ->
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.ChangeFilter(filter)
+                                    )
+                                },
+                                showServicesBottomSheet = {
+                                    viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
+                                    scope.launch { servicesSheetState.show() }
+                                }
+                            )
+                        },
+                        frontLayerContent = {
+                            FrontLayer(
+                                appointments = appointments,
+                                showStatusDialog = { id, index ->
+                                    viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
+                                    scope.launch { appointmentOptionsSheetState.show() }
+                                    viewModel.onTriggerEvent(
+                                        WorkerAppointmentsListEvent.UpdateAppointmentId(
+                                            id = id,
+                                            index = index
+                                        )
+                                    )
+                                },
+                                navigateToCreateAppointment = navigateToCreateAppointment
+                            )
+                        })
+                }
             }
         }
     }
@@ -454,6 +470,13 @@ private fun FrontLayer(
                     },
                     showOptionDialog = { showStatusDialog(item.id, index) }
                 )
+            }
+
+
+            if (appointments.isEmpty()) {
+                item {
+                    Empty()
+                }
             }
         }
 

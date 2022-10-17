@@ -15,9 +15,10 @@ sealed class WorkerAppointmentsListEvent {
     object CurrentWeekRange : WorkerAppointmentsListEvent()
     object DecreaseWeekRange : WorkerAppointmentsListEvent()
     object IncreaseWeekRange : WorkerAppointmentsListEvent()
-    object DismissStatusDialog : WorkerAppointmentsListEvent()
-    class UpdateAppointmentStatus(val status: String) : WorkerAppointmentsListEvent()
-    class ShowStatusDialog(val id: String, val index: Int) : WorkerAppointmentsListEvent()
+    class UpdateAppointmentStatus(val status: String, val service: String? = null) :
+        WorkerAppointmentsListEvent()
+
+    class UpdateAppointmentId(val id: String, val index: Int) : WorkerAppointmentsListEvent()
     object Refresh : WorkerAppointmentsListEvent()
     class CreateAppointment(
         val startHour: String,

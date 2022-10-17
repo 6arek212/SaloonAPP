@@ -26,14 +26,18 @@ constructor(
 ) {
 
 
-    suspend operator fun invoke(appointmentId: String, status: String) =
+    suspend operator fun invoke(appointmentId: String, status: String, service: String? = null) =
         flow {
 
 
             emit(Resource.Loading(true))
 
             val result =
-                appointmentsRepository.updateAppointmentStatus(id = appointmentId, status = status)
+                appointmentsRepository.updateAppointmentStatus(
+                    id = appointmentId,
+                    status = status,
+                    service = service
+                )
 
             when (result) {
                 is ApiResult.Success -> {

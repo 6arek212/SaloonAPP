@@ -28,7 +28,8 @@ constructor(
         return Service(
             id = model.id,
             title = title,
-            price = model.price
+            price = model.price,
+            titleKey = model.title
         )
     }
 

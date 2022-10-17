@@ -147,6 +147,8 @@
     <string name="range">Range</string>
     <string name="single">Single</string>
     <string name="end_time_bigger_than_start_time">The end time must be bigger than the start time</string>
+    <string name="delete_appointment">Delete Appointment</string>
+    <string name="appointment_options">Appointment Options</string>
 
 
 </resources>

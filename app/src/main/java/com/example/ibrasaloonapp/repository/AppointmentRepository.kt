@@ -36,7 +36,11 @@ interface AppointmentRepository {
     ): ApiResult<List<Appointment>>
 
 
-    suspend fun updateAppointmentStatus(id: String, status: String): ApiResult<Appointment>
+    suspend fun updateAppointmentStatus(
+        id: String,
+        status: String,
+        service: String? = null
+    ): ApiResult<Appointment>
 
     suspend fun createAppointment(appointmentData: CreateAppointmentDto): ApiResult<Appointment>
 
