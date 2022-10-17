@@ -12,6 +12,17 @@ This is a client appointments app mainly for a barber shop management.
 
 </br>
 
+## Videos & Images
+
+</br>
+
+https://drive.google.com/file/d/12nh7Vls2zsgXyXLN5HFMdYjdT1bq0pi4/view?usp=sharing
+
+</br>
+</br>
+
+![](imgs/booking_system2.gif)
+
 ## What I Used
 
 - Fully Compose UI
@@ -35,13 +46,12 @@ This is a client appointments app mainly for a barber shop management.
 - Navigation to login on 401 code (only occurs when refresh token is expired )
 
 
-</br>
 
 
-![](imgs/booking_system2.gif)
 
 
-![](https://drive.google.com/file/d/12nh7Vls2zsgXyXLN5HFMdYjdT1bq0pi4/view?usp=sharing)
+
+
 
 </br>
 
