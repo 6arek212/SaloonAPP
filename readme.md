@@ -16,7 +16,9 @@ This is a client appointments app mainly for a barber shop management.
 
 </br>
 
-![](imgs/saloonpreview.mp4)
+
+https://user-images.githubusercontent.com/10331972/196188542-6680b7a0-2286-4cf4-be4e-ff9fa60e5f83.mp4
+
 
 </br>
 </br>
