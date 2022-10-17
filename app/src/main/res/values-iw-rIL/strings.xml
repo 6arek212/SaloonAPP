@@ -148,5 +148,8 @@
     <string name="end_time_bigger_than_start_time">זמן סיום צריך להיות גדול מזמן ההתחלה</string>
     <string name="delete_appointment">מחק תור</string>
     <string name="appointment_options">הגדרות תור</string>
+    <string name="appointment_deleted">התור נמחק</string>
+    <string name="make_sure_picked_start_end_time">ודא שבחרת זמן התחלה וסיום</string>
+    <string name="appointment_created">תור נוצר</string>
 
 </resources>

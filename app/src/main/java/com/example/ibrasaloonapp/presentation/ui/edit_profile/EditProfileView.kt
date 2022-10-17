@@ -77,7 +77,7 @@ fun EditProfileView(
         ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                BackButton(onClick = { navController.popBackStack() })
+                BackButton(onClick = { navController.popBackStack() }, tint = MaterialTheme.colors.primary)
 
                 Spacer(modifier = Modifier.padding(4.dp))
 

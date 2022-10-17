@@ -149,6 +149,9 @@
     <string name="end_time_bigger_than_start_time">The end time must be bigger than the start time</string>
     <string name="delete_appointment">Delete Appointment</string>
     <string name="appointment_options">Appointment Options</string>
+    <string name="appointment_created">Appointments Created</string>
+    <string name="appointment_deleted">Appointment Deleted</string>
+    <string name="make_sure_picked_start_end_time">Make sure you picked a start and end time</string>
 
 
 </resources>

@@ -192,12 +192,7 @@ fun BookAppointmentView(
 fun TitleSection(popBackStack: () -> Boolean) {
     Row(verticalAlignment = Alignment.CenterVertically) {
 
-        IconButton(onClick = { popBackStack() }) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "back arrow"
-            )
-        }
+        BackButton(onClick = { popBackStack() }, tint = MaterialTheme.colors.primary)
 
         Spacer(modifier = Modifier.padding(4.dp))
 

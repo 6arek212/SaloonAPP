@@ -169,7 +169,11 @@ constructor(
         status: String?,
         interval: String
     ) {
-
+        if (startHour.isBlank() || startMin.isBlank() || endHour.isBlank() || endMin.isBlank()) {
+            return sendMessage(
+                UIComponent.Snackbar(message = context.getString(R.string.make_sure_picked_start_end_time))
+            )
+        }
         val workerId = authRepository.getUserId() ?: return
         val selectedDate = _state.value.selectedDate ?: return
         val fullDate =
@@ -214,7 +218,7 @@ constructor(
                         Log.d(TAG, "getWorkerAppointments: ${result.data}")
                         onTriggerEvent(WorkerAppointmentsListEvent.GetAppointments)
                         sendMessage(
-                            UIComponent.Snackbar(message = "Appointments Created")
+                            UIComponent.Snackbar(message = context.getString(R.string.appointment_created))
                         )
                     }
 
@@ -244,7 +248,7 @@ constructor(
                     list.removeAt(index)
                     _state.value = _state.value.copy(appointments = list)
                     sendMessage(
-                        UIComponent.Snackbar(message = "Appointment Deleted")
+                        UIComponent.Snackbar(message = context.getString(R.string.appointment_deleted))
                     )
                 }
 
@@ -266,7 +270,7 @@ constructor(
     ) {
         if (startHour.isBlank() || startMin.isBlank() || endHour.isBlank() || endMin.isBlank()) {
             return sendMessage(
-                UIComponent.Snackbar(message = "Make sure you picked a start and end time")
+                UIComponent.Snackbar(message = context.getString(R.string.make_sure_picked_start_end_time))
             )
         }
 
@@ -312,7 +316,7 @@ constructor(
                         Log.d(TAG, "getWorkerAppointments: ${result.data}")
                         onTriggerEvent(WorkerAppointmentsListEvent.GetAppointments)
                         sendMessage(
-                            UIComponent.Snackbar(message = "Appointment Created")
+                            UIComponent.Snackbar(message = context.getString(R.string.appointment_created))
                         )
                     }
 

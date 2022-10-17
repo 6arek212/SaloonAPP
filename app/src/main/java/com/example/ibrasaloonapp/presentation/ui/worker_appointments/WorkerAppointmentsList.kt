@@ -31,7 +31,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.domain.model.Appointment
@@ -44,6 +43,12 @@ import com.example.ibrasaloonapp.presentation.ui.services.ServicesSheetContent
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
+
+
+sealed class UpdateAppointmentEvent {
+    class UpdateStatus(val status: String, val service: String? = null) : UpdateAppointmentEvent()
+    object DeleteAppointment : UpdateAppointmentEvent()
+}
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -226,19 +231,6 @@ fun WorkerAppointmentsList(
 
 }
 
-
-@Composable
-private fun OptionDialog(
-    isVisible: Boolean,
-    onUpdate: (UpdateAppointmentEvent) -> Unit,
-    onDismiss: () -> Unit
-) {
-    if (!isVisible)
-        return
-    Dialog(onDismissRequest = onDismiss) {
-        UpdateAppointmentDialog(onUpdate = onUpdate)
-    }
-}
 
 
 @Composable
@@ -426,7 +418,7 @@ private fun FrontLayer(
     navigateToCreateAppointment: () -> Unit,
 ) {
 
-    Box() {
+    Box {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(8.dp),
@@ -475,7 +467,7 @@ private fun FrontLayer(
 
             if (appointments.isEmpty()) {
                 item {
-                    Empty()
+                    Empty(modifier = Modifier.fillMaxWidth())
                 }
             }
         }

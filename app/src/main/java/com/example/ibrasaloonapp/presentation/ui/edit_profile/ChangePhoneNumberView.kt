@@ -133,7 +133,7 @@ fun ChangePhoneNumber(
     ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            BackButton(onClick = close)
+            BackButton(onClick = close, tint = MaterialTheme.colors.primary)
 
             Spacer(modifier = Modifier.padding(4.dp))
 
