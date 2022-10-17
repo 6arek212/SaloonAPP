@@ -25,6 +25,7 @@ This is a client appointments app mainly for a barber shop management.
 
 ## Some fetuers
 
+- Employee Managment Page
 - Booking appointment
 - unbook appointment
 - appointment status
