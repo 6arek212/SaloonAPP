@@ -45,16 +45,16 @@ constructor(
                 is AppointmentListEvent.GetAppointments -> {
                     getAppointments()
                 }
-                is AppointmentListEvent.OnRemoveHeadFromQueue -> {
-                    removeMessage()
+                is AppointmentListEvent.DismissDialog -> {
+                    _state.value = _state.value.copy(unBookDialog = null)
                 }
                 is AppointmentListEvent.UnBookAppointment -> {
                     unbook(id = event.id, index = event.index)
                 }
 
                 is AppointmentListEvent.ShowUnbookConfirmDialog -> {
-                    sendMessage(
-                        UIComponent.Dialog(
+                    _state.value = _state.value.copy(
+                        unBookDialog = UIComponent.Dialog(
                             title = context.getString(R.string.unbook),
                             description = context.getString(R.string.are_you_sure_unbook_your_appointment),
                             actionButtons = true,

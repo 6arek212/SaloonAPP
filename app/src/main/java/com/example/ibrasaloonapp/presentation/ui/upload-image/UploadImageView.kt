@@ -35,7 +35,6 @@ import com.example.ibrasaloonapp.presentation.components.DefaultScreenUI
 import com.example.ibrasaloonapp.presentation.components.ProgressButton
 import com.example.ibrasaloonapp.presentation.theme.AppTheme
 import com.example.ibrasaloonapp.presentation.theme.Black4
-import com.example.ibrasaloonapp.presentation.ui.profile.ProfileViewModel
 import java.io.InputStream
 
 const val IMAGE_KEY = "image_key"

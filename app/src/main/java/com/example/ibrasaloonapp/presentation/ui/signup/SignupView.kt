@@ -33,15 +33,12 @@ import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.ProgressBarState
 import com.example.ibrasaloonapp.domain.model.OPT4Digits
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
-import com.example.ibrasaloonapp.presentation.MainEvent
-import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.AppTheme
 import com.example.ibrasaloonapp.presentation.theme.Gray1
 import com.example.ibrasaloonapp.presentation.theme.Green
 import com.example.ibrasaloonapp.presentation.ui.Screen
 import com.example.ibrasaloonapp.presentation.ui.login.CodeDigitPlace
-import kotlinx.coroutines.launch
 
 
 @Composable

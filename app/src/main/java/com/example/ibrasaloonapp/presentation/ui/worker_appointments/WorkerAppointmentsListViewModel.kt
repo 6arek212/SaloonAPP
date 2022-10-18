@@ -479,7 +479,6 @@ constructor(
 
     private suspend fun getServices() {
         val userId = authRepository.getUserId() ?: return
-
         getWorkerServicesUseCase(workerId = userId).collect { result ->
             when (result) {
                 is Resource.Loading -> {

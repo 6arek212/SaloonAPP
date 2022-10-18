@@ -31,6 +31,7 @@ import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.ibrasaloonapp.R
+import com.example.ibrasaloonapp.core.navigateToWhatsapp
 import com.example.ibrasaloonapp.domain.model.User
 import com.example.ibrasaloonapp.presentation.theme.AppTheme
 import com.example.ibrasaloonapp.presentation.theme.Black1
@@ -140,6 +141,16 @@ fun UserCard(user: User, onClick: () -> Unit) {
 
             Spacer(modifier = Modifier.weight(1f))
 
+
+            IconButton(onClick = {
+                navigateToWhatsapp(context = context, phone = user.phone)
+            }) {
+                Image(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(id = R.drawable.whatsapp),
+                    contentDescription = "Whatsapp"
+                )
+            }
 
             IconButton(onClick = {
 

@@ -29,3 +29,14 @@ fun navigateToMaps(context: Context) {
         )
     )
 }
+
+
+fun navigateToWhatsapp(context: Context, phone: String) {
+    val uri = "https://api.whatsapp.com/send?phone=$phone"
+    context.startActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(uri)
+        )
+    )
+}

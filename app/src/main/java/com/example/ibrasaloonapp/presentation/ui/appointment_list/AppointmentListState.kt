@@ -8,5 +8,6 @@ import com.example.ibrasaloonapp.core.domain.UIComponent
 data class AppointmentListState(
     val appointments: List<Appointment> = listOf(),
     val activeAppointment: Appointment? = null,
-    val isRefreshing: Boolean = false
+    val isRefreshing: Boolean = false,
+    val unBookDialog: UIComponent.Dialog? = null
 )

@@ -1,15 +1,10 @@
 package com.example.ibrasaloonapp.presentation.ui.appointment_list
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,20 +13,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.domain.DialogEvent
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.presentation.MainActivityViewModel
-import com.example.ibrasaloonapp.presentation.MainEvent
-import com.example.ibrasaloonapp.presentation.MainUIEvent
 import com.example.ibrasaloonapp.presentation.components.*
 import com.example.ibrasaloonapp.presentation.theme.*
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.launch
 
+private const val TAG = "AppointmentListView"
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -41,7 +35,7 @@ fun AppointmentListView(
     mainViewModel: MainActivityViewModel
 ) {
 
-    val uiMessage = viewModel.uiState.collectAsState().value.uiMessage
+    val unBookDialog = viewModel.state.value.unBookDialog
     val isRefreshing = viewModel.state.value.isRefreshing
     val progressBar = viewModel.uiState.collectAsState().value.progressBarState
     val appointments = viewModel.state.value.appointments
@@ -51,23 +45,11 @@ fun AppointmentListView(
         viewModel.onTriggerEvent(AppointmentListEvent.GetAppointments)
     }
 
+
+
     DefaultScreenUI(
-        onRemoveUIComponent = { viewModel.onTriggerEvent(AppointmentListEvent.OnRemoveHeadFromQueue) },
-        uiComponent = uiMessage,
+        onRemoveUIComponent = { },
         progressBarState = progressBar,
-        dialogOnConfirm = { event ->
-            when (event) {
-                is DialogEvent.Unbook -> {
-                    viewModel.onTriggerEvent(
-                        AppointmentListEvent.UnBookAppointment(
-                            event.id,
-                            event.index
-                        )
-                    )
-                }
-                else -> {}
-            }
-        }
     ) {
         SwipeRefresh(
             state = rememberSwipeRefreshState(isRefreshing),
@@ -118,6 +100,29 @@ fun AppointmentListView(
                 })
         }
     }
+
+
+    if (unBookDialog != null)
+        QuestionDialog(
+            actionButtons = true,
+            title = unBookDialog.title,
+            description = unBookDialog.description,
+            onConfirm = {
+                unBookDialog.dialogEvent?.let {
+                    when (it) {
+                        is DialogEvent.Unbook -> {
+                            viewModel.onTriggerEvent(
+                                AppointmentListEvent.UnBookAppointment(
+                                    it.id,
+                                    it.index
+                                )
+                            )
+                        }
+                    }
+                }
+            }, onDismiss = {
+                viewModel.onTriggerEvent(AppointmentListEvent.DismissDialog)
+            })
 }
 
 

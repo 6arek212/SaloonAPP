@@ -87,8 +87,11 @@ fun WorkerAppointmentsList(
     )
 
     BackHandler(servicesSheetState.isVisible) {
-        scope.launch { appointmentOptionsSheetState.hide() }
         scope.launch { servicesSheetState.hide() }
+    }
+
+    BackHandler(appointmentOptionsSheetState.isVisible) {
+        scope.launch { appointmentOptionsSheetState.hide() }
     }
 
     DefaultScreenUI(
@@ -210,7 +213,7 @@ fun WorkerAppointmentsList(
                         frontLayerContent = {
                             FrontLayer(
                                 appointments = appointments,
-                                showStatusDialog = { id, index ->
+                                showOptionsSheet = { id, index ->
                                     viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
                                     scope.launch { appointmentOptionsSheetState.show() }
                                     viewModel.onTriggerEvent(
@@ -414,7 +417,7 @@ private fun BackLayer(
 @Composable
 private fun FrontLayer(
     appointments: List<Appointment>,
-    showStatusDialog: (String, Int) -> Unit,
+    showOptionsSheet: (String, Int) -> Unit,
     navigateToCreateAppointment: () -> Unit,
 ) {
 
@@ -460,7 +463,7 @@ private fun FrontLayer(
                         2 -> RedDark
                         else -> PurpleDark
                     },
-                    showOptionDialog = { showStatusDialog(item.id, index) }
+                    showOptionDialog = { showOptionsSheet(item.id, index) }
                 )
             }
 
