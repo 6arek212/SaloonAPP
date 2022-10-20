@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -75,7 +77,7 @@ fun WorkerAppointmentsList(
         viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetAppointments)
     }
 
-
+    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     val servicesSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -198,7 +200,10 @@ fun WorkerAppointmentsList(
                                         WorkerAppointmentsListEvent.IncreaseWeekRange
                                     )
                                 },
-                                onSearch = { viewModel.onTriggerEvent(WorkerAppointmentsListEvent.Search) },
+                                onSearch = {
+                                    viewModel.onTriggerEvent(WorkerAppointmentsListEvent.Search)
+                                    focusManager.clearFocus()
+                                },
                                 changeFilter = { filter ->
                                     viewModel.onTriggerEvent(
                                         WorkerAppointmentsListEvent.ChangeFilter(filter)
@@ -233,7 +238,6 @@ fun WorkerAppointmentsList(
 
 
 }
-
 
 
 @Composable
@@ -356,6 +360,9 @@ private fun BackLayer(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Search
                 ),
+                keyboardActions = KeyboardActions(onSearch = {
+                    onSearch()
+                }),
                 onValueChange = { s ->
                     onSearchChange(s)
                 },

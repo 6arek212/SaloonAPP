@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import com.example.ibrasaloonapp.R
 import com.example.ibrasaloonapp.core.TimePatterns
+import com.example.ibrasaloonapp.core.navigateToWhatsapp
 import com.example.ibrasaloonapp.core.stringDateFormat
 import com.example.ibrasaloonapp.domain.model.Appointment
 import com.example.ibrasaloonapp.domain.model.User
@@ -286,34 +289,51 @@ fun WorkerAppointmentCard(
 
                         Spacer(modifier = Modifier.weight(1f))
 
-                        if (appointment.customer != null) {
-                            IconButton(onClick = {
 
-                                when (PackageManager.PERMISSION_GRANTED) {
-                                    ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.CALL_PHONE
-                                    ) -> {
-                                        // Some works that require permission
-                                        val intent = Intent(Intent.ACTION_CALL)
-                                        intent.data =
-                                            Uri.parse("tel:${appointment.customer.phone}")
-                                        startActivity(context, intent, null)
-                                    }
-                                    else -> {
-                                        // Asking for permission
-                                        launcher.launch(Manifest.permission.CALL_PHONE)
-                                    }
+                        if (appointment.customer != null) {
+
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                IconButton(onClick = {
+                                    navigateToWhatsapp(context = context, phone = appointment.customer.phone)
+                                }) {
+                                    Image(
+                                        modifier = Modifier.size(20.dp),
+                                        painter = painterResource(id = R.drawable.whatsapp),
+                                        contentDescription = "Whatsapp"
+                                    )
                                 }
 
-                            }) {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.call),
-                                    contentDescription = "Call",
-                                    tint = Gray1
-                                )
+
+                                IconButton(onClick = {
+
+                                    when (PackageManager.PERMISSION_GRANTED) {
+                                        ContextCompat.checkSelfPermission(
+                                            context,
+                                            Manifest.permission.CALL_PHONE
+                                        ) -> {
+                                            // Some works that require permission
+                                            val intent = Intent(Intent.ACTION_CALL)
+                                            intent.data =
+                                                Uri.parse("tel:${appointment.customer.phone}")
+                                            startActivity(context, intent, null)
+                                        }
+                                        else -> {
+                                            // Asking for permission
+                                            launcher.launch(Manifest.permission.CALL_PHONE)
+                                        }
+                                    }
+
+                                }) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(id = R.drawable.call),
+                                        contentDescription = "Call",
+                                        tint = Gray1
+                                    )
+                                }
                             }
                         }
+
                     }
                 }
             }

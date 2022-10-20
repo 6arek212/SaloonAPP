@@ -7,11 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +31,10 @@ fun AppointmentOptions(
 ) {
     var showHoldAppointment by rememberSaveable {
         mutableStateOf(false)
+    }
+
+    LaunchedEffect(Unit) {
+        showHoldAppointment = false
     }
 
     Column(
@@ -79,7 +80,7 @@ fun AppointmentOptions(
                             onClick = { onUpdate(UpdateAppointmentEvent.UpdateStatus("done")) })
                     }
 
-                    if (appointment?.status != "hold")
+                    if (appointment?.status != "hold" && appointment?.service != null)
                         item {
                             AppointmentOptionCard(
                                 icon = Icons.Outlined.WorkOutline,
