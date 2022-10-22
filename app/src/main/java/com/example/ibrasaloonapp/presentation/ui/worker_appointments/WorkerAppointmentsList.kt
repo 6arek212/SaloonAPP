@@ -210,8 +210,10 @@ fun WorkerAppointmentsList(
                                     )
                                 },
                                 showServicesBottomSheet = {
-                                    viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
-                                    scope.launch { servicesSheetState.show() }
+                                    scope.launch {
+                                        servicesSheetState.show()
+                                        viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
+                                    }
                                 }
                             )
                         },
@@ -219,14 +221,17 @@ fun WorkerAppointmentsList(
                             FrontLayer(
                                 appointments = appointments,
                                 showOptionsSheet = { id, index ->
-                                    viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
-                                    scope.launch { appointmentOptionsSheetState.show() }
-                                    viewModel.onTriggerEvent(
-                                        WorkerAppointmentsListEvent.UpdateAppointmentId(
-                                            id = id,
-                                            index = index
+                                    scope.launch {
+                                        appointmentOptionsSheetState.show()
+                                        viewModel.onTriggerEvent(WorkerAppointmentsListEvent.GetServices)
+                                        viewModel.onTriggerEvent(
+                                            WorkerAppointmentsListEvent.UpdateAppointmentId(
+                                                id = id,
+                                                index = index
+                                            )
                                         )
-                                    )
+                                    }
+
                                 },
                                 navigateToCreateAppointment = navigateToCreateAppointment
                             )
